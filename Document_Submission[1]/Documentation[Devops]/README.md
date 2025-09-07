@@ -1,1 +1,1 @@
-Documentation of the process of building the Project.
+# Documentation of the process of building the Project.
