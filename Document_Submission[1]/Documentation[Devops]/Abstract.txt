@@ -1,3 +1,22 @@
 Summary: The Logistics and Delivery Management System is a project that manages order placement, shipment tracking, delivery scheduling, and warehouse inventory. 
 It includes modules for users (admin, customer, delivery agent), vehicles, and orders with features like order status updates, route management, and billing.
 The system simulates real-world logistics operations using Java classes, inheritance, and file/database handling.
+
+With the help of the front-end platform, the users will have access to a set of operations
+The operations are :
+1. To request a shipment from a source location to another destination location
+2. To request purchase of product from the set of available retailers [ The retailers whose data has been listed in the DB]
+3. Request vehicle for transportation.
+4. Get updates regarding the above two operations.
+5. Payment feature to pay the delivery agent.
+
+The admin will be responsible for :
+1. Addition of vendors, warehouse, vehicle management. Validating the above by verifying their documents.
+2. Checking the delivery traffic for any issues [ issues include overload on certain routes, lack of delivery agents in certain areas].
+3. Addressing the concerns of users which will include their suggestions, issues faced by them and anything else which requires system admins response.
+
+The GUI would be roughly as follows :
+1. Login Page : Individuals can login as User, Admin, or Delivery Agent[It consists of the actual drivers and warehouse managers].
+2. User Page : Dashboard showing user history [Chart would be better ] and a navbar. The navbar will have path to the sections for the operations available for the user.
+3. Admin Page : *Fill in this section*
+4. Delivery Agent : Dashboard for past deliveries. Incase of warehouse managers, summary of the warehouse contents. List of tasks pending and available. The operations available wil be listed under navbar which will have further implementations.
