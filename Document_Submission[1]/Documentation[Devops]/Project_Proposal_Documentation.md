@@ -1,5 +1,5 @@
 # Project Title : Logistics and Delivery management System
-## Team Members : [Alan Joy](https://github.com/awaken-soul) [Deepa Mary Jose](https://github.com/deepamj) [Devananda Sumod](https://github.com/devanandasumod) [ S V Anupama](https://github.com/Anuvenu2006) [Jairaj] (https://github.com/jairajrenjith)
+## Team Members : [Alan Joy](https://github.com/awaken-soul) [Deepa Mary Jose](https://github.com/deepamj) [Devananda Sumod](https://github.com/devanandasumod) [ S V Anupama](https://github.com/Anuvenu2006) [Jairaj](https://github.com/jairajrenjith)
 ## Course : Object Oriented Programming
 ## Faculty : Piyush
 ## Objective of Project : 
