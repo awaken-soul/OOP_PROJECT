@@ -1,1 +1,7 @@
-Problem Statement : The Logistics and Delivery Management System is a project that manages order placement, shipment tracking, delivery scheduling, and warehouse inventory. It includes modules for users (admin, customer, delivery agent), vehicles, and orders with features like order status updates, route management, and billing. The system simulates real-world logistics operations using Java classes, inheritance, and file/database handling.
+The Logistics and Delivery Management System is a project that
+manages order placement, shipment tracking, delivery scheduling,
+and warehouse inventory. It includes modules for users (admin,
+customer, delivery agent), vehicles, and orders with features like
+order status updates, route management, and billing. The system
+simulates real-world logistics operations using Java classes,
+inheritance, and file/database handling.
