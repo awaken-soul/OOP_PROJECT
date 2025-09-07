@@ -7,7 +7,7 @@ The operations are :
 1. To request a shipment from a source location to another destination location
 2. To request purchase of product from the set of available retailers [ The retailers whose data has been listed in the DB]
 3. Request vehicle for transportation.
-4. Get updates regarding the above two operations.
+4. Get updates regarding the above three operations.
 5. Payment feature to pay the delivery agent.
 
 The admin will be responsible for :
@@ -16,7 +16,23 @@ The admin will be responsible for :
 3. Addressing the concerns of users which will include their suggestions, issues faced by them and anything else which requires system admins response.
 
 The GUI would be roughly as follows :
-1. Login Page : Individuals can login as User, Admin, or Delivery Agent[It consists of the actual drivers and warehouse managers].
+1. Login Page : Individuals can login as User, Admin, or Delivery Agent, Warehouse manager.
 2. User Page : Dashboard showing user history [Chart would be better ] and a navbar. The navbar will have path to the sections for the operations available for the user.
 3. Admin Page : *Fill in this section*
-4. Delivery Agent : Dashboard for past deliveries. Incase of warehouse managers, summary of the warehouse contents. List of tasks pending and available. The operations available wil be listed under navbar which will have further implementations.
+4. Delivery Agent and Warehouse Manager: Dashboard for past deliveries. Incase of warehouse managers, summary of the warehouse contents. List of tasks pending and available. The operations available wil be listed under navbar which will have further implementations.
+
+Each  individual will have the following in common : Personal Information.
+
+Interface/Abstraction of the features :
+1. Shipment of product : Class defination for different physical components required for the system [ Product, Delivery Agent, Warehouse and Warehouse, Vehicles [additonal classes if needed in future will be added] ]. The class defination will have the methods for the behaviour of the concerned component. When a Product object is required to be shipped. The software will then check for the available delivery agents under the DB for the same. The process will be finding the agents from pool of available ones based on the size and type of package to be delivered, Vehicle prefernce if any [though will not be needed], Distance from pickup location [Work needed to detect closest agent]. The agent's present status will be updated to working and destiantion to warehouse. Once the agent reaches the warehousem, the agent will then will have option to deliver the top product or accept another pickup request. The software will add the object to the warehouse DB queue. The deliveries will be made as per FIFO order. Then the system will request delivery agents to deliver the top product to destination.The same process for finding and delivering to destiantion will be used as did for pickup to warehouse.
+Optional change in flow : Directly pickup to destination if the agent agrees. [ If distance too far the agent could disagree].
+
+2. Purchase of product : Get user input on the the product to purchase. Filter the retailers for the ones with the product and ORDER BY distance from the user location, price, review[might not be added]. Then follow the flow of shipment except there is not intermediate warehouse.
+
+3. Vehicle for Transportation : User will request vehicle for transport based on their requirement, pickup and drop off location. Search the DB for available options and suggest the options to user. The objects will be created as per requirement, and their status will be updated. The user will have access to the info of the driver and their location field could be updated every 5 mins [ Live updation could be implemented but more research needed for that].
+
+The updates for shipment and purchase will be shown after the placement of request under separate section within navbar. The same for transportation will shown on the dashboard for the section inside transportation.
+
+4. Payment : The feature needs for input *Fill in this section*
+
+5. Tracking 
