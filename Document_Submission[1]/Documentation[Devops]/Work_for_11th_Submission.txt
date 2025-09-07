@@ -1,0 +1,3 @@
+Submission : Abstract of the project, Project_Proposal_Document, Project_Design_Document.
+Template : [Project_Proposal_Document](), [Project_Design_Document]().
+Documents to be prepared using Latex
