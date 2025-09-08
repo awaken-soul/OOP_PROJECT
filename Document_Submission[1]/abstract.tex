@@ -1,0 +1,179 @@
+% Logistics_and_Delivery_Management_System.tex
+\documentclass[12pt,a4paper]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{setspace}
+\usepackage{parskip}            % better paragraph spacing
+\usepackage{enumitem}           % control lists
+\usepackage{titlesec}           % control heading spacing
+\usepackage{hyperref}           % clickable links and metadata
+\usepackage{graphicx}           % if you want to add images/diagrams
+\usepackage{fancyhdr}           % header/footer
+\usepackage{caption}
+
+% Document metadata
+\title{Logistics and Delivery Management System}
+\author{GROUP 8 \\ S3 CSE B2 \\ CET, TVM}
+\date{\today}
+
+% Heading spacing adjustments
+\titlespacing*{\section}{0pt}{12pt}{6pt}
+\titlespacing*{\subsection}{0pt}{10pt}{4pt}
+
+% Header / Footer
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{Logistics and Delivery Management System}
+\fancyhead[R]{\thepage}
+\renewcommand{\headrulewidth}{0.4pt}
+
+% Line spacing
+\setstretch{1.15}
+
+\begin{document}
+
+% Cover page
+\begin{titlepage}
+  \centering
+  \vspace*{2.0cm}
+  {\LARGE\bfseries Logistics and Delivery Management System \par}
+  \vspace{1.5cm}
+  {\large \textbf{Object Oriented Programming Project Abstract } \par}
+  \vspace{2.0cm}
+  {\large \textbf{Prepared by:} \\[6pt] Alan Joy, Deepa Mary Jose, Deva Nanda Sumod, Jairaj R, S V Anupama \\[6pt] S3 CSE B2  \\[6pt] CET, TVM \par}
+  \vfill
+  {\large Date: \today \par}
+  \vspace{1.5cm}
+\end{titlepage}
+
+\tableofcontents
+\thispagestyle{empty}
+\clearpage
+
+\section{Introduction}
+The \textbf{Logistics and Delivery Management System} is a Java Swing and SQLite-based project designed to manage order placement, shipment tracking, delivery scheduling, and warehouse inventory.
+
+It simulates real-world logistics operations using object-oriented programming (OOP) concepts such as classes, inheritance, and abstraction, along with database handling.
+
+The system includes modules for Users (Admin, Customer, Delivery Agent, Warehouse Manager), Vehicles, and Orders, with features such as:
+\begin{itemize}[noitemsep]
+  \item Order placement and tracking
+  \item Delivery scheduling
+  \item Route management
+  \item Warehouse inventory monitoring
+  \item Billing and payment
+\end{itemize}
+
+\section{System Features}
+
+\subsection{User Operations}
+\begin{itemize}[noitemsep]
+  \item Request shipment from source to destination.
+  \item Purchase products from available retailers listed in the database.
+  \item Request a vehicle for transportation.
+  \item Get updates for shipments, purchases, and transportation.
+  \item Make payments to delivery agents securely.
+\end{itemize}
+
+\subsection{Admin Responsibilities}
+\begin{itemize}[noitemsep]
+  \item Add vendors, warehouses, and vehicles (with validation through document verification).
+  \item Monitor delivery traffic and detect issues such as route overloads or lack of agents.
+  \item Address user concerns including complaints, suggestions, and technical issues.
+\end{itemize}
+
+\subsection{Delivery Agent Features}
+\begin{itemize}[noitemsep]
+  \item View assigned deliveries on personal dashboard.
+  \item Update status of deliveries (Picked up, In Warehouse, Out for Delivery, Delivered).
+  \item Accept/reject delivery requests (based on distance, workload).
+  \item Manage personal delivery history (past completed deliveries).
+  \item Receive payment confirmation once user completes transaction.
+\end{itemize}
+
+\subsection{Warehouse Manager Features}
+\begin{itemize}[noitemsep]
+  \item Dashboard showing current warehouse stock and inventory summary.
+  \item Manage queue of products waiting for delivery (FIFO scheduling).
+  \item Assign items to delivery agents for outbound shipments.
+  \item Track incoming products arriving at the warehouse.
+  \item Maintain reports on warehouse capacity and performance.
+\end{itemize}
+
+\section{GUI Design}
+The graphical user interface is built using \textbf{Java Swing}, with different views for each user role:
+
+\begin{enumerate}
+  \item \textbf{Login Page} – Role-based login (User, Admin, Delivery Agent, Warehouse Manager).
+  \item \textbf{User Dashboard} – Shows request history in charts, and a navigation bar for shipment, purchase, transport, and payment.
+  \item \textbf{Admin Dashboard} – Charts and tables summarizing system health: active orders, pending deliveries, available vehicles, and warehouse stock. Navigation bar provides access to vendor, warehouse, vehicle, and traffic management modules.
+  \item \textbf{Delivery Agent / Warehouse Manager Dashboard} – Delivery agents see a list of past and ongoing deliveries; warehouse managers see stock summaries, pending shipments, and available delivery agents.
+\end{enumerate}
+
+\section{Interface / Abstraction of Features}
+
+\subsection{Shipment of Product}
+\textbf{Class Components:} Product, DeliveryAgent, Warehouse, Vehicle
+
+\textbf{Workflow:}
+\begin{enumerate}[leftmargin=*,noitemsep]
+  \item User requests shipment \(\rightarrow\) System finds available agent.
+  \item Match based on package size/type, vehicle availability, and proximity.
+  \item Agent status updated to \textit{Working}.
+  \item Product queued in warehouse (FIFO).
+  \item Assigned agent delivers to destination.
+\end{enumerate}
+
+\textit{Optional: Direct pickup-to-destination if feasible.}
+
+\subsection{Purchase of Product}
+\textbf{Class Components:} Product, Retailer, DeliveryAgent, Vehicle
+
+\textbf{Workflow:}
+\begin{enumerate}[leftmargin=*,noitemsep]
+  \item User searches for a product.
+  \item System filters retailers by distance, price, and availability.
+  \item Shipment flow applied directly (without warehouse).
+\end{enumerate}
+
+\subsection{Vehicle for Transportation}
+\textbf{Class Components:} Vehicle, Driver, TransportationRequest
+
+\textbf{Workflow:}
+\begin{enumerate}[leftmargin=*,noitemsep]
+  \item User requests vehicle with pickup/drop details.
+  \item Database searched for available vehicles.
+  \item Suggested options displayed to user with driver details.
+  \item Vehicle object created and location updates simulated every 5 minutes.
+\end{enumerate}
+
+\subsection{Payment Module}
+\textbf{Class Components:} Payment (abstract), CardPayment, UPIPayment, WalletPayment, Invoice
+
+\textbf{Workflow:}
+\begin{enumerate}[leftmargin=*,noitemsep]
+  \item Generate invoice object with order, agent, and cost details.
+  \item User chooses payment method (Card/UPI/Net Banking/Wallet).
+  \item Simulated payment gateway (recorded in SQLite).
+  \item Update invoice and notify agent.
+  \item Maintain payment history in dashboard.
+\end{enumerate}
+
+\subsection{Tracking Module}
+\textbf{Class Components:} Tracking, Order, Vehicle, DeliveryAgent
+
+\textbf{Workflow:}
+\begin{enumerate}[leftmargin=*,noitemsep]
+  \item System generates Tracking ID for each request.
+  \item Agent’s location and order status (Picked Up, In Warehouse, Out for Delivery, Delivered) updated in DB.
+  \item User dashboard shows order progress via progress bar or map-like view.
+  \item Admin dashboard aggregates all deliveries, highlighting delayed shipments.
+  \item Location updates simulated periodically in SQLite.
+\end{enumerate}
+
+\section{Common Features}
+All roles in the system share \textbf{personal information attributes} such as name, contact details, and login credentials, ensuring a uniform data structure.
+
+\section{Conclusion}
+The Logistics and Delivery Management System integrates \textbf{OOP concepts, Swing-based GUI design, and SQLite database handling} to provide a complete solution for shipment requests, product purchases, transportation, payments, and tracking. It acts as a \textbf{mini-simulation of real-world logistics operations}.
+
+\end{document}
