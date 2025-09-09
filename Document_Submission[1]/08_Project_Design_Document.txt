@@ -30,7 +30,7 @@ Major Use Cases:
 •	Admin: Manage warehouses, vendors, vehicles, complaints.
 •	Delivery Agent: Accept/reject delivery, update status.
 •	Warehouse Manager: Monitor inventory, assign delivery.
-(Diagram to be created in draw.io)
+<<Diagram to be created in draw.io and inserted here>>
 
 5. Class Diagram
 Key Classes:
@@ -54,9 +54,10 @@ Relationships:
 •	One Order → One Shipment.
 •	One Warehouse → Many Products.
 •	One Order → One Payment.
+<<insert DB structure diagram here>>
 
 7. UI Wireframe
-Wireframes (to be created using Figma):
+<<Wireframes (to be created using Figma and inserted here)>>
 •	Login Screen → Role selection (Admin, Customer, Delivery Agent, Warehouse Manager).
 •	Customer Dashboard → Place order, view order history, make payment, track order.
 •	Admin Dashboard → Manage vendors, vehicles, complaints, warehouse info.
