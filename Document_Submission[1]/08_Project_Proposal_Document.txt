@@ -1,1 +1,103 @@
+1. Project Title
+
+Logistics and Delivery Management System
+
+2. Team Members
+
+•	Alan Joy
+•	Deepa Mary Jose
+•	Deva Nanda Sumod
+•	Jairaj R
+•	S V Anupama
+
+3. Course
+
+B.Tech – Computer Science and Engineering
+
+4. Faculty
+
+PIYOOSH P
+CSE Department, CET,TVM
+
+5. Objectives of the Project
+
+•	To design and implement a software system that manages logistics operations including order placement, shipment tracking, delivery scheduling, and warehouse inventory.
+•	To simulate real-world delivery operations using object-oriented programming (OOP) principles.
+•	To provide an interactive Java Swing-based GUI for different user roles (Admin, Customer, Delivery Agent, Warehouse Manager).
+•	To ensure secure payment handling and effective tracking of shipments.
+
+6. Abstract
+
+The Logistics and Delivery Management System is a Java Swing and SQLite-based project that simulates real-world logistics operations. It enables users to place and track orders, schedule deliveries, manage routes, monitor warehouse stock, and handle billing and payments.
+The system incorporates modules for Admin, Customer, Delivery Agent, and Warehouse Manager, each with role-specific dashboards and functionalities. By integrating OOP concepts, GUI design, and database handling, the project acts as a mini-simulation of logistics operations and demonstrates how software can streamline delivery networks.
+
+7. Problem Statement
+
+Efficient logistics management is critical for e-commerce and retail businesses. Manual tracking of orders, inefficient vehicle allocation, and unorganized warehouse operations often lead to delays, resource wastage, and poor customer satisfaction. There is a need for an automated system that can handle shipment scheduling, order tracking, warehouse management, and payments in an integrated manner.
+
+8. Scope of the Project
+
+•	The project focuses on designing a desktop-based application using Java Swing and SQLite.
+•	It includes modules for order placement, tracking, vehicle scheduling, warehouse management, and payments.
+•	The system is intended for simulation and academic demonstration, but it can be extended to real-world logistics applications.
+•	Primary users: Admin, Customer, Delivery Agent, Warehouse Manager.
+
+9. Functional Requirements
+
+User
+•	Request shipments, purchase products, and make payments.
+•	View order and shipment tracking updates.
+Admin
+•	Manage vendors, warehouses, and vehicles.
+•	Monitor delivery traffic and resolve complaints.
+Delivery Agent
+•	Accept or reject delivery requests.
+•	Update delivery status and manage delivery history.
+Warehouse Manager
+•	Monitor warehouse inventory.
+•	Assign products to delivery agents.
+•	Track incoming and outgoing shipments.
+Common Features
+•	Role-based authentication.
+•	Shared data attributes (name, contact, login credentials).
+
+10. Tools and Technologies to be Used
+
+•	Programming Language: Java
+•	GUI Framework: Java Swing
+•	Database: SQLite
+•	IDE:  Eclipse
+•	UI design: Figma
+•	Version Control:  GitHub
+•	Documentation: LaTeX 
+
+11. Expected Output
+•	A working desktop-based logistics management system with role-specific dashboards.
+•	A desktop GUI based platform with different user persona which includes User, Admin, Warehouse Manager, Delivery Agent. The platform will implement options to perform the functionalities specified in the abstract.
+
+12. Project Plan and Timeline
+
+Phase	                          Duration	            Activities
+
+Requirement Analysis	          Week 1	      Identify features, user roles, database schema
+System Design	                  Week 2	      UML diagrams, ER diagrams, GUI mockups
+Database Setup & Backend Logic	Week 3-4	    Implement SQLite schema, classes, and OOP logic
+GUI Development	                Week 5-6	    Build Swing-based dashboards
+Module Integration	            Week 7	      Connect backend with frontend
+Testing & Debugging	            Week 8	      Unit tests, system testing
+Documentation & Finalization	  Week 9	      Prepare user manual, report, presentation
+
+14. Expected Deliverables
+
+•	System design 
+•	Working software (Java desktop app)
+•	User manual 
+•	Final project report
+•	Project presentation
+________________________________________
+15. References
+
+1.	JAVA Official Documentation
+2.	Tutorials Point for Simpler Reference
+
 
