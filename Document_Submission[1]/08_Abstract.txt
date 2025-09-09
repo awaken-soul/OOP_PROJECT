@@ -1,119 +1,26 @@
-Logistics and Delivery Management System 
+Logistics and Delivery Management System
 
-1 Introduction
+1. Introduction
+The Logistics and Delivery Management System is a desktop application developed using Java Swing and SQLite, designed to simulate real-world logistics operations. It applies Object-Oriented Programming (OOP) concepts such as classes, inheritance, abstraction, and polymorphism to model entities including Users, Orders, Shipments, Vehicles, Payments, and Warehouses. The system integrates GUI design with database management to provide a complete logistics workflow simulation.
 
-The Logistics and Delivery Management System is a Java Swing and SQLite-based
-project designed to manage order placement, shipment tracking, delivery scheduling, and
-warehouse inventory.
-It simulates real-world logistics operations using object-oriented programming (OOP)
-concepts such as classes, inheritance, and abstraction, along with database handling.
+2. User Roles and Features
+- Customer: Can place and track orders, request shipments, search and purchase products, request vehicles, and make secure payments.
+- Admin: Adds and manages vendors, warehouses, and vehicles with validation, monitors delivery traffic, and addresses complaints and system issues.
+- Delivery Agent: Views assigned deliveries, updates order status (Picked Up, In Warehouse, Out for Delivery, Delivered), accepts/rejects requests based on workload, manages delivery history, and receives payment confirmations.
+- Warehouse Manager: Monitors stock, manages product queues using FIFO scheduling, assigns items to delivery agents, tracks incoming shipments, and maintains warehouse performance reports.
 
-The system includes modules for Users (Admin, Customer, Delivery Agent, Warehouse
-Manager), Vehicles, and Orders, with features such as:
-• Order placement and tracking
-• Delivery scheduling
-• Route management
-• Warehouse inventory monitoring
-• Billing and payment
+3. Core Modules
+- Shipment of Product: Handles user requests, assigns delivery agents based on proximity and availability, queues products in warehouses, and manages delivery to destinations.
+- Purchase of Product: Facilitates product search, retailer selection, and direct shipment without warehouse involvement.
+- Vehicle Management: Users request vehicles; system checks availability, provides driver details, and simulates location updates.
+- Payment Module: Supports Card, UPI, Wallet, and Invoice-based payments; maintains transaction history and updates dashboards.
+- Tracking Module: Generates tracking IDs, updates agent locations and order statuses, and provides visual progress tracking for users and admins.
 
-2 System Features
+4. GUI Design
+- Login Page: Role-based authentication for all users.
+- User Dashboard: Displays shipment, purchase, transport, and payment history with charts and progress views.
+- Admin Dashboard: Summarizes system health, including active orders, pending deliveries, available vehicles, and warehouse stock; provides access to vendor, warehouse, and vehicle management modules.
+- Delivery Agent/Warehouse Manager Dashboard: Delivery agents see current and past deliveries; warehouse managers view stock summaries, pending shipments, and agent availability.
 
-2.1 User Operations
-• Request shipment from source to destination.
-• Purchase products from available retailers listed in the database.
-• Request a vehicle for transportation.
-• Get updates for shipments, purchases, and transportation.
-• Make payments to delivery agents securely.
-
-2.2 Admin Responsibilities
-• Add vendors, warehouses, and vehicles (with validation through document verification).
-• Monitor delivery traffic and detect issues such as route overloads or lack of agents.
-• Address user concerns including complaints, suggestions, and technical issues.
-
-2.3 Delivery Agent Features
-• View assigned deliveries on personal dashboard.
-• Update status of deliveries (Picked up, In Warehouse, Out for Delivery, Delivered).
-• Accept/reject delivery requests (based on distance, workload).
-• Manage personal delivery history (past completed deliveries).
-• Receive payment confirmation once user completes transaction.
-
-2.4 Warehouse Manager Features
-• Dashboard showing current warehouse stock and inventory summary.
-• Manage queue of products waiting for delivery (FIFO scheduling).
-• Assign items to delivery agents for outbound shipments.
-• Track incoming products arriving at the warehouse.
-• Maintain reports on warehouse capacity and performance.
-
-3 GUI Design
-
-The graphical user interface is built using Java Swing, with different views for each user
-role:
-1. Login Page – Role-based login (User, Admin, Delivery Agent, Warehouse Manager).
-
-2. User Dashboard – Shows request history in charts, and a navigation bar for
-shipment, purchase, transport, and payment.
-
-3. Admin Dashboard – Charts and tables summarizing system health: active orders,
-pending deliveries, available vehicles, and warehouse stock. Navigation bar provides
-access to vendor, warehouse, vehicle, and traffic management modules.
-
-4. Delivery Agent /Warehouse Manager Dashboard – Delivery agents see a list
-of past and ongoing deliveries; warehouse managers see stock summaries, pending
-shipments, and available delivery agents.
-
-4 Interface / Abstraction of Features
-
-4.1 Shipment of Product
-Class Components: Product, DeliveryAgent, Warehouse, Vehicle
-Workflow:
-1. User requests shipment → System finds available agent.
-2. Match based on package size/type, vehicle availability, and proximity.
-3. Agent status updated to Working.
-4. Product queued in warehouse (FIFO).
-5. Assigned agent delivers to destination.
-Optional: Direct pickup-to-destination if feasible.
-
-4.2 Purchase of Product
-Class Components: Product, Retailer, DeliveryAgent, Vehicle
-Workflow:
-1. User searches for a product.
-2. System filters retailers by distance, price, and availability.
-3. Shipment flow applied directly (without warehouse).
-
-4.3 Vehicle for Transportation
-Class Components: Vehicle, Driver, TransportationRequest
-Workflow:
-1. User requests vehicle with pickup/drop details.
-2. Database searched for available vehicles.
-3. Suggested options displayed to user with driver details.
-4. Vehicle object created and location updates simulated every 5 minutes.
-
-4.4 Payment Module
-Class Components: Payment (abstract), CardPayment, UPIPayment, WalletPayment,
-Invoice
-Workflow:
-1. Generate invoice object with order, agent, and cost details.
-2. User chooses payment method (Card/UPI/Net Banking/Wallet).
-3. Simulated payment gateway (recorded in SQLite).
-4. Update invoice and notify agent.
-5. Maintain payment history in dashboard.
-
-4.5 Tracking Module
-Class Components: Tracking, Order, Vehicle, DeliveryAgent
-Workflow:
-1. System generates Tracking ID for each request.
-2. Agent’s location and order status (Picked Up, In Warehouse, Out for Delivery, Delivered)
-updated in DB.
-3. User dashboard shows order progress via progress bar or map-like view.
-4. Admin dashboard aggregates all deliveries, highlighting delayed shipments.
-5. Location updates simulated periodically in SQLite.
-
-5 Common Features
-All roles in the system share personal information attributes such as name, contact
-details, and login credentials, ensuring a uniform data structure.
-
-6 Conclusion
-The Logistics and Delivery Management System integrates OOP concepts, Swingbased
-GUI design, and SQLite database handling to provide a complete solution
-for shipment requests, product purchases, transportation, payments, and tracking. It
-acts as a mini-simulation of real-world logistics operations.
+5. Conclusion
+By combining OOP principles, interactive GUI design, and SQLite database management, the system provides a comprehensive solution for logistics operations. It supports order placement, tracking, delivery scheduling, vehicle management, payment processing, and inventory monitoring, serving as a practical simulation of real-world logistics workflows and a hands-on implementation of software design concepts.
