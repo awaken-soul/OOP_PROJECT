@@ -18,6 +18,7 @@ The system follows a 3-tier layered architecture:
     o	Java classes implementing logistics functions such as order handling, delivery assignment, warehouse updates, and payment validation.
 3.	Data Layer (Database)
     o	SQLite database with tables for Users, Orders, Deliveries, Warehouse Stock, and Payments.
+<<insert architecture diagram here>>
 
 4. Use Case Diagram
 Actors:
@@ -30,7 +31,8 @@ Major Use Cases:
 •	Admin: Manage warehouses, vendors, vehicles, complaints.
 •	Delivery Agent: Accept/reject delivery, update status.
 •	Warehouse Manager: Monitor inventory, assign delivery.
-<<Diagram to be created in draw.io and inserted here>>
+
+<<Use case Diagram to be created in draw.io and inserted here>>
 
 5. Class Diagram
 Key Classes:
@@ -40,6 +42,7 @@ Key Classes:
 •	DeliveryAgent – methods: acceptDelivery(), updateStatus().
 •	WarehouseManager – methods: monitorStock(), assignProducts().
 •	Order, Shipment, Payment, Inventory – represent business entities.
+
 <<<insert class diagram>>>
 
 6. Database Design
@@ -54,6 +57,7 @@ Relationships:
 •	One Order → One Shipment.
 •	One Warehouse → Many Products.
 •	One Order → One Payment.
+
 <<insert DB structure diagram here>>
 
 7. UI Wireframe
