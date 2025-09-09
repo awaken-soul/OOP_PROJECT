@@ -1,1 +1,101 @@
+1. Introduction
+The Logistics and Delivery Management System is a Java Swing and SQLite-based desktop application designed to simulate real-world logistics operations. It provides role-based dashboards for Admin, Customer, Delivery Agent, and Warehouse Manager, enabling order placement, shipment tracking, vehicle scheduling, warehouse inventory monitoring, and payment handling.
+The project integrates Object-Oriented Programming (OOP) principles, GUI development, and database management to showcase how logistics operations can be digitized and automated.
+
+2. System Overview
+The system aims to solve challenges in order management, shipment tracking, and warehouse coordination. By automating logistics functions, it reduces manual delays and improves operational efficiency.
+Key Modules:
+•	Customer: Place orders, make payments, and track shipments.
+•	Admin: Manage vendors, warehouses, vehicles, and monitor operations.
+•	Delivery Agent: Accept/reject deliveries, update delivery statuses.
+•	Warehouse Manager: Manage stock, assign deliveries, track shipments.
+
+3. Architecture Overview
+The system follows a 3-tier layered architecture:
+1.	Presentation Layer (GUI)
+    o	Java Swing-based role-specific dashboards.
+2.	Application Layer (Business Logic)
+    o	Java classes implementing logistics functions such as order handling, delivery assignment, warehouse updates, and payment validation.
+3.	Data Layer (Database)
+    o	SQLite database with tables for Users, Orders, Deliveries, Warehouse Stock, and Payments.
+
+4. Use Case Diagram
+Actors:
+•	Customer
+•	Admin
+•	Delivery Agent
+•	Warehouse Manager
+Major Use Cases:
+•	Customer: Place order, track shipment, make payment.
+•	Admin: Manage warehouses, vendors, vehicles, complaints.
+•	Delivery Agent: Accept/reject delivery, update status.
+•	Warehouse Manager: Monitor inventory, assign delivery.
+(Diagram to be created in draw.io)
+
+5. Class Diagram
+Key Classes:
+•	User (abstract class) – attributes: userID, name, contact, loginCredentials.
+•	Customer – methods: placeOrder(), trackOrder(), makePayment().
+•	Admin – methods: manageWarehouse(), manageVehicle(), resolveComplaints().
+•	DeliveryAgent – methods: acceptDelivery(), updateStatus().
+•	WarehouseManager – methods: monitorStock(), assignProducts().
+•	Order, Shipment, Payment, Inventory – represent business entities.
+(UML Class Diagram to be included via StarUML/PlantUML)
+
+6. Database Design
+Tables:
+•	Users (userID, name, role, email, password).
+•	Orders (orderID, customerID, product, quantity, status).
+•	Shipments (shipmentID, orderID, agentID, deliveryStatus).
+•	Warehouse (warehouseID, product, stockLevel).
+•	Payments (paymentID, orderID, amount, method, status).
+Relationships:
+•	One Customer → Many Orders.
+•	One Order → One Shipment.
+•	One Warehouse → Many Products.
+•	One Order → One Payment.
+
+7. UI Wireframe
+Wireframes (to be created using Figma):
+•	Login Screen → Role selection (Admin, Customer, Delivery Agent, Warehouse Manager).
+•	Customer Dashboard → Place order, view order history, make payment, track order.
+•	Admin Dashboard → Manage vendors, vehicles, complaints, warehouse info.
+•	Delivery Agent Dashboard → Assigned deliveries, update status, view history.
+•	Warehouse Manager Dashboard → Stock levels, assign products, track shipments.
+
+8. Technology Stack
+•	Programming Language: Java
+•	GUI: Java Swing
+•	Database: SQLite
+•	IDE: Eclipse
+•	Design Tools: Figma (UI), StarUML (UML)
+•	Version Control: GitHub
+•	Documentation: LaTeX
+
+9. Security and Validation
+•	Authentication: Role-based login with encrypted credentials.
+•	Validation: Input validation on order placement, payment fields, and delivery updates.
+•	Database Integrity: Constraints to prevent duplicate orders or invalid stock assignments.
+•	Secure Payments: Dummy simulation of transactions with validation checks.
+
+10. Limitations and Assumptions
+Limitations:
+•	Desktop-only application (not web-enabled).
+•	Payment system is simulated, not integrated with real gateways.
+•	Single warehouse simulation for simplicity.
+Assumptions:
+•	Users provide correct product and delivery information.
+•	Delivery agents and warehouse managers are available during operations.
+•	Database is centralized and accessible by all roles.
+
+11. Appendices
+Glossary of Terms
+•	Shipment: The delivery package linked to an order.
+•	Warehouse Manager: Role responsible for stock management.
+•	Tracking: Monitoring delivery status from dispatch to completion.
+References
+1.	Java Official Documentation – https://docs.oracle.com/javase/
+2.	Tutorials Point – https://www.tutorialspoint.com/java/
+3.	SQLite Documentation – https://www.sqlite.org/docs.html
+
 
