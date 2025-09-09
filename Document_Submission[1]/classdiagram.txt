@@ -1,0 +1,73 @@
+@startuml
+abstract class User {
+  - userID: int
+  - name: String
+  - email: String
+  - password: String
+  - role: String
+  + login()
+  + logout()
+}
+
+class Customer {
+  + placeOrder()
+  + trackOrder()
+  + makePayment()
+}
+
+class Admin {
+  + manageWarehouse()
+  + manageVehicle()
+  + resolveComplaints()
+}
+
+class DeliveryAgent {
+  + acceptDelivery()
+  + updateStatus()
+}
+
+class WarehouseManager {
+  + monitorStock()
+  + assignProducts()
+}
+
+class Order {
+  - orderID: int
+  - customerID: int
+  - product: String
+  - quantity: int
+  - status: String
+}
+
+class Shipment {
+  - shipmentID: int
+  - orderID: int
+  - agentID: int
+  - deliveryStatus: String
+}
+
+class Payment {
+  - paymentID: int
+  - orderID: int
+  - amount: double
+  - method: String
+  - status: String
+}
+
+class Inventory {
+  - warehouseID: int
+  - product: String
+  - stockLevel: int
+}
+
+User <|-- Customer
+User <|-- Admin
+User <|-- DeliveryAgent
+User <|-- WarehouseManager
+
+Customer "1" -- "many" Order
+Order "1" -- "1" Shipment
+Order "1" -- "1" Payment
+WarehouseManager "1" -- "many" Inventory
+DeliveryAgent "1" -- "many" Shipment
+@enduml
