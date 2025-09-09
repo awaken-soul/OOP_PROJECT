@@ -40,7 +40,7 @@ Key Classes:
 •	DeliveryAgent – methods: acceptDelivery(), updateStatus().
 •	WarehouseManager – methods: monitorStock(), assignProducts().
 •	Order, Shipment, Payment, Inventory – represent business entities.
-(UML Class Diagram to be included via StarUML/PlantUML)
+<<<insert class diagram>>>
 
 6. Database Design
 Tables:
@@ -68,7 +68,7 @@ Wireframes (to be created using Figma):
 •	GUI: Java Swing
 •	Database: SQLite
 •	IDE: Eclipse
-•	Design Tools: Figma (UI), StarUML (UML)
+•	Design Tools: Figma (UI), PlantUML (UML)
 •	Version Control: GitHub
 •	Documentation: LaTeX
 
