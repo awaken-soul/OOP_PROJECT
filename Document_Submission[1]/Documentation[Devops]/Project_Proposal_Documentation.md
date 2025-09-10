@@ -10,6 +10,26 @@ The Logistics and Delivery Management System is a project that manages order pla
 It includes modules for users (admin, customer, delivery agent), vehicles, and orders with features like order status updates, route management, and billing.
 The system simulates real-world logistics operations using Java classes, inheritance, and file/database handling.
 ## Scope of the project : 
+The Logistics and Delivery Management System aims to simulate and demonstrate the functioning of a modern logistics network through a desktop-based application.
+### Platform and Architecture
+The system will be developed as a Java Swing desktop application with a backend powered by SQLite.
+It will follow Object-Oriented Programming (OOP) principles to ensure modularity, reusability, and scalability.
+### Functional Scope
+#### Customer Module: Allows customers to place product orders, request shipments, track deliveries, and make secure payments.
+#### Admin Module: Enables administrators to manage vendors, vehicles, warehouses, and monitor delivery flow.
+#### Delivery Agent Module: Provides functionality for agents to accept/reject orders, update delivery status, and maintain delivery records.
+#### Warehouse Manager Module: Facilitates monitoring of warehouse stock, assigning products for delivery, and handling inbound/outbound shipments.
+### Common Features: Includes role-based authentication, shared user attributes (name, contact, login credentials), and a centralized dashboard interface.
+### Non-Functional Scope
+The system will provide a user-friendly interface with Java Swing for intuitive navigation.
+It will ensure basic data integrity and security for payments and user authentication.
+The system will be designed for academic demonstration with lightweight database operations suitable for simulation.
+### Boundaries and Limitations
+The project will not include real-time GPS tracking or large-scale enterprise-level integration.
+It will be limited to a desktop environment and will not support web or mobile platforms in its current version.
+Advanced logistics operations such as AI-based route optimization and integration with external payment gateways are excluded but may be considered in future extensions.
+### Extensibility
+While intended as a prototype for academic purposes, the system can be further extended to support real-world logistics companies by integrating APIs for real-time tracking, online payment gateways, and cloud-based inventory management.
 ## Functional Reuirements :
 1. User Functions
    1. Request Delivery Agent for shipment of product from a certain pickup location to a destiantion.
