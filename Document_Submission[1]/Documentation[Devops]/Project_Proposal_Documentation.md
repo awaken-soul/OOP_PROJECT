@@ -51,6 +51,40 @@ While intended as a prototype for academic purposes, the system can be further e
 # Expected Output : 
 A GUI platform with different user persona which includes User, Warehouse Manager, Retailers, Delivery Agent. The platform will implement options to perform the functionalites specified in the abstract. 
 # Project Plan and timeline :
+## Phase 1 – Planning & UI Design (Week 1–2)
+- Learn Java OOP concepts
+- Create rough Database Diagram
+- Sketch UI Design
+- Write basic Java classes for core entities
+
+## Phase 2 – Core Java & Class Implementation (Week 2–3)
+- Implement core Java classes and methods
+- Add constructors, getters/setters, and simple functionality
+- Write test cases or small drivers
+
+## Phase 3 – Frontend UI with Swing (Week 3–5)
+- Learn Swing basics
+- Build UI screens step by step
+- Connect UI with OOP classes
+- Refactor code for clarity
+
+## Phase 4 – Database Development (Week 5–6)
+- Learn SQLite basics
+- Finalize Database schema
+- Learn JDBC and connect Java to SQLite
+- Test queries through JDBC
+
+## Phase 5 – Full Integration (Week 6–7)
+- Integrate Swing UI, Java OOP classes, and SQLite DB
+- Implement form input to DB storage
+- Retrieve DB records and display in UI
+- Debug errors
+
+## Phase 6 – Testing, Documentation & Buffer (Week 7–8)
+- Test for bugs and edge cases
+- Write documentation and UML diagrams
+- Polish UI and finalize DB
+
 
 # Expected Deliverables
 1. System design
