@@ -1,0 +1,158 @@
+\documentclass[12pt,a4paper]{article}
+\usepackage{enumitem}
+
+\sloppy
+
+\begin{document}
+
+\title{\textbf{Logistics and Delivery Management System}}
+\author{
+  Alan Joy \and
+  Deepa Mary Jose \and
+  Devananda Sumod \and
+  S V Anupama \and
+  Jairaj
+}
+\date{Course: Object Oriented Programming \\ Faculty: Piyush}
+\maketitle
+
+
+\section*{Objective of Project}
+Enable users to request shipment of products, purchase of products and transportation services.
+
+\section*{Abstract}
+The Logistics and Delivery Management System is a Java Swing and SQLite-based application designed to simulate the operations of a logistics network. The system manages order placement, shipment tracking, delivery scheduling, warehouse inventory, and vehicle allocation. It supports multiple user roles including administrators, customers, delivery agents, and warehouse managers, each with role-specific functions such as shipment requests, product purchases, vehicle booking, payment processing, vendor management, and delivery monitoring.  
+
+The architecture follows object-oriented programming principles, employing classes, inheritance, and abstraction to model real-world logistics entities such as products, vehicles, warehouses, and delivery agents. Database integration enables storage and retrieval of user information, orders, and warehouse data, while the GUI provides interactive dashboards tailored for each role.  
+
+Key features include shipment requests with warehouse queuing, purchase flows with retailer selection, vehicle transport scheduling, delivery status updates, and cash-on-delivery payments. Administrators oversee vendor and vehicle management, traffic monitoring, and user concerns, while agents and warehouse managers handle assigned deliveries and stock updates.  
+
+Although limited to desktop simulation without live tracking or online payments, the system provides a practical demonstration of logistics workflows while reinforcing academic concepts in object-oriented programming, GUI development, and database management.  
+
+\section*{Problem Statement}
+The aim of the system is to help users with transportation and shipment service within a single sphere instead of relying on different platforms. The Logistics and Delivery Management System manages order placement, shipment tracking, delivery scheduling, and warehouse inventory. It includes modules for users (admin, customer, delivery agent), vehicles, and orders with features like order status updates, route management, and billing. The system simulates real-world logistics operations using Java classes, inheritance, and file/database handling.
+
+\section*{Scope of the Project}
+The Logistics and Delivery Management System aims to simulate and demonstrate the functioning of a modern logistics network through a desktop-based application.
+
+\subsection*{Platform and Architecture}
+The system will be developed as a Java Swing desktop application with a backend powered by SQLite. It will follow Object-Oriented Programming (OOP) principles to ensure modularity, reusability, and scalability.
+
+\subsection*{Functional Scope}
+\begin{itemize}[left=1.5em]
+  \item \textbf{Customer Module:} Allows customers to place product orders, request shipments, track deliveries, and make secure payments.
+  \item \textbf{Admin Module:} Enables administrators to manage vendors, vehicles, warehouses, and monitor delivery flow.
+  \item \textbf{Delivery Agent Module:} Provides functionality for agents to accept/reject orders, update delivery status, and maintain delivery records.
+  \item \textbf{Warehouse Manager Module:} Facilitates monitoring of warehouse stock, assigning products for delivery, and handling inbound/outbound shipments.
+\end{itemize}
+
+\subsection*{Common Features}
+Role-based authentication, shared user attributes (name, contact, login credentials), and a centralized dashboard interface.
+
+\subsection*{Non-Functional Scope}
+The system will provide a user-friendly interface with Java Swing for intuitive navigation. It will ensure basic data integrity and security for payments and user authentication. The system is designed for academic demonstration with lightweight database operations suitable for simulation.
+
+\subsection*{Boundaries and Limitations}
+The project will not include real-time GPS tracking or enterprise-level integration. It is limited to a desktop environment and does not support web or mobile platforms in its current version. Advanced operations such as AI-based route optimization and integration with external payment gateways are excluded but may be considered in future extensions.
+
+\subsection*{Extensibility}
+While intended as a prototype for academic purposes, the system can be extended to support real-world logistics companies by integrating APIs for real-time tracking, online payment gateways, and cloud-based inventory management.
+
+\section*{Functional Requirements}
+\begin{enumerate}
+  \item \textbf{User Functions}
+  \begin{enumerate}
+    \item Request delivery agent for shipment of product from pickup to destination.
+    \item Request purchase of product from available retailers.
+    \item Request transportation facility.
+  \end{enumerate}
+  \item \textbf{Delivery Agent Functions}
+  \begin{enumerate}
+    \item Accept delivery/pickup requests.
+  \end{enumerate}
+  \item \textbf{Warehouse and Retailer Functions}
+  \begin{enumerate}
+    \item Manage products listed inside.
+    \item Request delivery agents for delivering products.
+  \end{enumerate}
+  \item \textbf{Admin Functions}
+  \begin{enumerate}
+    \item Moderate the system.
+    \item Validate retailers, warehouses, and delivery agents.
+  \end{enumerate}
+\end{enumerate}
+
+\section*{Tools and Technologies to be Used}
+\begin{enumerate}
+  \item Swing for implementing the GUI
+  \item SQLite for DBMS
+  \item JDBC for SQLite connectivity
+  \item Figma for UI Designing
+\end{enumerate}
+
+\section*{Expected Output}
+A GUI platform with different user personas (User, Warehouse Manager, Retailers, Delivery Agent). The platform will implement options to perform the functionalities specified in the abstract.
+
+\section*{Project Plan and Timeline}
+\subsection*{Phase 1 – Planning \& UI Design (Week 1–2)}
+\begin{itemize}
+  \item Learn Java OOP concepts
+  \item Create rough Database Diagram
+  \item Sketch UI Design
+  \item Write basic Java classes for core entities
+\end{itemize}
+
+\subsection*{Phase 2 – Core Java \& Class Implementation (Week 2–3)}
+\begin{itemize}
+  \item Implement core Java classes and methods
+  \item Add constructors, getters/setters, and simple functionality
+  \item Write test cases or small drivers
+\end{itemize}
+
+\subsection*{Phase 3 – Frontend UI with Swing (Week 3–5)}
+\begin{itemize}
+  \item Learn Swing basics
+  \item Build UI screens step by step
+  \item Connect UI with OOP classes
+  \item Refactor code for clarity
+\end{itemize}
+
+\subsection*{Phase 4 – Database Development (Week 5–6)}
+\begin{itemize}
+  \item Learn SQLite basics
+  \item Finalize Database schema
+  \item Learn JDBC and connect Java to SQLite
+  \item Test queries through JDBC
+\end{itemize}
+
+\subsection*{Phase 5 – Full Integration (Week 6–7)}
+\begin{itemize}
+  \item Integrate Swing UI, Java OOP classes, and SQLite DB
+  \item Implement form input to DB storage
+  \item Retrieve DB records and display in UI
+  \item Debug errors
+\end{itemize}
+
+\subsection*{Phase 6 – Testing, Documentation \& Buffer (Week 7–8)}
+\begin{itemize}
+  \item Test for bugs and edge cases
+  \item Write documentation and UML diagrams
+  \item Polish UI and finalize DB
+\end{itemize}
+
+\section*{Expected Deliverables}
+\begin{enumerate}
+  \item System design
+  \item Working GUI App (Swing)
+  \item User manual
+  \item Final project report
+  \item Presentation
+\end{enumerate}
+
+\section*{References}
+\begin{enumerate}
+  \item \href{https://dev.java}{Java Official Documentation}
+  \item \href{https://www.tutorialspoint.com/java/index.htm}{Tutorials Point for Simpler Reference}
+\end{enumerate}
+
+\end{document}
