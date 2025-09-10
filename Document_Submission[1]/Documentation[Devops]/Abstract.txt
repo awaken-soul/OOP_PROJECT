@@ -33,6 +33,5 @@ Optional change in flow : Directly pickup to destination if the agent agrees. [ 
 
 The updates for shipment and purchase will be shown after the placement of request under separate section within navbar. The same for transportation will shown on the dashboard for the section inside transportation.
 
-4. Payment : The feature needs for input *Fill in this section*
-
-5. Tracking 
+4. Payment : Currently set to pay through cash on delivery [ More work needed to check the feasibility on other payment methods]
+5. Tracking : The tracking will currently be done based on Database data. The driver location will not implement real-time as per current plan.
