@@ -164,9 +164,7 @@ public class LoginFrame extends JFrame {
                 new DeliveryAgentDashboard((DeliveryAgent) user).setVisible(true); 
                 break;
             case "Manager":
-                // Placeholder: Launches the Warehouse Manager Dashboard
-                // new WarehouseManagerDashboard((WarehouseManager) user).setVisible(true);
-                JOptionPane.showMessageDialog(this, "Welcome Warehouse Manager: " + user.getName() + ". Dashboard not implemented yet.");
+                new WarehouseManagerDashboard((WarehouseManager) user).setVisible(true); // Launch the Manager Dashboard
                 break;
             default:
                 JOptionPane.showMessageDialog(this, "Unknown role! Cannot launch dashboard.");
