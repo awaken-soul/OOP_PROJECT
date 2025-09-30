@@ -68,11 +68,18 @@ public class Customer extends User {
      */
     @Override
     public boolean login(String enteredEmail, String enteredPassword) {
-        // Placeholder implementation - will be wired to UserService in the next steps
-        System.out.println("Customer login attempted for: " + enteredEmail);
-        return false; 
+        UserService service = new UserService();
+        User authenticatedUser = service.loginUser(enteredEmail, enteredPassword);
+        
+        // Check if authentication succeeded AND the retrieved role matches the expected role
+        if (authenticatedUser != null && authenticatedUser.getRole().equals(this.getRole())) {
+            // If successful, update the current object's state (essential for the session)
+            // Note: For simplicity, the GUI will handle the session object directly from the service return.
+            System.out.println(this.getRole() + " login via service succeeded.");
+            return true;
+        }
+        return false;
     }
-
     /**
      * Handles the customer logout process.
      */
