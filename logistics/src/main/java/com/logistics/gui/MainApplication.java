@@ -4,10 +4,6 @@ import com.logistics.database.DBConnector;
 
 import javax.swing.SwingUtilities;
 
-/**
- * The main entry point for the Logistics and Delivery Management System.
- * Initializes the database and starts the Swing GUI.
- */
 public class MainApplication {
 
     public static void main(String[] args) {
@@ -18,10 +14,8 @@ public class MainApplication {
         
         // 2. Start the Swing Frontend on the Event Dispatch Thread (EDT)
         SwingUtilities.invokeLater(() -> {
-            // Placeholder: The actual GUI will be initialized here
-            System.out.println("GUI initialization started...");
-            
-            // new LoginFrame().setVisible(true); // Uncomment when LoginFrame is created
+            System.out.println("Launching Login Frame...");
+            new LoginFrame().setVisible(true); // Launch the login screen
         });
         
         System.out.println("System initialization complete.");
