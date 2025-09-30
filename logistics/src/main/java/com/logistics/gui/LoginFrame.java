@@ -21,7 +21,6 @@ public class LoginFrame extends JFrame {
     private final JPasswordField passwordField;
     private final JComboBox<String> roleSelector;
     private final JLabel messageLabel;
-
     public LoginFrame() {
         super("Logistics & Delivery Management System - Login");
         this.userService = new UserService(); // Initialize the service layer
