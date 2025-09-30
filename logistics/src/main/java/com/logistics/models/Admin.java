@@ -59,10 +59,18 @@ public class Admin extends User {
     // --- ABSTRACT METHOD IMPLEMENTATIONS ---
     
     @Override
-    public boolean login(String enteredEmail, String enteredPassword) { 
-        // Delegated to UserService: attempts to authenticate against the DB.
-        System.out.println("Admin login attempted for: " + enteredEmail);
-        return false; 
+    public boolean login(String enteredEmail, String enteredPassword) {
+        UserService service = new UserService();
+        User authenticatedUser = service.loginUser(enteredEmail, enteredPassword);
+    
+        // Check if authentication succeeded AND the retrieved role matches the expected role
+        if (authenticatedUser != null && authenticatedUser.getRole().equals(this.getRole())) {
+            // If successful, update the current object's state (essential for the session)
+            // Note: For simplicity, the GUI will handle the session object directly from the service return.
+            System.out.println(this.getRole() + " login via service succeeded.");
+            return true;
+        }
+        return false;
     }
 
     @Override
