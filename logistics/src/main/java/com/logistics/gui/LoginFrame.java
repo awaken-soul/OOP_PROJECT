@@ -160,9 +160,8 @@ public class LoginFrame extends JFrame {
                 new AdminDashboard((Admin) user).setVisible(true); 
                 break;
             case "Agent":
-                // Placeholder: Launches the Delivery Agent Dashboard
-                // new AgentDashboard((DeliveryAgent) user).setVisible(true);
-                JOptionPane.showMessageDialog(this, "Welcome Delivery Agent: " + user.getName() + ". Dashboard not implemented yet.");
+                // Launch the Agent Dashboard
+                new DeliveryAgentDashboard((DeliveryAgent) user).setVisible(true); 
                 break;
             case "Manager":
                 // Placeholder: Launches the Warehouse Manager Dashboard
