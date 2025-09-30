@@ -42,7 +42,7 @@ public class LoginFrame extends JFrame {
         JLabel logoLabel = new JLabel("Logistics & Delivery Management System");
         logoLabel.setFont(new Font("Arial", Font.BOLD, 18));
         logoLabel.setForeground(AppColors.PRIMARY_BLUE);
-        // Add placeholder for the logo/illustration
+        [cite_start]// Placeholder for the logo/illustration [cite: 129]
         leftPanel.add(logoLabel); 
         
         add(leftPanel);
@@ -58,7 +58,7 @@ public class LoginFrame extends JFrame {
         gbc.weightx = 1.0;
 
         // Title
-        JLabel loginTitle = new JLabel("Login");
+        [cite_start]JLabel loginTitle = new JLabel("Login"); [cite: 128]
         loginTitle.setFont(new Font("Arial", Font.BOLD, 24));
         loginTitle.setForeground(AppColors.TEXT_BLACK);
         gbc.gridx = 0; gbc.gridy = 0; gbc.gridwidth = 2;
@@ -66,21 +66,21 @@ public class LoginFrame extends JFrame {
 
         // --- Email ---
         gbc.gridy = 1; gbc.gridwidth = 2;
-        rightPanel.add(new JLabel("Email:"), gbc);
+        [cite_start]rightPanel.add(new JLabel("Email:"), gbc); [cite: 128]
         emailField = new JTextField(20);
         gbc.gridy = 2;
         rightPanel.add(emailField, gbc);
 
         // --- Password ---
         gbc.gridy = 3;
-        rightPanel.add(new JLabel("Password:"), gbc);
+        [cite_start]rightPanel.add(new JLabel("Password:"), gbc); [cite: 130]
         passwordField = new JPasswordField(20);
         gbc.gridy = 4;
         rightPanel.add(passwordField, gbc);
 
         // --- Role Selector ---
         gbc.gridy = 5;
-        rightPanel.add(new JLabel("Role Selection:"), gbc);
+        [cite_start]rightPanel.add(new JLabel("Role Selection:"), gbc); [cite: 131]
         String[] roles = {"Customer", "Agent", "Manager", "Admin"};
         roleSelector = new JComboBox<>(roles);
         roleSelector.setBackground(AppColors.BACKGROUND_WHITE);
@@ -88,7 +88,7 @@ public class LoginFrame extends JFrame {
         rightPanel.add(roleSelector, gbc);
 
         // --- Login Button ---
-        JButton loginButton = new JButton("Login");
+        [cite_start]JButton loginButton = new JButton("Login"); [cite: 141]
         loginButton.setBackground(AppColors.PRIMARY_BLUE);
         loginButton.setForeground(AppColors.BACKGROUND_WHITE);
         loginButton.setFont(new Font("Arial", Font.BOLD, 14));
@@ -133,7 +133,6 @@ public class LoginFrame extends JFrame {
                 messageLabel.setForeground(AppColors.ACCENT_GREEN);
                 
                 // Redirect to the appropriate dashboard
-                // NOTE: Dashboard frames are placeholders until they are created
                 redirectToDashboard(user);
                 
                 this.dispose(); // Close the login window
@@ -148,25 +147,28 @@ public class LoginFrame extends JFrame {
     }
 
     /**
-     * Placeholder method to redirect to the correct dashboard based on role.
+     * Redirects to the correct dashboard based on the authenticated user's role.
      */
     private void redirectToDashboard(User user) {
         switch (user.getRole()) {
             case "Customer":
-                // new CustomerDashboard((Customer) user).setVisible(true);
-                JOptionPane.showMessageDialog(this, "Welcome Customer: " + user.getName());
+                // Launch the completed CustomerDashboard
+                new CustomerDashboard((Customer) user).setVisible(true);
                 break;
             case "Admin":
-                // new AdminDashboard((Admin) user).setVisible(true);
-                JOptionPane.showMessageDialog(this, "Welcome Admin: " + user.getName());
+                // Placeholder: Launches the Admin Dashboard (to be created next)
+                // new AdminDashboard((Admin) user).setVisible(true); 
+                JOptionPane.showMessageDialog(this, "Welcome Admin: " + user.getName() + ". Dashboard not implemented yet.");
                 break;
             case "Agent":
+                // Placeholder: Launches the Delivery Agent Dashboard
                 // new AgentDashboard((DeliveryAgent) user).setVisible(true);
-                JOptionPane.showMessageDialog(this, "Welcome Delivery Agent: " + user.getName());
+                JOptionPane.showMessageDialog(this, "Welcome Delivery Agent: " + user.getName() + ". Dashboard not implemented yet.");
                 break;
             case "Manager":
+                // Placeholder: Launches the Warehouse Manager Dashboard
                 // new WarehouseManagerDashboard((WarehouseManager) user).setVisible(true);
-                JOptionPane.showMessageDialog(this, "Welcome Warehouse Manager: " + user.getName());
+                JOptionPane.showMessageDialog(this, "Welcome Warehouse Manager: " + user.getName() + ". Dashboard not implemented yet.");
                 break;
             default:
                 JOptionPane.showMessageDialog(this, "Unknown role! Cannot launch dashboard.");
