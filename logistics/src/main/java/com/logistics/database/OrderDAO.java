@@ -210,4 +210,28 @@ public class OrderDAO {
         }
         return orders;
     }
+    // Inside OrderDAO.java (add this method)
+
+    /**
+     * Updates only the payment status field for an order. Required by PaymentService.
+     * @param orderId The ID of the order to update.
+     * @param newPaymentStatus The new payment status (e.g., 'Paid', 'COD').
+     * @return true if the update was successful.
+     */
+    public boolean updatePaymentStatusField(int orderId, String newPaymentStatus) {
+        String sql = "UPDATE Orders SET payment_status = ?, updated_at = ? WHERE order_id = ?";
+        
+        try (Connection conn = DBConnector.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            
+            pstmt.setString(1, newPaymentStatus);
+            pstmt.setString(2, LocalDateTime.now().toString());
+            pstmt.setInt(3, orderId);
+
+            return pstmt.executeUpdate() > 0;
+        } catch (SQLException e) {
+            System.err.println("DB Error updating order payment status: " + e.getMessage());
+            return false;
+        }
+    }
 }
