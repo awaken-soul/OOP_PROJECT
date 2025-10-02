@@ -1,10 +1,11 @@
-package com.logistics.database;
+]package com.logistics.database;
 
-import com.logistics.models.*; // Import all user models
-import com.logistics.utils.PasswordHasher; // Used here for hashing on creation
+import com.logistics.models.*; // Import all user models (User, Customer, Admin, etc.)
+import com.logistics.utils.PasswordHasher; // Used for hashing/verification
 
 import java.sql.*;
-import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Handles all database operations (CRUD) for the User table.
@@ -110,5 +111,31 @@ public class UserDAO {
             System.err.println("Database error during user retrieval: " + e.getMessage());
         }
         return null; // User not found or error occurred
+    }
+    
+    /**
+     * Retrieves a list of all users whose role is 'Agent' for assignment purposes.
+     * This method is required by OrderService.
+     * @return A List of DeliveryAgent objects.
+     */
+    public List<DeliveryAgent> getAvailableAgents() {
+        List<DeliveryAgent> agents = new ArrayList<>();
+        String sql = "SELECT * FROM User WHERE role = 'Agent'"; 
+
+        try (Connection conn = DBConnector.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql);
+             ResultSet rs = pstmt.executeQuery()) {
+
+            while (rs.next()) {
+                // Use the existing mapper and cast to the specific model
+                User user = mapResultSetToUser(rs); 
+                if (user instanceof DeliveryAgent) {
+                    agents.add((DeliveryAgent) user);
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("DB Error retrieving available agents: " + e.getMessage());
+        }
+        return agents;
     }
 }
