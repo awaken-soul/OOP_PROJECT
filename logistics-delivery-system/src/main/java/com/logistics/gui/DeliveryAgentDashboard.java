@@ -1,15 +1,16 @@
 package com.logistics.gui;
 
 import com.logistics.models.DeliveryAgent;
+import com.logistics.models.Order;
 import com.logistics.services.OrderService;
 import com.logistics.utils.AppColors;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.List; // Added missing import
 
 /**
  * The main dashboard for the Delivery Agent role.
- * Includes panels for assigned deliveries, status updates, and history.
  */
 public class DeliveryAgentDashboard extends JFrame {
 
@@ -50,9 +51,6 @@ public class DeliveryAgentDashboard extends JFrame {
         setVisible(true);
     }
     
-    // ==========================================================
-    // HEADER PANEL
-    // ==========================================================
     private JPanel createHeaderPanel() {
         JPanel headerPanel = new JPanel(new BorderLayout());
         headerPanel.setBackground(AppColors.PRIMARY_BLUE);
@@ -75,20 +73,15 @@ public class DeliveryAgentDashboard extends JFrame {
         return headerPanel;
     }
 
-    // ==========================================================
-    // LEFT PANEL: Assigned Deliveries & History (Matching wireframe)
-    // ==========================================================
     private JPanel createAssignedOrdersPanel() {
         JPanel panel = new JPanel(new BorderLayout(10, 10));
         panel.setBackground(AppColors.SECONDARY_GRAY);
         panel.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
         
-        [cite_start]// --- Assigned Deliveries List (Matching 'Assigned Deliveries' section) [cite: 142] ---
         assignedOrdersList = new JList<>();
         assignedOrdersList.setFont(new Font("Arial", Font.PLAIN, 14));
         assignedOrdersList.setBorder(BorderFactory.createTitledBorder("Assigned Deliveries"));
         
-        // Listener to show details when an item is clicked
         assignedOrdersList.addListSelectionListener(e -> {
             if (!e.getValueIsAdjusting() && assignedOrdersList.getSelectedIndex() != -1) {
                 String selectedOrder = assignedOrdersList.getSelectedValue();
@@ -99,12 +92,11 @@ public class DeliveryAgentDashboard extends JFrame {
 
         panel.add(new JScrollPane(assignedOrdersList), BorderLayout.CENTER);
         
-        [cite_start]// --- History Button (Matching 'History' section) [cite: 145] ---
         JButton historyButton = new JButton("View Delivery History");
         historyButton.setBackground(AppColors.PRIMARY_BLUE);
         historyButton.setForeground(AppColors.BACKGROUND_WHITE);
         historyButton.addActionListener(e -> {
-            agent.maintainDeliveryRecords(); // Log action
+            agent.maintainDeliveryRecords();
             JOptionPane.showMessageDialog(this, "Fetching historical records for Agent " + agent.getUserID());
         });
         panel.add(historyButton, BorderLayout.SOUTH);
@@ -113,8 +105,7 @@ public class DeliveryAgentDashboard extends JFrame {
     }
 
     private void loadAssignedOrders() {
-        // SIMULATION: In a real system, you'd call userDAO.getAssignedOrders(agent.getUserID());
-        // For demonstration, we simulate data:
+        // SIMULATION
         String[] orders = {
             "ID: 101 - Pickup: Warehouse A - Status: Assigned",
             "ID: 105 - Pickup: Customer Z - Status: En Route",
@@ -124,7 +115,6 @@ public class DeliveryAgentDashboard extends JFrame {
     }
     
     private int extractOrderId(String orderString) {
-        // Pull ID from "ID: XXX - ..."
         try {
             return Integer.parseInt(orderString.substring(4, orderString.indexOf(" - ")));
         } catch (Exception e) {
@@ -132,20 +122,15 @@ public class DeliveryAgentDashboard extends JFrame {
         }
     }
 
-    // ==========================================================
-    // RIGHT PANEL: Delivery Details & Status Update (Matching wireframe fields)
-    // ==========================================================
     private JPanel createDeliveryDetailsPanel() {
         JPanel panel = new JPanel(new BorderLayout(10, 10));
         panel.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
         
-        // --- Details Area ---
         deliveryDetailsArea = new JTextArea("Select an assigned delivery on the left to view details...");
         deliveryDetailsArea.setEditable(false);
         deliveryDetailsArea.setBorder(BorderFactory.createTitledBorder("Delivery Information"));
         panel.add(new JScrollPane(deliveryDetailsArea), BorderLayout.CENTER);
         
-        [cite_start]// --- Status Update Panel (Matching fields: Status, Update Status) [cite: 144, 146] ---
         JPanel updatePanel = new JPanel(new GridLayout(3, 1, 5, 5));
         updatePanel.setBorder(BorderFactory.createTitledBorder("Update Status (Order Action)"));
         
@@ -181,11 +166,10 @@ public class DeliveryAgentDashboard extends JFrame {
     }
     
     private void loadDeliveryDetails(int orderId) {
-        // SIMULATION: In a real system, you'd call orderDAO.getOrderById(orderId);
         String details = String.format(
             "Order ID: %d\n" +
-            [cite_start]"Agent ID: %d\n" + // Matching 'ID' field in wireframe [cite: 141]
-            [cite_start]"Address: [Placeholder Address]\n" + // Matching 'Address' field [cite: 143]
+            "Agent ID: %d\n" +
+            "Address: [Placeholder Address]\n" +
             "Vehicle ID: V-404\n" +
             "Pickup: 123 Main St, Warehouse A\n" +
             "Drop-off: 456 Oak Ave, Customer Home\n" +
@@ -206,15 +190,12 @@ public class DeliveryAgentDashboard extends JFrame {
             int orderId = Integer.parseInt(orderIdToUpdateField.getText().trim());
             String newStatus = (String) statusUpdateCombo.getSelectedItem();
             
-            // Call OrderService to update the status and tracking record
-            // For simulation, we assume agentAcceptsDelivery can be reused for any status update
             boolean success = orderService.agentAcceptsDelivery(orderId, agent.getUserID());
             
             if (success) {
-                // Log and refresh UI message
                 updateMessageLabel.setText("Order " + orderId + " status updated to: " + newStatus);
                 updateMessageLabel.setForeground(AppColors.ACCENT_GREEN);
-                agent.updateStatus(orderId, newStatus); // Log action in console
+                agent.updateStatus(orderId, newStatus);
             } else {
                 updateMessageLabel.setText("Update failed! Check if Order ID is valid.");
                 updateMessageLabel.setForeground(AppColors.WARNING_RED);
