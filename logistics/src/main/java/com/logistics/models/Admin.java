@@ -61,14 +61,13 @@ public class Admin extends User {
     // --- ABSTRACT METHOD IMPLEMENTATIONS ---
     
     @Override
-    public boolean login(String enteredEmail, String enteredPassword) {
-        // Fix: UserService is now accessible due to the import.
+    public boolean login(String enteredEmail, String enteredPassword) { 
+        // FIX: Implement the correct wiring logic
         UserService service = new UserService();
         User authenticatedUser = service.loginUser(enteredEmail, enteredPassword);
     
         // Check if authentication succeeded AND the retrieved role matches the expected role
         if (authenticatedUser != null && authenticatedUser.getRole().equals(this.getRole())) {
-            // If successful, update the current object's state (essential for the session)
             System.out.println(this.getRole() + " login via service succeeded.");
             return true;
         }
