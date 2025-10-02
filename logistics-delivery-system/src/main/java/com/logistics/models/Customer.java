@@ -1,5 +1,5 @@
 package com.logistics.models;
-
+import com.logistics.services.UserService;
 // Note: This class remains an OOP model. 
 // The 'login' method will be implemented to call the UserService for DB interaction.
 
