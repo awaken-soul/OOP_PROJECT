@@ -1,5 +1,7 @@
 package com.logistics.models;
 
+import com.logistics.services.UserService; // <-- REQUIRED IMPORT HERE
+
 /**
  * Represents the System Administrator. 
  * Manages the core system components, including vendors, vehicles, and user concerns.
@@ -18,7 +20,7 @@ public class Admin extends User {
         super(userID, name, email, passwordHash, "Admin", contactNumber, address);
     }
 
-    // --- ADMIN-SPECIFIC FUNCTIONALITY [cite: 176-178] ---
+    [cite_start]// --- ADMIN-SPECIFIC FUNCTIONALITY [cite: 176-178] ---
     
     /**
      * Oversees the vendor/warehouse management process (add, edit, remove warehouses).
@@ -49,7 +51,7 @@ public class Admin extends User {
     
     /**
      * Validates new vendor accounts (retailers, warehouses, delivery agents) based on documents.
-     * Corresponds to the 'Verify Vendor Data' use case and Admin's role in moderating the system[cite: 64].
+     * [cite_start]Corresponds to the 'Verify Vendor Data' use case and Admin's role in moderating the system[cite: 64].
      */
     public void verifyVendorData(int vendorID, String vendorType) {
         // Calls AdminService to update the 'is_validated' status for a user/retailer.
@@ -60,13 +62,13 @@ public class Admin extends User {
     
     @Override
     public boolean login(String enteredEmail, String enteredPassword) {
+        // Fix: UserService is now accessible due to the import.
         UserService service = new UserService();
         User authenticatedUser = service.loginUser(enteredEmail, enteredPassword);
     
         // Check if authentication succeeded AND the retrieved role matches the expected role
         if (authenticatedUser != null && authenticatedUser.getRole().equals(this.getRole())) {
             // If successful, update the current object's state (essential for the session)
-            // Note: For simplicity, the GUI will handle the session object directly from the service return.
             System.out.println(this.getRole() + " login via service succeeded.");
             return true;
         }
