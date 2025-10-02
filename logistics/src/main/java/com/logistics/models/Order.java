@@ -1,72 +1,96 @@
 package com.logistics.models;
 
+import java.time.LocalDateTime;
+
 /**
- * Represents the System Administrator. 
- * Manages the core system components, including vendors, vehicles, and user concerns.
+ * Represents a single transaction in the logistics system. 
+ * This can be a product Purchase, a cargo Shipment, or a Transport service request.
  */
-public class Admin extends User {
+public class Order {
+    
+    // Attributes from the Orders Table
+    private int orderID;
+    private int userID; // FK to User table (Customer)
+    private Integer productID; // Nullable if shipment/transport only
+    private String orderType; // Enum: Purchase, Shipment, Transport
+    private String sourceAddress; // Pickup location
+    private String destinationAddress; // Delivery location
+    private String status; // Enum: Pending, In Warehouse, Out for Delivery, Delivered
+    private Integer assignedAgentID; // FK to User table (Delivery Agent)
+    private Integer vehicleID; // FK to Vehicle table (optional)
+    private String paymentStatus; // Enum: Pending, Paid, COD
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
     
     // --- CONSTRUCTORS ---
 
-    /** Registration Constructor (New User) */
-    public Admin(String name, String email, String passwordHash, String contactNumber, String address) {
-        super(name, email, passwordHash, "Admin", contactNumber, address);
-    }
-    
-    /** Full Constructor (DB Retrieval) */
-    public Admin(int userID, String name, String email, String passwordHash, String contactNumber, String address) {
-        super(userID, name, email, passwordHash, "Admin", contactNumber, address);
-    }
-
-    // --- ADMIN-SPECIFIC FUNCTIONALITY [cite: 176-178] ---
-    
     /**
-     * Oversees the vendor/warehouse management process (add, edit, remove warehouses).
-     * Corresponds to 'manageWarehouse()' in the Class Diagram.
+     * Creation Constructor: Used when a customer places a new request.
      */
-    public void manageWarehouse() {
-        // Calls AdminService for warehouse CRUD operations.
-        System.out.println("Admin " + getName() + " is managing warehouse data (e.g., adding capacity).");
+    public Order(int userID, Integer productID, String orderType, String sourceAddress, String destinationAddress) {
+        this.userID = userID;
+        this.productID = productID;
+        this.orderType = orderType;
+        this.sourceAddress = sourceAddress;
+        this.destinationAddress = destinationAddress;
+        
+        this.status = "Pending"; 
+        this.paymentStatus = "Pending";
+        this.assignedAgentID = null;
+        this.vehicleID = null;
+        this.orderID = -1;
     }
 
     /**
-     * Manages the vehicle fleet (add, update status, assign to agents).
-     * Corresponds to 'manageVehicle()' in the Class Diagram.
+     * Full Constructor: Used when retrieving an existing order from the database.
      */
-    public void manageVehicle() {
-        // Calls AdminService to interact with VehicleDAO (e.g., set status to 'Maintenance').
-        System.out.println("Admin " + getName() + " is managing vehicle fleet and status.");
-    }
-
-    /**
-     * Reviews and updates the status of user-submitted complaints and issues.
-     * Corresponds to 'resolveComplaints()' in the Class Diagram and 'Manage Issues' use case.
-     */
-    public void resolveComplaints() {
-        // Calls AdminService to retrieve and update complaint records.
-        System.out.println("Admin " + getName() + " is reviewing and resolving user complaints.");
+    public Order(int orderID, int userID, Integer productID, String orderType, String sourceAddress, String destinationAddress, 
+                 String status, Integer assignedAgentID, Integer vehicleID, String paymentStatus, 
+                 LocalDateTime createdAt, LocalDateTime updatedAt) {
+        this.orderID = orderID;
+        this.userID = userID;
+        this.productID = productID;
+        this.orderType = orderType;
+        this.sourceAddress = sourceAddress;
+        this.destinationAddress = destinationAddress;
+        this.status = status;
+        this.assignedAgentID = assignedAgentID;
+        this.vehicleID = vehicleID;
+        this.paymentStatus = paymentStatus;
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
     }
     
-    /**
-     * Validates new vendor accounts (retailers, warehouses, delivery agents) based on documents.
-     * Corresponds to the 'Verify Vendor Data' use case and Admin's role in moderating the system[cite: 64].
-     */
-    public void verifyVendorData(int vendorID, String vendorType) {
-        // Calls AdminService to update the 'is_validated' status for a user/retailer.
-        System.out.println("Admin is validating " + vendorType + " (ID: " + vendorID + ") documents.");
-    }
-
-    // --- ABSTRACT METHOD IMPLEMENTATIONS ---
+    // --- GETTERS AND SETTERS ---
     
-    @Override
-    public boolean login(String enteredEmail, String enteredPassword) { 
-        // Delegated to UserService: attempts to authenticate against the DB.
-        System.out.println("Admin login attempted for: " + enteredEmail);
-        return false; 
-    }
+    public int getOrderID() { return orderID; }
+    public int getUserID() { return userID; }
+    public Integer getProductID() { return productID; }
+    public String getOrderType() { return orderType; }
+    public String getSourceAddress() { return sourceAddress; }
+    public String getDestinationAddress() { return destinationAddress; }
+    public String getStatus() { return status; }
+    public Integer getAssignedAgentID() { return assignedAgentID; }
+    public Integer getVehicleID() { return vehicleID; }
+    public String getPaymentStatus() { return paymentStatus; }
+    public LocalDateTime getCreatedAt() { return createdAt; }
+    public LocalDateTime getUpdatedAt() { return updatedAt; }
 
-    @Override
-    public void logout() {
-        System.out.println("Admin " + getName() + " logged out successfully.");
+    public void setOrderID(int orderID) { this.orderID = orderID; }
+    public void setStatus(String status) { 
+        this.status = status; 
+        this.updatedAt = LocalDateTime.now();
+    }
+    public void setAssignedAgentID(Integer assignedAgentID) { 
+        this.assignedAgentID = assignedAgentID;
+        this.updatedAt = LocalDateTime.now();
+    }
+    public void setVehicleID(Integer vehicleID) { 
+        this.vehicleID = vehicleID;
+        this.updatedAt = LocalDateTime.now();
+    }
+    public void setPaymentStatus(String paymentStatus) {
+        this.paymentStatus = paymentStatus;
+        this.updatedAt = LocalDateTime.now();
     }
 }
