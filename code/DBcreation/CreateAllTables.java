@@ -1,6 +1,6 @@
 //create all tables
 
-package testui;
+package logistics;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
