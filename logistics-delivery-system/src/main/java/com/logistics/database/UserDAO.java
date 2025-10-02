@@ -1,7 +1,7 @@
-]package com.logistics.database;
+package com.logistics.database;
 
-import com.logistics.models.*; // Import all user models (User, Customer, Admin, etc.)
-import com.logistics.utils.PasswordHasher; // Used for hashing/verification
+import com.logistics.models.*; 
+import com.logistics.utils.PasswordHasher; 
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -12,12 +12,6 @@ import java.util.List;
  */
 public class UserDAO {
 
-    /**
-     * Maps a ResultSet row to the appropriate concrete User subclass object.
-     * @param rs The ResultSet containing the user data.
-     * @return A concrete User object (Customer, Admin, etc.) or null if role is unknown.
-     * @throws SQLException if a database access error occurs.
-     */
     private User mapResultSetToUser(ResultSet rs) throws SQLException {
         int userID = rs.getInt("user_id");
         String name = rs.getString("name");
@@ -27,7 +21,6 @@ public class UserDAO {
         String contactNumber = rs.getString("contact_number");
         String address = rs.getString("address");
 
-        // Factory-like pattern to return the correct object type
         return switch (role) {
             case "Customer" -> new Customer(userID, name, email, passwordHash, contactNumber, address);
             case "Admin" -> new Admin(userID, name, email, passwordHash, contactNumber, address);
@@ -40,14 +33,7 @@ public class UserDAO {
         };
     }
 
-    /**
-     * Saves a new User object (must have role and plain password set for hashing) to the database.
-     * @param user The User object to save (the ID will be updated upon success).
-     * @param plainPassword The plain text password entered by the user.
-     * @return true if insertion was successful, false otherwise.
-     */
     public boolean registerNewUser(User user, String plainPassword) {
-        // Hash the password before insertion
         String hashedPassword = PasswordHasher.hashPassword(plainPassword);
         if (hashedPassword == null) return false;
 
@@ -66,11 +52,10 @@ public class UserDAO {
             int rowsAffected = pstmt.executeUpdate();
             
             if (rowsAffected > 0) {
-                // Retrieve the auto-generated user_id
                 try (ResultSet generatedKeys = pstmt.getGeneratedKeys()) {
                     if (generatedKeys.next()) {
                         int newID = generatedKeys.getInt(1);
-                        user.setUserID(newID); // Update the model object with the new ID
+                        user.setUserID(newID);
                         System.out.println("New user registered successfully with ID: " + newID);
                         return true;
                     }
@@ -78,7 +63,6 @@ public class UserDAO {
             }
             return false;
         } catch (SQLException e) {
-            // Handle unique constraint violation (e.g., email already exists)
             if (e.getMessage() != null && e.getMessage().contains("UNIQUE constraint failed")) {
                  System.err.println("Registration failed: Email already in use.");
             } else {
@@ -88,11 +72,6 @@ public class UserDAO {
         }
     }
 
-    /**
-     * Retrieves a User record by email for authentication purposes.
-     * @param email The login email.
-     * @return A User object containing all data, or null if the user is not found.
-     */
     public User getUserByEmail(String email) {
         String sql = "SELECT * FROM User WHERE email = ?";
         
@@ -103,21 +82,15 @@ public class UserDAO {
             
             try (ResultSet rs = pstmt.executeQuery()) {
                 if (rs.next()) {
-                    // Map the found record to a concrete User object
                     return mapResultSetToUser(rs);
                 }
             }
         } catch (SQLException e) {
             System.err.println("Database error during user retrieval: " + e.getMessage());
         }
-        return null; // User not found or error occurred
+        return null;
     }
     
-    /**
-     * Retrieves a list of all users whose role is 'Agent' for assignment purposes.
-     * This method is required by OrderService.
-     * @return A List of DeliveryAgent objects.
-     */
     public List<DeliveryAgent> getAvailableAgents() {
         List<DeliveryAgent> agents = new ArrayList<>();
         String sql = "SELECT * FROM User WHERE role = 'Agent'"; 
@@ -127,7 +100,6 @@ public class UserDAO {
              ResultSet rs = pstmt.executeQuery()) {
 
             while (rs.next()) {
-                // Use the existing mapper and cast to the specific model
                 User user = mapResultSetToUser(rs); 
                 if (user instanceof DeliveryAgent) {
                     agents.add((DeliveryAgent) user);
