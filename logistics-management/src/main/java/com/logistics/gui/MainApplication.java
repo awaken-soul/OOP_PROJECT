@@ -17,8 +17,9 @@ public class MainApplication {
     private static final WarehouseDAO warehouseDAO = new WarehouseDAO();
 
     private static final UserService userService = new UserService(userDAO);
-    private static final OrderService orderService = new OrderService(orderDAO);
     private static final ProductService productService = new ProductService(productDAO);
+    // Updated OrderService instantiation to include productService
+    private static final OrderService orderService = new OrderService(orderDAO, productService);
     private static final VehicleService vehicleService = new VehicleService(vehicleDAO);
     private static final RetailerService retailerService = new RetailerService(retailerDAO);
     private static final WarehouseService warehouseService = new WarehouseService(warehouseDAO);
@@ -46,7 +47,6 @@ public class MainApplication {
                 dashboard.setVisible(true);
                 break;
             case MANAGER:
-                // Add productService to the constructor call
                 dashboard = new WarehouseManagerDashboardFrame(user, orderService, userService, vehicleService, productService);
                 dashboard.setVisible(true);
                 break;
