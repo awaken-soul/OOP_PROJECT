@@ -15,14 +15,17 @@ public class MainApplication {
     private static final VehicleDAO vehicleDAO = new VehicleDAO();
     private static final RetailerDAO retailerDAO = new RetailerDAO();
     private static final WarehouseDAO warehouseDAO = new WarehouseDAO();
+    private static final TrackingDAO trackingDAO = new TrackingDAO(); // New DAO
 
     private static final UserService userService = new UserService(userDAO);
     private static final ProductService productService = new ProductService(productDAO);
-    // Updated OrderService instantiation to include productService
-    private static final OrderService orderService = new OrderService(orderDAO, productService);
     private static final VehicleService vehicleService = new VehicleService(vehicleDAO);
     private static final RetailerService retailerService = new RetailerService(retailerDAO);
     private static final WarehouseService warehouseService = new WarehouseService(warehouseDAO);
+    private static final TrackingService trackingService = new TrackingService(trackingDAO); // New Service
+
+    // Updated OrderService instantiation
+    private static final OrderService orderService = new OrderService(orderDAO, productService, trackingService);
 
     public static void main(String args) {
         SwingUtilities.invokeLater(() -> {
