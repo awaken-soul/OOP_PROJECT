@@ -21,7 +21,7 @@ public class LoginFrame extends JFrame {
     private final JPasswordField passwordField;
     private final JComboBox<String> roleSelector;
     private final JLabel messageLabel;
-    
+
     public LoginFrame() {
         super("Logistics & Delivery Management System - Login");
         this.userService = new UserService(); // Initialize the service layer
@@ -38,27 +38,26 @@ public class LoginFrame extends JFrame {
         JPanel leftPanel = new JPanel();
         leftPanel.setBackground(AppColors.BACKGROUND_WHITE);
         leftPanel.setLayout(new GridBagLayout()); // Center contents
-        
+
         JLabel logoLabel = new JLabel("Logistics & Delivery Management System");
         logoLabel.setFont(new Font("Arial", Font.BOLD, 18));
         logoLabel.setForeground(AppColors.PRIMARY_BLUE);
-        // Placeholder for the logo/illustration (removed malformed tags)
-        leftPanel.add(logoLabel); 
-        
+        leftPanel.add(logoLabel);
+
         add(leftPanel);
 
         // --- 2. Right Panel (Login Form) ---
         JPanel rightPanel = new JPanel();
         rightPanel.setBackground(AppColors.SECONDARY_GRAY);
         rightPanel.setLayout(new GridBagLayout());
-        
+
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(10, 10, 10, 10);
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.weightx = 1.0;
 
         // Title
-        JLabel loginTitle = new JLabel("Login"); // Removed malformed tags
+        JLabel loginTitle = new JLabel("Login");
         loginTitle.setFont(new Font("Arial", Font.BOLD, 24));
         loginTitle.setForeground(AppColors.TEXT_BLACK);
         gbc.gridx = 0; gbc.gridy = 0; gbc.gridwidth = 2;
@@ -66,21 +65,21 @@ public class LoginFrame extends JFrame {
 
         // --- Email ---
         gbc.gridy = 1; gbc.gridwidth = 2;
-        rightPanel.add(new JLabel("Email:"), gbc); // Removed malformed tags
+        rightPanel.add(new JLabel("Email:"), gbc);
         emailField = new JTextField(20);
         gbc.gridy = 2;
         rightPanel.add(emailField, gbc);
 
         // --- Password ---
         gbc.gridy = 3;
-        rightPanel.add(new JLabel("Password:"), gbc); // Removed malformed tags
+        rightPanel.add(new JLabel("Password:"), gbc);
         passwordField = new JPasswordField(20);
         gbc.gridy = 4;
         rightPanel.add(passwordField, gbc);
 
         // --- Role Selector ---
         gbc.gridy = 5;
-        rightPanel.add(new JLabel("Role Selection:"), gbc); // Removed malformed tags
+        rightPanel.add(new JLabel("Role Selection:"), gbc);
         String[] roles = {"Customer", "Agent", "Manager", "Admin"};
         roleSelector = new JComboBox<>(roles);
         roleSelector.setBackground(AppColors.BACKGROUND_WHITE);
@@ -88,21 +87,20 @@ public class LoginFrame extends JFrame {
         rightPanel.add(roleSelector, gbc);
 
         // --- Login Button ---
-        JButton loginButton = new JButton("Login"); // Removed malformed tags
+        JButton loginButton = new JButton("Login");
         loginButton.setBackground(AppColors.PRIMARY_BLUE);
         loginButton.setForeground(AppColors.BACKGROUND_WHITE);
         loginButton.setFont(new Font("Arial", Font.BOLD, 14));
         loginButton.addActionListener(this::handleLogin);
         gbc.gridy = 7; gbc.ipady = 10;
         rightPanel.add(loginButton, gbc);
-        
+
         // --- Message Label (for errors/feedback) ---
         messageLabel = new JLabel(" ");
         messageLabel.setForeground(AppColors.WARNING_RED);
         messageLabel.setHorizontalAlignment(SwingConstants.CENTER);
         gbc.gridy = 8; gbc.ipady = 0;
         rightPanel.add(messageLabel, gbc);
-
 
         add(rightPanel);
         setVisible(true);
@@ -115,9 +113,10 @@ public class LoginFrame extends JFrame {
         String email = emailField.getText().trim();
         String password = new String(passwordField.getPassword());
         String selectedRole = (String) roleSelector.getSelectedItem();
-        
+
         // Input Validation
         if (email.isEmpty() || password.isEmpty() || selectedRole == null) {
+            messageLabel.setForeground(AppColors.WARNING_RED);
             messageLabel.setText("Please enter email, password, and select a role.");
             return;
         }
@@ -127,44 +126,84 @@ public class LoginFrame extends JFrame {
 
         // 2. Process Result
         if (user != null) {
-            // Check if the authenticated user's actual role matches the selected login role
-            if (user.getRole().equals(selectedRole)) {
-                messageLabel.setText("Login Successful! Redirecting...");
+            String actualRole = user.getRole() == null ? "" : user.getRole().trim();
+            if (actualRole.equalsIgnoreCase(selectedRole.trim())) {
                 messageLabel.setForeground(AppColors.ACCENT_GREEN);
-                
-                // Redirect to the appropriate dashboard
-                redirectToDashboard(user);
-                
-                this.dispose(); // Close the login window
+                messageLabel.setText("Login Successful! Redirecting...");
+
+                // Debug log for troubleshooting role/type mismatches
+                System.out.println("Authenticated user class: " + user.getClass().getName() + ", role: '" + actualRole + "'");
+
+                // Redirect on the Event Dispatch Thread and close login frame afterwards
+                SwingUtilities.invokeLater(() -> {
+                    try {
+                        redirectToDashboard(user);
+                        // Dispose the login window only after launching dashboard
+                        this.dispose();
+                    } catch (Throwable ex) {
+                        // Show user-facing error if anything unexpected occurs during dashboard launch
+                        JOptionPane.showMessageDialog(this,
+                                "Internal error launching dashboard. See console for details.",
+                                "Launch Error", JOptionPane.ERROR_MESSAGE);
+                        ex.printStackTrace();
+                    }
+                });
             } else {
-                messageLabel.setText("Login Failed: You are a " + user.getRole() + ", not a " + selectedRole + ".");
                 messageLabel.setForeground(AppColors.WARNING_RED);
+                messageLabel.setText("Login Failed: You are a " + actualRole + ", not a " + selectedRole + ".");
             }
         } else {
-            messageLabel.setText("Login Failed: Invalid email or password.");
             messageLabel.setForeground(AppColors.WARNING_RED);
+            messageLabel.setText("Login Failed: Invalid email or password.");
         }
     }
 
     /**
      * Redirects to the correct dashboard based on the authenticated user's role.
+     * This method defensively handles ClassCastException and reports actionable errors.
      */
     private void redirectToDashboard(User user) {
-        switch (user.getRole()) {
-            case "Customer":
-                new CustomerDashboard((Customer) user).setVisible(true);
-                break;
-            case "Admin":
-                new AdminDashboard((Admin) user).setVisible(true); 
-                break;
-            case "Agent":
-                new DeliveryAgentDashboard((DeliveryAgent) user).setVisible(true); 
-                break;
-            case "Manager":
-                new WarehouseManagerDashboard((WarehouseManager) user).setVisible(true);
-                break;
-            default:
-                JOptionPane.showMessageDialog(this, "Unknown role! Cannot launch dashboard.");
+        String role = user.getRole() == null ? "" : user.getRole().trim();
+        try {
+            switch (role) {
+                case "Customer":
+                    // If UserService returns a generic User instance, dashboards should accept User.
+                    if (user instanceof Customer) {
+                        new CustomerDashboard((Customer) user).setVisible(true);
+                    } else {
+                        new CustomerDashboard(user).setVisible(true);
+                    }
+                    break;
+                case "Admin":
+                    if (user instanceof Admin) {
+                        new AdminDashboard((Admin) user).setVisible(true);
+                    } else {
+                        new AdminDashboard(user).setVisible(true);
+                    }
+                    break;
+                case "Agent":
+                    if (user instanceof DeliveryAgent) {
+                        new DeliveryAgentDashboard((DeliveryAgent) user).setVisible(true);
+                    } else {
+                        new DeliveryAgentDashboard(user).setVisible(true);
+                    }
+                    break;
+                case "Manager":
+                    if (user instanceof WarehouseManager) {
+                        new WarehouseManagerDashboard((WarehouseManager) user).setVisible(true);
+                    } else {
+                        new WarehouseManagerDashboard(user).setVisible(true);
+                    }
+                    break;
+                default:
+                    JOptionPane.showMessageDialog(this, "Unknown role: " + role);
+            }
+        } catch (ClassCastException ex) {
+            JOptionPane.showMessageDialog(this,
+                    "Internal error launching dashboard. User type mismatch: " + ex.getMessage(),
+                    "Launch Error", JOptionPane.ERROR_MESSAGE);
+            ex.printStackTrace();
         }
     }
 }
+
