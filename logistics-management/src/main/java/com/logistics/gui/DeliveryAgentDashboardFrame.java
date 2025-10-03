@@ -17,12 +17,12 @@ public class DeliveryAgentDashboardFrame extends JFrame {
     private final DefaultTableModel tableModel;
     private final User agentUser;
     private final OrderService orderService;
-    private final TrackingService trackingService; // New service
+    private final TrackingService trackingService;
 
     public DeliveryAgentDashboardFrame(User agentUser, OrderService orderService, TrackingService trackingService) {
         this.agentUser = agentUser;
         this.orderService = orderService;
-        this.trackingService = trackingService; // Store the service
+        this.trackingService = trackingService;
 
         setTitle("Delivery Agent Dashboard");
         setSize(900, 600);
@@ -48,7 +48,7 @@ public class DeliveryAgentDashboardFrame extends JFrame {
 
         JPanel bottomPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
         JButton updateStatusButton = new JButton("Update Status");
-        JButton viewHistoryButton = new JButton("View History"); // New button
+        JButton viewHistoryButton = new JButton("View History");
         bottomPanel.add(updateStatusButton);
         bottomPanel.add(viewHistoryButton);
 
@@ -57,7 +57,7 @@ public class DeliveryAgentDashboardFrame extends JFrame {
         add(bottomPanel, BorderLayout.SOUTH);
 
         updateStatusButton.addActionListener(e -> updateSelectedOrderStatus());
-        viewHistoryButton.addActionListener(e -> showTrackingHistory()); // Add action listener
+        viewHistoryButton.addActionListener(e -> showTrackingHistory());
 
         loadAgentOrders();
     }
