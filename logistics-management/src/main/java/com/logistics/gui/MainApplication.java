@@ -46,7 +46,8 @@ public class MainApplication {
                 dashboard.setVisible(true);
                 break;
             case MANAGER:
-                dashboard = new WarehouseManagerDashboardFrame(user, orderService, userService, vehicleService);
+                // Add productService to the constructor call
+                dashboard = new WarehouseManagerDashboardFrame(user, orderService, userService, vehicleService, productService);
                 dashboard.setVisible(true);
                 break;
             default:
