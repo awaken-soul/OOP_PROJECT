@@ -1,9 +1,11 @@
 package com.logistics.gui;
 
 import com.logistics.database.OrderDAO;
+import com.logistics.database.ProductDAO;
 import com.logistics.database.UserDAO;
 import com.logistics.models.User;
 import com.logistics.services.OrderService;
+import com.logistics.services.ProductService;
 import com.logistics.services.UserService;
 
 import javax.swing.*;
@@ -13,8 +15,11 @@ public class MainApplication {
     // Instantiate all DAOs and Services here.
     private static final UserDAO userDAO = new UserDAO();
     private static final OrderDAO orderDAO = new OrderDAO();
+    private static final ProductDAO productDAO = new ProductDAO();
+
     private static final UserService userService = new UserService(userDAO);
     private static final OrderService orderService = new OrderService(orderDAO);
+    private static final ProductService productService = new ProductService(productDAO);
 
     public static void main(String args) {
         SwingUtilities.invokeLater(() -> {
@@ -35,7 +40,7 @@ public class MainApplication {
                 dashboard.setVisible(true);
                 break;
             case CUSTOMER:
-                dashboard = new CustomerDashboardFrame(user, orderService);
+                dashboard = new CustomerDashboardFrame(user, orderService, productService);
                 dashboard.setVisible(true);
                 break;
             case MANAGER:
