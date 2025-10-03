@@ -10,12 +10,14 @@ import java.util.Optional;
 public class OrderService {
 
     private final OrderDAO orderDAO;
-    private final ProductService productService; // New dependency
+    private final ProductService productService;
+    private final TrackingService trackingService; // New dependency
 
-    // Updated constructor to accept ProductService
-    public OrderService(OrderDAO orderDAO, ProductService productService) {
+    // Updated constructor
+    public OrderService(OrderDAO orderDAO, ProductService productService, TrackingService trackingService) {
         this.orderDAO = orderDAO;
         this.productService = productService;
+        this.trackingService = trackingService;
     }
 
     public List<Order> getOrdersForAgent(int agentId) {
@@ -27,7 +29,12 @@ public class OrderService {
     }
 
     public boolean updateOrderStatus(int orderId, String newStatus) {
-        return orderDAO.updateStatus(orderId, newStatus);
+        boolean success = orderDAO.updateStatus(orderId, newStatus);
+        if (success) {
+            // Log this status change to the tracking history
+            trackingService.addTrackingUpdate(orderId, 0, newStatus, "Status updated by agent.");
+        }
+        return success;
     }
 
     public List<Order> getOrdersByStatus(String status) {
@@ -36,28 +43,33 @@ public class OrderService {
 
     public boolean assignOrderToAgent(int orderId, int agentId, int vehicleId) {
         String newStatus = "Out for Delivery";
-        return orderDAO.assignAgentAndVehicle(orderId, agentId, vehicleId, newStatus);
+        boolean success = orderDAO.assignAgentAndVehicle(orderId, agentId, vehicleId, newStatus);
+        if (success) {
+            // Log this assignment to the tracking history
+            trackingService.addTrackingUpdate(orderId, agentId, newStatus, "Assigned by Warehouse Manager.");
+        }
+        return success;
     }
 
-    /**
-     * Creates a new order and automatically decrements the stock for the ordered product.
-     * @param order The Order object to be created.
-     * @return true if the order was created successfully, false otherwise.
-     */
     public boolean createNewOrder(Order order) {
-        // Step 1: Save the new order to the database.
-        boolean orderSaved = orderDAO.save(order);
+        // Step 1: Save the new order and get its generated ID.
+        Optional<Integer> newOrderIdOpt = orderDAO.save(order);
 
-        // Step 2: If the order was saved, update the product stock.
-        if (orderSaved) {
+        if (newOrderIdOpt.isPresent()) {
+            int newOrderId = newOrderIdOpt.get();
+
+            // Step 2: Log the initial "Pending" status to the tracking history.
+            trackingService.addTrackingUpdate(newOrderId, 0, "Pending", "Order placed by customer.");
+
+            // Step 3: Update the product stock.
             Optional<Product> productOpt = productService.getProductById(order.getProductId());
             if (productOpt.isPresent()) {
                 Product product = productOpt.get();
                 int newQuantity = product.getQuantity() - 1;
-                // This will fail gracefully if newQuantity is negative.
                 productService.updateProductQuantity(product.getProductId(), newQuantity);
             }
+            return true;
         }
-        return orderSaved;
+        return false;
     }
 }
