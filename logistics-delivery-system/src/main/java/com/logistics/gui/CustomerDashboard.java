@@ -5,28 +5,19 @@ import com.logistics.models.Order;
 import com.logistics.services.OrderService;
 import com.logistics.services.TrackingService;
 import com.logistics.utils.AppColors;
-
 import javax.swing.*;
 import java.awt.*;
 
-/**
- * The main dashboard for the Customer role.
- * Includes panels for placing new requests and tracking existing orders.
- */
 public class CustomerDashboard extends JFrame {
 
     private final Customer customer;
     private final OrderService orderService;
     private final TrackingService trackingService;
-
-    // Components for Placing Request
     private JComboBox<String> requestTypeCombo;
     private JTextField pickupField;
     private JTextField deliveryField;
     private JTextField productDetailsField;
     private JLabel requestMessageLabel;
-
-    // Components for Tracking Order
     private JTextField trackingIdField;
     private JTextArea trackingResultArea;
 
@@ -35,17 +26,11 @@ public class CustomerDashboard extends JFrame {
         this.customer = customer;
         this.orderService = new OrderService();
         this.trackingService = new TrackingService();
-
-        // --- Frame Setup ---
         setSize(900, 600);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
         getContentPane().setBackground(AppColors.BACKGROUND_WHITE);
-        
-        // --- Header ---
         add(createHeaderPanel(), BorderLayout.NORTH);
-
-        // --- Main Content: Tabbed Pane ---
         JTabbedPane tabbedPane = new JTabbedPane();
         tabbedPane.setFont(new Font("Arial", Font.BOLD, 14));
         tabbedPane.addTab("Place New Request", createRequestPanel());
@@ -77,9 +62,6 @@ public class CustomerDashboard extends JFrame {
         return headerPanel;
     }
     
-    // ==========================================================
-    // PLACE NEW REQUEST PANEL
-    // ==========================================================
     private JPanel createRequestPanel() {
         JPanel panel = new JPanel(new GridBagLayout());
         panel.setBackground(AppColors.SECONDARY_GRAY);
@@ -96,7 +78,6 @@ public class CustomerDashboard extends JFrame {
         gbc.gridx = 0; gbc.gridy = 0; gbc.gridwidth = 2;
         panel.add(title, gbc);
 
-        // Request Type (Purchase, Shipment, Transport)
         gbc.gridy++; gbc.gridwidth = 1;
         panel.add(new JLabel("Request Type:"), gbc);
         requestTypeCombo = new JComboBox<>(new String[]{"Shipment", "Purchase", "Transport"});
@@ -104,28 +85,25 @@ public class CustomerDashboard extends JFrame {
         gbc.gridx = 1;
         panel.add(requestTypeCombo, gbc);
 
-        // Pickup Address
         gbc.gridx = 0; gbc.gridy++;
         panel.add(new JLabel("Pickup Address (Source):"), gbc);
         pickupField = new JTextField(20);
         gbc.gridx = 1;
         panel.add(pickupField, gbc);
 
-        // Delivery Address
+     
         gbc.gridx = 0; gbc.gridy++;
         panel.add(new JLabel("Delivery Address (Destination):"), gbc);
         deliveryField = new JTextField(20);
         gbc.gridx = 1;
         panel.add(deliveryField, gbc);
 
-        // Product/Cargo Details
         gbc.gridx = 0; gbc.gridy++;
         panel.add(new JLabel("Product/Cargo Details:"), gbc);
         productDetailsField = new JTextField(20);
         gbc.gridx = 1;
         panel.add(productDetailsField, gbc);
 
-        // Submit Button
         JButton submitButton = new JButton("Submit Request");
         submitButton.setBackground(AppColors.ACCENT_GREEN);
         submitButton.setForeground(AppColors.BACKGROUND_WHITE);
@@ -134,7 +112,6 @@ public class CustomerDashboard extends JFrame {
         gbc.gridx = 0; gbc.gridy++; gbc.gridwidth = 2; gbc.ipady = 8;
         panel.add(submitButton, gbc);
         
-        // Message Label
         requestMessageLabel = new JLabel(" ");
         requestMessageLabel.setHorizontalAlignment(SwingConstants.CENTER);
         gbc.gridy++; gbc.ipady = 0;
@@ -155,26 +132,19 @@ public class CustomerDashboard extends JFrame {
             return;
         }
         
-        // In a real scenario, we'd look up the productID/warehouseID
-        // For simulation, productID is null as the item isn't tracked yet
-        
-        // Create the Order Model
         Order newOrder = new Order(
             customer.getUserID(),
-            null, // ProductID is Null (handled by warehouse later)
+            null, 
             type,
             pickup,
             delivery
         );
         
-        // Call the OrderService to process and assign the order
         Order placedOrder = orderService.placeNewRequest(newOrder);
 
         if (placedOrder != null) {
             requestMessageLabel.setText("Request successful! Order ID: " + placedOrder.getOrderID() + ". Agent assignment in progress.");
             requestMessageLabel.setForeground(AppColors.PRIMARY_BLUE);
-            
-            // Clear fields after success
             pickupField.setText("");
             deliveryField.setText("");
             productDetailsField.setText("");
@@ -183,16 +153,12 @@ public class CustomerDashboard extends JFrame {
             requestMessageLabel.setForeground(AppColors.WARNING_RED);
         }
     }
-
-    // ==========================================================
-    // TRACK EXISTING ORDER PANEL
-    // ==========================================================
+    
     private JPanel createTrackingPanel() {
         JPanel panel = new JPanel(new BorderLayout(10, 10));
         panel.setBackground(AppColors.BACKGROUND_WHITE);
         panel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
-        // Top Search Panel
         JPanel searchPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 15, 10));
         searchPanel.setBackground(AppColors.SECONDARY_GRAY);
         searchPanel.setBorder(BorderFactory.createLineBorder(AppColors.SECONDARY_GRAY.darker()));
@@ -209,7 +175,6 @@ public class CustomerDashboard extends JFrame {
 
         panel.add(searchPanel, BorderLayout.NORTH);
 
-        // Results Area
         trackingResultArea = new JTextArea("Tracking results will appear here...\n\n(Example: 1 -> Pending, 2 -> Out for Delivery)");
         trackingResultArea.setEditable(false);
         trackingResultArea.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 12));
@@ -228,8 +193,6 @@ public class CustomerDashboard extends JFrame {
         
         try {
             int orderId = Integer.parseInt(idText);
-            
-            // Call the TrackingService to retrieve and format the history
             String history = trackingService.getFormattedTrackingHistory(orderId);
             trackingResultArea.setText(history);
             
