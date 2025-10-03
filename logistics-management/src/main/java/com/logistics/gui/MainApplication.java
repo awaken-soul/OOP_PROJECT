@@ -36,7 +36,7 @@ public class MainApplication {
         JFrame dashboard;
         switch (user.getRole()) {
             case ADMIN:
-                dashboard = new AdminDashboardFrame(user);
+                dashboard = new AdminDashboardFrame(user, vehicleService); // Pass vehicleService
                 dashboard.setVisible(true);
                 break;
             case AGENT:
