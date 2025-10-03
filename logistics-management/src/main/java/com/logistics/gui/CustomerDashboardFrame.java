@@ -18,7 +18,7 @@ public class CustomerDashboardFrame extends JFrame {
     private final ProductService productService;
     private final TrackingService trackingService;
     private final ComplaintService complaintService;
-    private final PaymentService paymentService; // New service
+    private final PaymentService paymentService;
 
     public CustomerDashboardFrame(User user, OrderService orderService, ProductService productService, TrackingService trackingService, ComplaintService complaintService, PaymentService paymentService) {
         this.customerUser = user;
@@ -26,7 +26,7 @@ public class CustomerDashboardFrame extends JFrame {
         this.productService = productService;
         this.trackingService = trackingService;
         this.complaintService = complaintService;
-        this.paymentService = paymentService; // Store the service
+        this.paymentService = paymentService;
 
         setTitle("Customer Dashboard");
         setSize(800, 600);
@@ -52,7 +52,7 @@ public class CustomerDashboardFrame extends JFrame {
         JButton placeOrderButton = new JButton("Place New Order");
         JButton trackOrderButton = new JButton("Track Selected Order");
         JButton fileComplaintButton = new JButton("File a Complaint");
-        JButton payButton = new JButton("Pay for Order"); // New button
+        JButton payButton = new JButton("Pay for Order");
         bottomPanel.add(placeOrderButton);
         bottomPanel.add(trackOrderButton);
         bottomPanel.add(fileComplaintButton);
@@ -65,7 +65,7 @@ public class CustomerDashboardFrame extends JFrame {
         placeOrderButton.addActionListener(e -> showPlaceOrderDialog());
         trackOrderButton.addActionListener(e -> showTrackingHistory());
         fileComplaintButton.addActionListener(e -> showComplaintDialog());
-        payButton.addActionListener(e -> showPaymentDialog()); // Add action listener
+        payButton.addActionListener(e -> showPaymentDialog());
 
         loadCustomerOrders();
     }
@@ -93,9 +93,8 @@ public class CustomerDashboardFrame extends JFrame {
             return;
         }
 
-        // Find the order to get the product ID
         Optional<Order> orderOpt = orderService.getOrdersForCustomer(customerUser.getUserId()).stream()
-              .filter(o -> o.getOrderId() == orderId).findFirst();
+             .filter(o -> o.getOrderId() == orderId).findFirst();
 
         if (orderOpt.isPresent()) {
             Order order = orderOpt.get();
@@ -110,12 +109,11 @@ public class CustomerDashboardFrame extends JFrame {
                         "Confirm Payment", JOptionPane.YES_NO_OPTION);
 
                 if (choice == JOptionPane.YES_OPTION) {
-                    // Simulate payment and update status
                     boolean paymentSuccess = paymentService.processPayment(orderId, amount, "Card");
                     if (paymentSuccess) {
                         orderService.updateOrderPaymentStatus(orderId, "Paid");
                         JOptionPane.showMessageDialog(this, "Payment successful!", "Success", JOptionPane.INFORMATION_MESSAGE);
-                        loadCustomerOrders(); // Refresh table to show "Paid"
+                        loadCustomerOrders();
                     } else {
                         JOptionPane.showMessageDialog(this, "Payment failed. Please try again.", "Error", JOptionPane.ERROR_MESSAGE);
                     }
@@ -124,8 +122,6 @@ public class CustomerDashboardFrame extends JFrame {
         }
     }
 
-    // --- Other existing methods (showComplaintDialog, showTrackingHistory, showPlaceOrderDialog) ---
-    // These methods do not need any changes.
     private void showComplaintDialog() {
         JTextField subjectField = new JTextField();
         JTextArea descriptionArea = new JTextArea(5, 30);
