@@ -22,7 +22,7 @@ public class SignupFrame extends JFrame {
 
         setTitle("Customer Signup");
         setSize(450, 350);
-        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE); // Close only this window
+        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setLocationRelativeTo(null);
         setLayout(new BorderLayout(10, 10));
 
@@ -56,22 +56,18 @@ public class SignupFrame extends JFrame {
         String contact = contactField.getText();
         String address = addressArea.getText();
 
-        if (name.isEmpty() |
-
-| email.isEmpty() |
-| password.isEmpty()) {
+        if (name.isEmpty() || email.isEmpty() || password.isEmpty()) {
             JOptionPane.showMessageDialog(this, "Name, Email, and Password are required.", "Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
 
-        // Create a new User object for the customer
         User newUser = new User(name, email, password, Role.CUSTOMER, contact, address);
 
         boolean success = userService.registerUser(newUser);
 
         if (success) {
             JOptionPane.showMessageDialog(this, "Registration successful! You can now log in.", "Success", JOptionPane.INFORMATION_MESSAGE);
-            this.dispose(); // Close the signup window
+            this.dispose();
         } else {
             JOptionPane.showMessageDialog(this, "Registration failed. The email may already be in use.", "Error", JOptionPane.ERROR_MESSAGE);
         }
