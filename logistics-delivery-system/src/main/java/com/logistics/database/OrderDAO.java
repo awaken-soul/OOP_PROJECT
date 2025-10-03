@@ -7,16 +7,8 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Handles all database operations (CRUD) for the Orders table and associated tracking.
- */
 public class OrderDAO {
 
-    /**
-     * Saves a new Order object to the database.
-     * @param order The Order object to save (orderID will be updated upon success).
-     * @return true if insertion was successful, false otherwise.
-     */
     public boolean saveNewOrder(Order order) {
         String sql = "INSERT INTO Orders (user_id, product_id, order_type, source_address, destination_address, status, payment_status, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
         
@@ -26,7 +18,7 @@ public class OrderDAO {
             LocalDateTime now = LocalDateTime.now();
             
             pstmt.setInt(1, order.getUserID());
-            // SQLite allows NULL for INTEGER types
+    
             if (order.getProductID() == null) {
                 pstmt.setNull(2, Types.INTEGER); 
             } else {
@@ -37,20 +29,18 @@ public class OrderDAO {
             pstmt.setString(5, order.getDestinationAddress());
             pstmt.setString(6, order.getStatus());
             pstmt.setString(7, order.getPaymentStatus());
-            pstmt.setString(8, now.toString()); // Save LocalDateTime as TEXT
+            pstmt.setString(8, now.toString());
             pstmt.setString(9, now.toString());
 
             int rowsAffected = pstmt.executeUpdate();
             
             if (rowsAffected > 0) {
-                // Retrieve the auto-generated order_id
+              
                 try (ResultSet generatedKeys = pstmt.getGeneratedKeys()) {
                     if (generatedKeys.next()) {
                         int newID = generatedKeys.getInt(1);
-                        order.setOrderID(newID); // Update the model object
+                        order.setOrderID(newID); 
                         System.out.println("New order saved successfully with ID: " + newID);
-                        
-                        // Automatically create initial tracking record
                         createInitialTrackingRecord(conn, newID, order.getStatus());
                         
                         return true;
@@ -63,10 +53,7 @@ public class OrderDAO {
             return false;
         }
     }
-
-    /**
-     * Retrieves an Order object by its ID.
-     */
+    
     public Order getOrderById(int orderId) {
         String sql = "SELECT * FROM Orders WHERE order_id = ?";
         try (Connection conn = DBConnector.getConnection();
@@ -85,9 +72,6 @@ public class OrderDAO {
         return null;
     }
 
-    /**
-     * Updates the status and assigned agent ID for an existing order.
-     */
     public boolean updateOrderStatus(int orderId, String newStatus, Integer agentId, Integer vehicleId) {
         String sql = "UPDATE Orders SET status = ?, assigned_agent_id = ?, vehicle_id = ?, updated_at = ? WHERE order_id = ?";
         
@@ -95,7 +79,6 @@ public class OrderDAO {
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
             
             pstmt.setString(1, newStatus);
-            // Handle optional fields (Agent ID and Vehicle ID)
             if (agentId == null) {
                  pstmt.setNull(2, Types.INTEGER);
             } else {
@@ -112,7 +95,6 @@ public class OrderDAO {
             int rowsAffected = pstmt.executeUpdate();
             
             if (rowsAffected > 0) {
-                // Update tracking record
                 updateTrackingRecord(conn, orderId, newStatus, agentId, null); 
                 return true;
             }
@@ -123,11 +105,6 @@ public class OrderDAO {
         }
     }
     
-    // --- Helper Methods ---
-
-    /**
-     * Maps a ResultSet row to an Order object.
-     */
     private Order mapResultSetToOrder(ResultSet rs) throws SQLException {
         return new Order(
             rs.getInt("order_id"),
@@ -145,10 +122,6 @@ public class OrderDAO {
         );
     }
     
-    /**
-     * Creates the initial tracking record for a new order.
-     * Uses the same connection as the order insertion (for transaction control, though simple here).
-     */
     private void createInitialTrackingRecord(Connection conn, int orderId, String status) throws SQLException {
         String sql = "INSERT INTO Tracking (order_id, current_status, updated_at) VALUES (?, ?, ?)";
         
@@ -161,15 +134,8 @@ public class OrderDAO {
         }
     }
     
-    /**
-     * Updates the Tracking record whenever the order status changes.
-     */
     public void updateTrackingRecord(Connection conn, int orderId, String newStatus, Integer agentId, String location) throws SQLException {
         String sql = "INSERT INTO Tracking (order_id, agent_id, current_status, location, updated_at) VALUES (?, ?, ?, ?, ?)";
-        
-        // This method can be public for agent-specific location updates, 
-        // but it's currently called by updateOrderStatus.
-
         try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setInt(1, orderId);
             if (agentId == null) {
@@ -184,13 +150,10 @@ public class OrderDAO {
             System.out.println("Tracking update recorded for Order ID: " + orderId);
         } catch (SQLException e) {
             System.err.println("Error updating tracking record: " + e.getMessage());
-            throw e; // Re-throw to be handled by the caller
+            throw e; 
         }
     }
     
-    /**
-     * Retrieves all orders for a specific user ID.
-     */
     public List<Order> getOrdersByUserId(int userId) {
         List<Order> orders = new ArrayList<>();
         String sql = "SELECT * FROM Orders WHERE user_id = ? ORDER BY created_at DESC";
@@ -210,14 +173,7 @@ public class OrderDAO {
         }
         return orders;
     }
-    // Inside OrderDAO.java (add this method)
-
-    /**
-     * Updates only the payment status field for an order. Required by PaymentService.
-     * @param orderId The ID of the order to update.
-     * @param newPaymentStatus The new payment status (e.g., 'Paid', 'COD').
-     * @return true if the update was successful.
-     */
+   
     public boolean updatePaymentStatusField(int orderId, String newPaymentStatus) {
         String sql = "UPDATE Orders SET payment_status = ?, updated_at = ? WHERE order_id = ?";
         
