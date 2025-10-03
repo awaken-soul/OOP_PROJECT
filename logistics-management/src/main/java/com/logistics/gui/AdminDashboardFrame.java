@@ -1,6 +1,7 @@
 package com.logistics.gui;
 
 import com.logistics.models.User;
+import com.logistics.services.ComplaintService;
 import com.logistics.services.RetailerService;
 import com.logistics.services.VehicleService;
 import com.logistics.services.WarehouseService;
@@ -13,7 +14,7 @@ public class AdminDashboardFrame extends JFrame {
     private final CardLayout cardLayout = new CardLayout();
     private final JPanel contentPanel = new JPanel(cardLayout);
 
-    public AdminDashboardFrame(User adminUser, VehicleService vehicleService, RetailerService retailerService, WarehouseService warehouseService) {
+    public AdminDashboardFrame(User adminUser, VehicleService vehicleService, RetailerService retailerService, WarehouseService warehouseService, ComplaintService complaintService) {
         setTitle("Admin Dashboard");
         setSize(1000, 700);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -56,11 +57,13 @@ public class AdminDashboardFrame extends JFrame {
         welcomePanel.add(new JLabel("Welcome, Admin! Select an option from the left menu."));
         ManageVehiclesPanel manageVehiclesPanel = new ManageVehiclesPanel(vehicleService);
         ManageVendorsPanel manageVendorsPanel = new ManageVendorsPanel(retailerService, warehouseService);
+        ManageComplaintsPanel manageComplaintsPanel = new ManageComplaintsPanel(complaintService); // New panel
 
         // Add panels to the content panel
         contentPanel.add(welcomePanel, "WELCOME");
         contentPanel.add(manageVehiclesPanel, "MANAGE_VEHICLES");
         contentPanel.add(manageVendorsPanel, "MANAGE_VENDORS");
+        contentPanel.add(manageComplaintsPanel, "MANAGE_COMPLAINTS"); // Add new panel
 
         add(navigationPanel, BorderLayout.WEST);
         add(contentPanel, BorderLayout.CENTER);
@@ -68,5 +71,6 @@ public class AdminDashboardFrame extends JFrame {
         // Add ActionListeners to switch panels
         manageVehiclesButton.addActionListener(e -> cardLayout.show(contentPanel, "MANAGE_VEHICLES"));
         manageVendorsButton.addActionListener(e -> cardLayout.show(contentPanel, "MANAGE_VENDORS"));
+        manageComplaintsButton.addActionListener(e -> cardLayout.show(contentPanel, "MANAGE_COMPLAINTS")); // Add action listener
     }
 }
