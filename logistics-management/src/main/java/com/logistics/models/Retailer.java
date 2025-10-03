@@ -6,6 +6,12 @@ public class Retailer {
     private String address;
     private String contactNumber;
 
+    public Retailer(String name, String address, String contactNumber) {
+        this.name = name;
+        this.address = address;
+        this.contactNumber = contactNumber;
+    }
+        
     public Retailer(int retailerId, String name, String address, String contactNumber) {
         this.retailerId = retailerId;
         this.name = name;
