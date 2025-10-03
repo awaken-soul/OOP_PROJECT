@@ -50,6 +50,10 @@ public class OrderService {
         }
         return success;
     }
+    
+    public boolean updateOrderPaymentStatus(int orderId, String newPaymentStatus) {
+        return orderDAO.updatePaymentStatus(orderId, newPaymentStatus);
+    }
 
     public boolean createNewOrder(Order order) {
         // Step 1: Save the new order and get its generated ID.
