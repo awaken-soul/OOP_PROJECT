@@ -13,11 +13,23 @@ public class VehicleService {
         this.vehicleDAO = vehicleDAO;
     }
 
-    /**
-     * Retrieves all vehicles that are currently available for assignment.
-     * @return A list of available Vehicle objects.
-     */
     public List<Vehicle> getAvailableVehicles() {
         return vehicleDAO.findAvailableVehicles();
+    }
+
+    public List<Vehicle> getAllVehicles() {
+        return vehicleDAO.findAll();
+    }
+
+    public boolean addVehicle(Vehicle vehicle) {
+        return vehicleDAO.save(vehicle);
+    }
+
+    public boolean updateVehicle(Vehicle vehicle) {
+        return vehicleDAO.update(vehicle);
+    }
+
+    public boolean deleteVehicle(Vehicle vehicle) {
+        return vehicleDAO.delete(vehicle);
     }
 }
