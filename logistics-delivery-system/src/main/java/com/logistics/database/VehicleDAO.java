@@ -110,4 +110,29 @@ public class VehicleDAO {
         }
         return null;
     }
+    public void initializeTestVehicles() {
+        // We assume the vehicle table is empty or we insert regardless for testing
+        String sql = "INSERT INTO Vehicle (vehicle_id, vehicle_type, license_plate, status, driver_id, current_location) VALUES (?, ?, ?, ?, ?, ?)";
+        
+        try (Connection conn = DBConnector.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            
+            // Vehicle 1: Linked to Bob (ID 102), Status: Available
+            pstmt.setInt(1, 1);
+            pstmt.setString(2, "Truck");
+            pstmt.setString(3, "TL-001");
+            pstmt.setString(4, "Available");
+            pstmt.setInt(5, 102); // Bob's Agent ID
+            pstmt.setString(6, "Warehouse 1 Depot");
+            pstmt.executeUpdate();
+    
+            System.out.println("VehicleDAO: Test vehicle TL-001 injected successfully.");
+            
+        } catch (SQLException e) {
+            // Ignore unique constraint error if run twice
+            if (!e.getMessage().contains("UNIQUE constraint failed")) {
+                System.err.println("DB Error inserting test vehicle: " + e.getMessage());
+            }
+        }
+    }
 }
