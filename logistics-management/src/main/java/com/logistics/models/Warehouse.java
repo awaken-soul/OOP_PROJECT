@@ -7,6 +7,13 @@ public class Warehouse {
     private int capacity;
     private int managerId;
 
+    public Warehouse(String name, String address, int capacity, int managerId) {
+        this.name = name;
+        this.address = address;
+        this.capacity = capacity;
+        this.managerId = managerId;
+    }
+    
     public Warehouse(int warehouseId, String name, String address, int capacity, int managerId) {
         this.warehouseId = warehouseId;
         this.name = name;
