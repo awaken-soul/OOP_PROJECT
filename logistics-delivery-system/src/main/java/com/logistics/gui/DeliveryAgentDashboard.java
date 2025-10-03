@@ -4,20 +4,15 @@ import com.logistics.models.DeliveryAgent;
 import com.logistics.models.Order;
 import com.logistics.services.OrderService;
 import com.logistics.utils.AppColors;
-
 import javax.swing.*;
 import java.awt.*;
-import java.util.List; // Added missing import
+import java.util.List;
 
-/**
- * The main dashboard for the Delivery Agent role.
- */
 public class DeliveryAgentDashboard extends JFrame {
 
     private final DeliveryAgent agent;
     private final OrderService orderService;
-
-    // Components for Assigned Deliveries Panel
+    
     private JList<String> assignedOrdersList;
     private JTextArea deliveryDetailsArea;
     private JComboBox<String> statusUpdateCombo;
@@ -29,23 +24,21 @@ public class DeliveryAgentDashboard extends JFrame {
         this.agent = agent;
         this.orderService = new OrderService();
 
-        // --- Frame Setup ---
+      
         setSize(900, 600);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
         getContentPane().setBackground(AppColors.BACKGROUND_WHITE);
 
-        // --- Header ---
         add(createHeaderPanel(), BorderLayout.NORTH);
 
-        // --- Main Content: Split Pane (Matching wireframe style) ---
+   
         JSplitPane mainSplit = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,
                 createAssignedOrdersPanel(),
                 createDeliveryDetailsPanel());
         mainSplit.setDividerLocation(300);
         add(mainSplit, BorderLayout.CENTER);
 
-        // Initialize Data (Simulated list for demonstration)
         loadAssignedOrders();
         
         setVisible(true);
@@ -105,7 +98,7 @@ public class DeliveryAgentDashboard extends JFrame {
     }
 
     private void loadAssignedOrders() {
-        // SIMULATION
+
         String[] orders = {
             "ID: 101 - Pickup: Warehouse A - Status: Assigned",
             "ID: 105 - Pickup: Customer Z - Status: En Route",
