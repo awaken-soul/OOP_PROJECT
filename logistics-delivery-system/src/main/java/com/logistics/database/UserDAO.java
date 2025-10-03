@@ -157,4 +157,18 @@ public class UserDAO {
         }
         return agents;
     }
+
+    public boolean updateValidationStatus(int userId, boolean approved) {
+        String sql = "UPDATE User SET is_validated = ? WHERE user_id = ?"; 
+        try (Connection conn = DBConnector.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setInt(1, approved ? 1 : 0);
+            pstmt.setInt(2, userId);
+    
+            return pstmt.executeUpdate() > 0;
+        } catch (SQLException e) {
+            System.err.println("DB Error validating user ID " + userId + ": " + e.getMessage());
+            return false;
+        }
+    }
 }
