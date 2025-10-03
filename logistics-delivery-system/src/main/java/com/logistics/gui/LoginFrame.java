@@ -162,48 +162,27 @@ public class LoginFrame extends JFrame {
      * Redirects to the correct dashboard based on the authenticated user's role.
      * This method defensively handles ClassCastException and reports actionable errors.
      */
-    private void redirectToDashboard(User user) {
-        String role = user.getRole() == null ? "" : user.getRole().trim();
-        try {
-            switch (role) {
-                case "Customer":
-                    // If UserService returns a generic User instance, dashboards should accept User.
-                    if (user instanceof Customer) {
-                        new CustomerDashboard((Customer) user).setVisible(true);
-                    } else {
-                        new CustomerDashboard(user).setVisible(true);
-                    }
-                    break;
-                case "Admin":
-                    if (user instanceof Admin) {
-                        new AdminDashboard((Admin) user).setVisible(true);
-                    } else {
-                        new AdminDashboard(user).setVisible(true);
-                    }
-                    break;
-                case "Agent":
-                    if (user instanceof DeliveryAgent) {
-                        new DeliveryAgentDashboard((DeliveryAgent) user).setVisible(true);
-                    } else {
-                        new DeliveryAgentDashboard(user).setVisible(true);
-                    }
-                    break;
-                case "Manager":
-                    if (user instanceof WarehouseManager) {
-                        new WarehouseManagerDashboard((WarehouseManager) user).setVisible(true);
-                    } else {
-                        new WarehouseManagerDashboard(user).setVisible(true);
-                    }
-                    break;
-                default:
-                    JOptionPane.showMessageDialog(this, "Unknown role: " + role);
-            }
-        } catch (ClassCastException ex) {
-            JOptionPane.showMessageDialog(this,
-                    "Internal error launching dashboard. User type mismatch: " + ex.getMessage(),
-                    "Launch Error", JOptionPane.ERROR_MESSAGE);
-            ex.printStackTrace();
-        }
+  private void redirectToDashboard(User user) {
+    switch (user.getRole()) {
+        case "Customer":
+            // FIX: Add (Customer) cast
+            new CustomerDashboard((Customer) user).setVisible(true);
+            break;
+        case "Admin":
+            // FIX: Add (Admin) cast
+            new AdminDashboard((Admin) user).setVisible(true); 
+            break;
+        case "Agent":
+            // FIX: Add (DeliveryAgent) cast
+            new DeliveryAgentDashboard((DeliveryAgent) user).setVisible(true); 
+            break;
+        case "Manager":
+            // FIX: Add (WarehouseManager) cast
+            new WarehouseManagerDashboard((WarehouseManager) user).setVisible(true);
+            break;
+        default:
+            JOptionPane.showMessageDialog(this, "Unknown role! Cannot launch dashboard.");
     }
+}
 }
 
