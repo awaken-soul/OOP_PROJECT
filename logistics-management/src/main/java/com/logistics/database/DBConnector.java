@@ -123,6 +123,19 @@ public class DBConnector {
                     "FOREIGN KEY (order_id) REFERENCES orders(order_id), " +
                     "FOREIGN KEY (agent_id) REFERENCES users(user_id))");
 
+            stmt.execute("CREATE TABLE IF NOT EXISTS complaints (" +
+                    "complaint_id INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                    "user_id INTEGER NOT NULL, " +
+                    "order_id INTEGER, " + // Optional, can be null
+                    "subject TEXT NOT NULL, " +
+                    "description TEXT NOT NULL, " +
+                    "status TEXT NOT NULL, " + // e.g., 'Open', 'Resolved'
+                    "created_at DATETIME DEFAULT CURRENT_TIMESTAMP, " +
+                    "FOREIGN KEY (user_id) REFERENCES users(user_id), " +
+                    "FOREIGN KEY (order_id) REFERENCES orders(order_id))");
+
+            System.out.println("Database schema initialized successfully.");
+
             System.out.println("Database schema initialized successfully.");
 
         } catch (SQLException e) {
