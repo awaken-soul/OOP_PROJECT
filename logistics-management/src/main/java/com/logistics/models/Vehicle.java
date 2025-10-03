@@ -9,6 +9,13 @@ public class Vehicle {
     private int driverId;
     private String currentLocation;
 
+    public Vehicle(String vehicleType, String licensePlate, String status, String currentLocation) {
+        this.vehicleType = vehicleType;
+        this.licensePlate = licensePlate;
+        this.status = status;
+        this.currentLocation = currentLocation;
+    }
+    
     public Vehicle(int vehicleId, String vehicleType, String licensePlate, String status, int driverId, String currentLocation) {
         this.vehicleId = vehicleId;
         this.vehicleType = vehicleType;
