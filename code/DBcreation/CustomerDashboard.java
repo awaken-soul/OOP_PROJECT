@@ -7,12 +7,12 @@ import java.sql.*;
 import java.util.List;
 import javax.swing.table.DefaultTableModel;
 
-public class UserDashboard extends JFrame {
+public class CustomerDashboard extends JFrame {
     private JPanel rightPane;   // right side content area
     private User user;
     private ProductDAO productDAO = new ProductDAO();
 
-    public UserDashboard(User user) {
+    public CustomerDashboard(User user) {
         this.user = user;
         setTitle("Customer Dashboard");
         setSize(900, 600);
