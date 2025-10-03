@@ -225,4 +225,88 @@ public class AdminDashboard extends JFrame {
         
         JButton addButton = new JButton("Add New Vehicle");
         addButton.setBackground(AppColors.PRIMARY_BLUE);
-        addButton.setForeground(AppColors.
+        addButton.setForeground(AppColors.BACKGROUND_WHITE);
+        addButton.addActionListener(e -> handleAddVehicle());
+        formPanel.add(addButton);
+        
+        vehicleMessageLabel = new JLabel(" ");
+        vehicleMessageLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        formPanel.add(vehicleMessageLabel);
+        
+        panel.add(formPanel, BorderLayout.NORTH);
+
+        // Vehicle Status Table (Placeholder)
+        JTextArea statusArea = new JTextArea("VEHICLE STATUS (Table Placeholder)\n- Plate XYZ: Available (Driver 101)\n- Plate ABC: On Delivery (Driver 102)");
+        statusArea.setBorder(BorderFactory.createTitledBorder("Current Fleet Status"));
+        statusArea.setEditable(false);
+        panel.add(new JScrollPane(statusArea), BorderLayout.CENTER);
+        
+        return panel;
+    }
+    
+    private void handleAddVehicle() {
+        try {
+            String type = vehicleTypeField.getText().trim();
+            String plate = licensePlateField.getText().trim();
+            String driverIdStr = driverIdField.getText().trim();
+            Integer driverId = driverIdStr.isEmpty() ? null : Integer.parseInt(driverIdStr);
+            String initialLocation = "Warehouse 1"; 
+
+            if (type.isEmpty() || plate.isEmpty()) {
+                vehicleMessageLabel.setText("Type and Plate are required.");
+                vehicleMessageLabel.setForeground(AppColors.WARNING_RED);
+                return;
+            }
+            
+            boolean success = adminService.addNewVehicle(type, plate, driverId, initialLocation);
+            
+            if (success) {
+                vehicleMessageLabel.setText("Vehicle added successfully!");
+                vehicleMessageLabel.setForeground(AppColors.ACCENT_GREEN);
+                vehicleTypeField.setText("");
+                licensePlateField.setText("");
+                driverIdField.setText("");
+            } else {
+                vehicleMessageLabel.setText("Failed to add vehicle. Plate may exist.");
+                vehicleMessageLabel.setForeground(AppColors.WARNING_RED);
+            }
+        } catch (NumberFormatException e) {
+            vehicleMessageLabel.setText("Driver ID must be a number or left blank.");
+            vehicleMessageLabel.setForeground(AppColors.WARNING_RED);
+        }
+    }
+
+    // --- 3.4 Complaints Panel ---
+    private JPanel createComplaintsPanel() {
+        JPanel panel = new JPanel(new BorderLayout(10, 10));
+        panel.setBackground(AppColors.SECONDARY_GRAY);
+        panel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(AppColors.PRIMARY_BLUE), "Complaint Section"));
+        
+        JTextArea complaintArea = new JTextArea("COMPLAINT SECTION (Log Placeholder)\n- Issue 001: Agent late for pickup (Pending)\n- Issue 002: Item damaged (Closed)");
+        complaintArea.setEditable(false);
+        panel.add(new JScrollPane(complaintArea), BorderLayout.CENTER);
+        
+        JPanel resolutionPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        JTextField complaintIdField = new JTextField(10);
+        JButton resolveButton = new JButton("Resolve Issue");
+        resolveButton.setBackground(AppColors.ACCENT_GREEN);
+        
+        resolutionPanel.add(new JLabel("Issue ID:"));
+        resolutionPanel.add(complaintIdField);
+        resolutionPanel.add(resolveButton);
+
+        resolveButton.addActionListener(e -> {
+            try {
+                int id = Integer.parseInt(complaintIdField.getText().trim());
+                adminService.closeComplaint(id, "Resolved via mediation.");
+                JOptionPane.showMessageDialog(this, "Issue ID " + id + " marked as resolved.");
+            } catch (NumberFormatException ex) {
+                JOptionPane.showMessageDialog(this, "Please enter a valid Issue ID.", "Input Error", JOptionPane.ERROR_MESSAGE);
+            }
+        });
+        
+        panel.add(resolutionPanel, BorderLayout.SOUTH);
+        
+        return panel;
+    }
+}
