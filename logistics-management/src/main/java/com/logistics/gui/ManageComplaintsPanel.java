@@ -99,7 +99,7 @@ public class ManageComplaintsPanel extends JPanel {
 
     private Complaint getSelectedComplaint(int complaintId) {
         return complaintService.getAllComplaints().stream()
-             .filter(c -> c.getComplaintId() == complaintId)
-             .findFirst().orElse(null);
+               .filter(c -> c.getComplaintId() == complaintId)
+               .findFirst().orElse(null);
     }
 }
