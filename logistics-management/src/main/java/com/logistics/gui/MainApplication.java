@@ -38,8 +38,8 @@ public class MainApplication {
                 dashboard.setVisible(true);
                 break;
             case MANAGER:
-                // dashboard = new WarehouseManagerDashboardFrame(user /*, pass services */);
-                JOptionPane.showMessageDialog(null, "Manager Dashboard not yet implemented.");
+                dashboard = new WarehouseManagerDashboardFrame(user);
+                dashboard.setVisible(true);
                 break;
             default:
                 throw new IllegalStateException("Unsupported user role: " + user.getRole());
