@@ -29,7 +29,20 @@ public class OrderDAO implements Dao<Order> {
         }
         return Optional.empty();
     }
-
+     public List<Order> findByUserId(int userId) {
+            List<Order> orders = new ArrayList<>();
+            String sql = "SELECT * FROM orders WHERE user_id =?";
+            try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+                pstmt.setInt(1, userId);
+                ResultSet rs = pstmt.executeQuery();
+                while (rs.next()) {
+                    orders.add(mapRowToOrder(rs));
+                }
+            } catch (SQLException e) {
+                throw new DataAccessException("Error finding orders by user id.", e);
+            }
+            return orders;
+        }
     @Override
     public List<Order> findAll() {
         List<Order> orders = new ArrayList<>();
