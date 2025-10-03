@@ -3,6 +3,7 @@ package com.logistics.services;
 import com.logistics.database.UserDAO;
 import com.logistics.models.User;
 
+import java.util.List;
 import java.util.Optional;
 
 public class UserService {
@@ -24,13 +25,6 @@ public class UserService {
             System.err.println("Registration failed: Email already in use.");
             return false;
         }
-        /**
-     * Retrieves a list of all users who are delivery agents.
-     * @return A list of User objects with the AGENT role.
-     */
-    public List<User> getAvailableAgents() {
-        return userDAO.findAvailableAgents();
-    }
         // Proceed with saving the new user.
         return userDAO.save(user);
     }
@@ -54,5 +48,13 @@ public class UserService {
         }
 
         return Optional.empty(); // Authentication failed
+    }
+
+    /**
+     * Retrieves a list of all users who are delivery agents.
+     * @return A list of User objects with the AGENT role.
+     */
+    public List<User> getAvailableAgents() {
+        return userDAO.findAvailableAgents();
     }
 }
