@@ -27,14 +27,19 @@ public class OrderService {
      * @param orderId The ID of the order to update.
      * @param newStatus The new status to set for the order.
      * @return true if the update was successful, false otherwise.
-     */
-     public List<Order> getOrdersForAgent(int agentId) {
-        return orderDAO.findByAgentId(agentId);
+     */    
+    public List<Order> getOrdersByStatus(String status) {
+        return orderDAO.findByStatus(status);
     }
-
     public List<Order> getOrdersForCustomer(int userId) {
         return orderDAO.findByUserId(userId);
     }
+    public boolean assignOrderToAgent(int orderId, int agentId, int vehicleId) {
+        // Business logic: When an order is assigned, its status should be updated.
+        String newStatus = "Out for Delivery";
+        return orderDAO.assignAgentAndVehicle(orderId, agentId, vehicleId, newStatus);
+    }
+
 
     public boolean updateOrderStatus(int orderId, String newStatus) {
         // Business logic can be added here, e.g., checking if the status transition is valid.
