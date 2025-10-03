@@ -26,8 +26,8 @@ public class MainApplication {
         JFrame dashboard;
         switch (user.getRole()) {
             case ADMIN:
-                // dashboard = new AdminDashboardFrame(/* pass necessary services */);
-                JOptionPane.showMessageDialog(null, "Admin Dashboard not yet implemented.");
+                dashboard = new AdminDashboardFrame(user);
+                dashboard.setVisible(true);
                 break;
             case AGENT:
                 // dashboard = new DeliveryAgentDashboardFrame(user /*, pass services */);
