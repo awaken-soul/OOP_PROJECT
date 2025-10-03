@@ -1,8 +1,24 @@
 package com.logistics.gui;
 
-import com.logistics.database.*;
+import com.logistics.database.ComplaintDAO;
+import com.logistics.database.OrderDAO;
+import com.logistics.database.PaymentDAO;
+import com.logistics.database.ProductDAO;
+import com.logistics.database.RetailerDAO;
+import com.logistics.database.TrackingDAO;
+import com.logistics.database.UserDAO;
+import com.logistics.database.VehicleDAO;
+import com.logistics.database.WarehouseDAO;
 import com.logistics.models.User;
-import com.logistics.services.*;
+import com.logistics.services.ComplaintService;
+import com.logistics.services.OrderService;
+import com.logistics.services.PaymentService;
+import com.logistics.services.ProductService;
+import com.logistics.services.RetailerService;
+import com.logistics.services.TrackingService;
+import com.logistics.services.UserService;
+import com.logistics.services.VehicleService;
+import com.logistics.services.WarehouseService;
 
 import javax.swing.*;
 
@@ -17,7 +33,7 @@ public class MainApplication {
     private static final WarehouseDAO warehouseDAO = new WarehouseDAO();
     private static final TrackingDAO trackingDAO = new TrackingDAO();
     private static final ComplaintDAO complaintDAO = new ComplaintDAO();
-    private static final PaymentDAO paymentDAO = new PaymentDAO(); // New DAO
+    private static final PaymentDAO paymentDAO = new PaymentDAO();
 
     private static final UserService userService = new UserService(userDAO);
     private static final ProductService productService = new ProductService(productDAO);
@@ -26,7 +42,7 @@ public class MainApplication {
     private static final WarehouseService warehouseService = new WarehouseService(warehouseDAO);
     private static final TrackingService trackingService = new TrackingService(trackingDAO);
     private static final ComplaintService complaintService = new ComplaintService(complaintDAO);
-    private static final PaymentService paymentService = new PaymentService(paymentDAO); // New Service
+    private static final PaymentService paymentService = new PaymentService(paymentDAO);
 
     private static final OrderService orderService = new OrderService(orderDAO, productService, trackingService);
 
@@ -49,7 +65,6 @@ public class MainApplication {
                 dashboard.setVisible(true);
                 break;
             case CUSTOMER:
-                // Pass paymentService to the constructor
                 dashboard = new CustomerDashboardFrame(user, orderService, productService, trackingService, complaintService, paymentService);
                 dashboard.setVisible(true);
                 break;
