@@ -95,7 +95,7 @@ public class CustomerDashboardFrame extends JFrame {
 
         // Find the order to get the product ID
         Optional<Order> orderOpt = orderService.getOrdersForCustomer(customerUser.getUserId()).stream()
-               .filter(o -> o.getOrderId() == orderId).findFirst();
+              .filter(o -> o.getOrderId() == orderId).findFirst();
 
         if (orderOpt.isPresent()) {
             Order order = orderOpt.get();
