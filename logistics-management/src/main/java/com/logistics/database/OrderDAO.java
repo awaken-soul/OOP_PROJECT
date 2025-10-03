@@ -111,6 +111,21 @@ public class OrderDAO implements Dao<Order> {
         }
     }
 
+    public List<Order> findByStatus(String status) {
+        List<Order> orders = new ArrayList<>();
+        String sql = "SELECT * FROM orders WHERE status =?";
+        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+            pstmt.setString(1, status);
+            ResultSet rs = pstmt.executeQuery();
+            while (rs.next()) {
+                orders.add(mapRowToOrder(rs));
+            }
+        } catch (SQLException e) {
+            throw new DataAccessException("Error finding orders by status.", e);
+        }
+        return orders;
+    }
+
     public boolean assignAgentAndVehicle(int orderId, int agentId, int vehicleId, String newStatus) {
         String sql = "UPDATE orders SET assigned_agent_id =?, vehicle_id =?, status =?, updated_at = CURRENT_TIMESTAMP WHERE order_id =?";
         try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
