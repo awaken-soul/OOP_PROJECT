@@ -76,11 +76,9 @@ public class OrderDAO implements Dao<Order> {
     }
     
     @Override
-    public boolean save(Order order) {
-        // Implementation for saving a new order
-        // This would be more complex in a real app, setting all fields
+    public Optional<Integer> save(Order order) {
         String sql = "INSERT INTO orders(user_id, product_id, order_type, source_address, destination_address, status, payment_status) VALUES(?,?,?,?,?,?,?)";
-        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+        try (PreparedStatement pstmt = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             pstmt.setInt(1, order.getUserId());
             pstmt.setInt(2, order.getProductId());
             pstmt.setString(3, order.getOrderType());
@@ -88,11 +86,22 @@ public class OrderDAO implements Dao<Order> {
             pstmt.setString(5, order.getDestinationAddress());
             pstmt.setString(6, order.getStatus());
             pstmt.setString(7, order.getPaymentStatus());
-            return pstmt.executeUpdate() > 0;
+
+            int affectedRows = pstmt.executeUpdate();
+
+            if (affectedRows > 0) {
+                try (ResultSet generatedKeys = pstmt.getGeneratedKeys()) {
+                    if (generatedKeys.next()) {
+                        return Optional.of(generatedKeys.getInt(1));
+                    }
+                }
+            }
         } catch (SQLException e) {
             throw new DataAccessException("Error saving order.", e);
         }
+        return Optional.empty();
     }
+
 
     @Override
     public boolean update(Order order) {
