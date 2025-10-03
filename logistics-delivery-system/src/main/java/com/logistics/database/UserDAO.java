@@ -1,26 +1,13 @@
 package com.logistics.database;
 
 import com.logistics.models.*; 
-// PasswordHasher is no longer imported as plain passwords are used
-
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Handles all database operations (CRUD) for the User table, and includes 
- * methods for injecting initial test data.
- */
 public class UserDAO {
-    
-    // --- Test Data Constant (Plain Password for all test users) ---
     private static final String TEST_PASSWORD = "password"; 
-
-    // --- Database Initialization Method (Called once by MainApplication) ---
     
-    /**
-     * Inserts test data for all four roles if the User table is currently empty.
-     */
     public void initializeTestUsers() {
         if (getUserCount() > 0) {
             System.out.println("UserDAO: Test users already exist.");
@@ -29,16 +16,12 @@ public class UserDAO {
 
         System.out.println("UserDAO: Inserting default test users (password='password')...");
         
-        // 1. Admin
         registerTestUser(100, "Admin Root", "admin@logistics.com", TEST_PASSWORD, "Admin", "9990001111", "HQ - City Center");
         
-        // 2. Customer
         registerTestUser(101, "Alice Customer", "alice@customer.com", TEST_PASSWORD, "Customer", "9876543210", "123 Main St");
         
-        // 3. Agent
         registerTestUser(102, "Bob Agent", "bob@agent.com", TEST_PASSWORD, "Agent", "7775553333", "456 North St");
-        
-        // 4. Warehouse Manager
+   
         registerTestUser(103, "Charlie Manager", "charlie@wh.com", TEST_PASSWORD, "Manager", "6664442222", "Warehouse 1 Depot");
         
         System.out.println("UserDAO: Test data injection complete.");
@@ -59,7 +42,6 @@ public class UserDAO {
         return 0;
     }
     
-    // Simplified registration helper for initialization (uses user_id and plain password directly)
     private boolean registerTestUser(int id, String name, String email, String password, String role, String contact, String address) {
         String sql = "INSERT INTO User (user_id, name, email, password, role, contact_number, address) VALUES (?, ?, ?, ?, ?, ?, ?)";
         
@@ -69,7 +51,7 @@ public class UserDAO {
             pstmt.setInt(1, id);
             pstmt.setString(2, name);
             pstmt.setString(3, email);
-            pstmt.setString(4, password); // Storing plain text password
+            pstmt.setString(4, password);
             pstmt.setString(5, role);
             pstmt.setString(6, contact);
             pstmt.setString(7, address);
@@ -80,23 +62,17 @@ public class UserDAO {
             return false;
         }
     }
-
-    // --- Main DAO Methods ---
-
-    /**
-     * Maps a ResultSet row to the appropriate concrete User subclass object.
-     */
+    
     private User mapResultSetToUser(ResultSet rs) throws SQLException {
         int userID = rs.getInt("user_id");
         String name = rs.getString("name");
         String email = rs.getString("email");
-        String password = rs.getString("password"); // Retrieving plain password
+        String password = rs.getString("password");
         String role = rs.getString("role");
         String contactNumber = rs.getString("contact_number");
         String address = rs.getString("address");
 
         return switch (role) {
-            // Note: Constructors updated to use plain 'password'
             case "Customer" -> new Customer(userID, name, email, password, contactNumber, address);
             case "Admin" -> new Admin(userID, name, email, password, contactNumber, address);
             case "Agent" -> new DeliveryAgent(userID, name, email, password, contactNumber, address);
@@ -108,11 +84,7 @@ public class UserDAO {
         };
     }
 
-    /**
-     * Saves a new User object using the plain password.
-     */
     public boolean registerNewUser(User user, String plainPassword) {
-        // Storing plainPassword directly.
         String sql = "INSERT INTO User (name, email, password, role, contact_number, address) VALUES (?, ?, ?, ?, ?, ?)";
         
         try (Connection conn = DBConnector.getConnection();
@@ -120,9 +92,8 @@ public class UserDAO {
 
             pstmt.setString(1, user.getName());
             pstmt.setString(2, user.getEmail());
-            pstmt.setString(3, plainPassword); // Storing PLAIN PASSWORD
+            pstmt.setString(3, plainPassword);
             pstmt.setString(4, user.getRole());
-            // FIX: Uses public getters for address and contact number
             pstmt.setString(5, user.getContactNumber()); 
             pstmt.setString(6, user.getAddress());
 
@@ -148,9 +119,6 @@ public class UserDAO {
         }
     }
 
-    /**
-     * Retrieves a User record by email for authentication purposes.
-     */
     public User getUserByEmail(String email) {
         String sql = "SELECT * FROM User WHERE email = ?";
         
@@ -169,10 +137,7 @@ public class UserDAO {
         }
         return null; 
     }
-    
-    /**
-     * Retrieves a list of all users whose role is 'Agent' for assignment purposes.
-     */
+   
     public List<DeliveryAgent> getAvailableAgents() {
         List<DeliveryAgent> agents = new ArrayList<>();
         String sql = "SELECT * FROM User WHERE role = 'Agent'"; 
