@@ -30,8 +30,8 @@ public class MainApplication {
                 dashboard.setVisible(true);
                 break;
             case AGENT:
-                // dashboard = new DeliveryAgentDashboardFrame(user /*, pass services */);
-                JOptionPane.showMessageDialog(null, "Agent Dashboard not yet implemented.");
+                dashboard = new DeliveryAgentDashboardFrame(user);
+                dashboard.setVisible(true);
                 break;
             case CUSTOMER:
                 dashboard = new CustomerDashboardFrame(user);
