@@ -5,14 +5,7 @@ import com.logistics.models.Payment;
 import java.sql.*;
 import java.time.LocalDateTime;
 
-/**
- * Handles all database operations (CRUD) for the Payment table.
- */
 public class PaymentDAO {
-
-    /**
-     * Maps a ResultSet row to a Payment object.
-     */
     private Payment mapResultSetToPayment(ResultSet rs) throws SQLException {
         return new Payment(
             rs.getInt("payment_id"),
@@ -24,11 +17,6 @@ public class PaymentDAO {
         );
     }
 
-    /**
-     * Saves a new Payment record to the database.
-     * @param payment The Payment object to save (paymentID will be updated).
-     * @return true if insertion was successful, false otherwise.
-     */
     public boolean recordPayment(Payment payment) {
         String sql = "INSERT INTO Payment (order_id, amount, method, status, payment_date) VALUES (?, ?, ?, ?, ?)";
         
@@ -41,8 +29,7 @@ public class PaymentDAO {
             pstmt.setDouble(2, payment.getAmount());
             pstmt.setString(3, payment.getMethod());
             pstmt.setString(4, payment.getStatus());
-            pstmt.setString(5, now.toString()); // Save LocalDateTime as TEXT
-
+            pstmt.setString(5, now.toString()); 
             int rowsAffected = pstmt.executeUpdate();
             
             if (rowsAffected > 0) {
@@ -61,9 +48,6 @@ public class PaymentDAO {
         }
     }
     
-    /**
-     * Updates the status of an existing payment record.
-     */
     public boolean updatePaymentStatus(int paymentId, String newStatus) {
         String sql = "UPDATE Payment SET status = ? WHERE payment_id = ?";
         
