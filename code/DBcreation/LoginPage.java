@@ -21,9 +21,9 @@ public class LoginPage extends JFrame {
 
         // Left side panel for logo/illustration
         JPanel leftPanel = new JPanel();
-        leftPanel.setBackground(Color.LIGHT_GRAY);
+        leftPanel.setBackground(new Color(200, 255, 200));
         leftPanel.setPreferredSize(new Dimension(500, 0));
-        JLabel logoLabel = new JLabel("<html><center>Logistics & Delivery<br/>Management System<br/>Illustration or Logo</center></html>");
+        JLabel logoLabel = new JLabel("<html><center>Logistics & Delivery<br/>Management System<br/></html>");
         logoLabel.setFont(new Font("Arial", Font.PLAIN, 16));
         logoLabel.setHorizontalAlignment(SwingConstants.CENTER);
         leftPanel.setLayout(new GridBagLayout());
@@ -112,7 +112,7 @@ public class LoginPage extends JFrame {
 
             switch (role) {
                 case "Customer":
-                    new UserDashboard(user);
+                    new CustomerDashboard(user);
                     break;
                 case "Admin":
            //         new AdminDashboard(user);
