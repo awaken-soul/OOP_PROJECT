@@ -16,6 +16,7 @@ public class MainApplication {
     private static final RetailerDAO retailerDAO = new RetailerDAO();
     private static final WarehouseDAO warehouseDAO = new WarehouseDAO();
     private static final TrackingDAO trackingDAO = new TrackingDAO();
+    private static final ComplaintDAO complaintDAO = new ComplaintDAO(); // New DAO
 
     private static final UserService userService = new UserService(userDAO);
     private static final ProductService productService = new ProductService(productDAO);
@@ -23,6 +24,7 @@ public class MainApplication {
     private static final RetailerService retailerService = new RetailerService(retailerDAO);
     private static final WarehouseService warehouseService = new WarehouseService(warehouseDAO);
     private static final TrackingService trackingService = new TrackingService(trackingDAO);
+    private static final ComplaintService complaintService = new ComplaintService(complaintDAO); // New Service
 
     private static final OrderService orderService = new OrderService(orderDAO, productService, trackingService);
 
@@ -37,6 +39,7 @@ public class MainApplication {
         JFrame dashboard;
         switch (user.getRole()) {
             case ADMIN:
+                // Pass complaintService to AdminDashboardFrame in the next step
                 dashboard = new AdminDashboardFrame(user, vehicleService, retailerService, warehouseService);
                 dashboard.setVisible(true);
                 break;
@@ -45,11 +48,11 @@ public class MainApplication {
                 dashboard.setVisible(true);
                 break;
             case CUSTOMER:
-                dashboard = new CustomerDashboardFrame(user, orderService, productService, trackingService);
+                // Pass complaintService to CustomerDashboardFrame
+                dashboard = new CustomerDashboardFrame(user, orderService, productService, trackingService, complaintService);
                 dashboard.setVisible(true);
                 break;
             case MANAGER:
-                // Pass trackingService to the constructor
                 dashboard = new WarehouseManagerDashboardFrame(user, orderService, userService, vehicleService, productService, trackingService);
                 dashboard.setVisible(true);
                 break;
