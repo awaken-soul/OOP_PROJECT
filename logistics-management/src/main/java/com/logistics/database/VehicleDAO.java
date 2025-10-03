@@ -61,20 +61,42 @@ public class VehicleDAO implements Dao<Vehicle> {
 
     @Override
     public boolean save(Vehicle vehicle) {
-        // Placeholder for future implementation
-        return false;
+        String sql = "INSERT INTO vehicles(vehicle_type, license_plate, status, current_location) VALUES(?,?,?,?)";
+        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+            pstmt.setString(1, vehicle.getVehicleType());
+            pstmt.setString(2, vehicle.getLicensePlate());
+            pstmt.setString(3, vehicle.getStatus());
+            pstmt.setString(4, vehicle.getCurrentLocation());
+            return pstmt.executeUpdate() > 0;
+        } catch (SQLException e) {
+            throw new DataAccessException("Error saving vehicle.", e);
+        }
     }
 
     @Override
     public boolean update(Vehicle vehicle) {
-        // Placeholder for future implementation
-        return false;
+        String sql = "UPDATE vehicles SET vehicle_type =?, license_plate =?, status =?, current_location =? WHERE vehicle_id =?";
+        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+            pstmt.setString(1, vehicle.getVehicleType());
+            pstmt.setString(2, vehicle.getLicensePlate());
+            pstmt.setString(3, vehicle.getStatus());
+            pstmt.setString(4, vehicle.getCurrentLocation());
+            pstmt.setInt(5, vehicle.getVehicleId());
+            return pstmt.executeUpdate() > 0;
+        } catch (SQLException e) {
+            throw new DataAccessException("Error updating vehicle.", e);
+        }
     }
 
     @Override
     public boolean delete(Vehicle vehicle) {
-        // Placeholder for future implementation
-        return false;
+        String sql = "DELETE FROM vehicles WHERE vehicle_id =?";
+        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+            pstmt.setInt(1, vehicle.getVehicleId());
+            return pstmt.executeUpdate() > 0;
+        } catch (SQLException e) {
+            throw new DataAccessException("Error deleting vehicle.", e);
+        }
     }
 
     private Vehicle mapRowToVehicle(ResultSet rs) throws SQLException {
