@@ -19,14 +19,12 @@ public class ManageComplaintsPanel extends JPanel {
         setLayout(new BorderLayout(10, 10));
         setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
-        // Table Panel
         String columnNames = {"ID", "User ID", "Order ID", "Subject", "Status", "Date"};
         tableModel = new DefaultTableModel(columnNames, 0);
         complaintsTable = new JTable(tableModel);
         complaintsTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         JScrollPane scrollPane = new JScrollPane(complaintsTable);
 
-        // Button Panel
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 0));
         JButton viewDetailsButton = new JButton("View Details");
         JButton resolveButton = new JButton("Mark as Resolved");
@@ -101,7 +99,7 @@ public class ManageComplaintsPanel extends JPanel {
 
     private Complaint getSelectedComplaint(int complaintId) {
         return complaintService.getAllComplaints().stream()
-              .filter(c -> c.getComplaintId() == complaintId)
-              .findFirst().orElse(null);
+             .filter(c -> c.getComplaintId() == complaintId)
+             .findFirst().orElse(null);
     }
 }
