@@ -149,6 +149,17 @@ public class OrderDAO implements Dao<Order> {
     }
 
 
+    public boolean updatePaymentStatus(int orderId, String newPaymentStatus) {
+        String sql = "UPDATE orders SET payment_status =? WHERE order_id =?";
+        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+            pstmt.setString(1, newPaymentStatus);
+            pstmt.setInt(2, orderId);
+            return pstmt.executeUpdate() > 0;
+        } catch (SQLException e) {
+            throw new DataAccessException("Error updating order payment status.", e);
+        }
+    }
+    
     @Override
     public boolean delete(Order order) {
         // Implementation for deleting an order
