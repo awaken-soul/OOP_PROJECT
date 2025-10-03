@@ -2,22 +2,15 @@ package com.logistics.models;
 
 import com.logistics.services.UserService;
 
-/**
- * Represents the System Administrator. 
- */
 public class Admin extends User {
     
     public Admin(String name, String email, String passwordHash, String contactNumber, String address) {
         super(name, email, passwordHash, "Admin", contactNumber, address);
     }
     
-    /** Full Constructor (DB Retrieval) */
-    // Ensure this line and the block below it are correct (Line 23 area)
     public Admin(int userID, String name, String email, String passwordHash, String contactNumber, String address) {
         super(userID, name, email, passwordHash, "Admin", contactNumber, address);
     }
-
-    // ... (rest of the Admin methods are fine)
 
     public void manageWarehouse() {
         System.out.println("Admin " + getName() + " is managing warehouse data (e.g., adding capacity).");
