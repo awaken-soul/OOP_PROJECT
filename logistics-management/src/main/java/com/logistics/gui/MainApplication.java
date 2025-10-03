@@ -17,6 +17,7 @@ public class MainApplication {
     private static final WarehouseDAO warehouseDAO = new WarehouseDAO();
     private static final TrackingDAO trackingDAO = new TrackingDAO();
     private static final ComplaintDAO complaintDAO = new ComplaintDAO();
+    private static final PaymentDAO paymentDAO = new PaymentDAO(); // New DAO
 
     private static final UserService userService = new UserService(userDAO);
     private static final ProductService productService = new ProductService(productDAO);
@@ -25,6 +26,7 @@ public class MainApplication {
     private static final WarehouseService warehouseService = new WarehouseService(warehouseDAO);
     private static final TrackingService trackingService = new TrackingService(trackingDAO);
     private static final ComplaintService complaintService = new ComplaintService(complaintDAO);
+    private static final PaymentService paymentService = new PaymentService(paymentDAO); // New Service
 
     private static final OrderService orderService = new OrderService(orderDAO, productService, trackingService);
 
@@ -39,7 +41,6 @@ public class MainApplication {
         JFrame dashboard;
         switch (user.getRole()) {
             case ADMIN:
-                // Pass all necessary services, including complaintService
                 dashboard = new AdminDashboardFrame(user, vehicleService, retailerService, warehouseService, complaintService);
                 dashboard.setVisible(true);
                 break;
@@ -48,6 +49,16 @@ public class MainApplication {
                 dashboard.setVisible(true);
                 break;
             case CUSTOMER:
-                dashboard = new CustomerDashboardFrame(user, orderService, productService, trackingService, complaintService);
+                // Pass paymentService to the constructor
+                dashboard = new CustomerDashboardFrame(user, orderService, productService, trackingService, complaintService, paymentService);
                 dashboard.setVisible(true);
                 break;
+            case MANAGER:
+                dashboard = new WarehouseManagerDashboardFrame(user, orderService, userService, vehicleService, productService, trackingService);
+                dashboard.setVisible(true);
+                break;
+            default:
+                throw new IllegalStateException("Unsupported user role: " + user.getRole());
+        }
+    }
+}
