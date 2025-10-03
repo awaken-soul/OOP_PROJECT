@@ -45,4 +45,12 @@ public class ProductService {
         }
         return productDAO.updateQuantity(productId, newQuantity);
     }
+     /**
+     * Retrieves a single product by its ID.
+     * @param productId The ID of the product to find.
+     * @return An Optional containing the Product if found, otherwise empty.
+     */
+    public java.util.Optional<com.logistics.models.Product> getProductById(int productId) {
+        return productDAO.findById(productId);
+    }
 }
