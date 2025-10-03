@@ -27,14 +27,14 @@ public class WarehouseManagerDashboardFrame extends JFrame {
     private final UserService userService;
     private final VehicleService vehicleService;
     private final ProductService productService;
-    private final TrackingService trackingService; // New service
+    private final TrackingService trackingService;
 
     public WarehouseManagerDashboardFrame(User managerUser, OrderService orderService, UserService userService, VehicleService vehicleService, ProductService productService, TrackingService trackingService) {
         this.orderService = orderService;
         this.userService = userService;
         this.vehicleService = vehicleService;
         this.productService = productService;
-        this.trackingService = trackingService; // Store the service
+        this.trackingService = trackingService;
 
         setTitle("Warehouse Manager Dashboard");
         setSize(1100, 700);
@@ -69,12 +69,12 @@ public class WarehouseManagerDashboardFrame extends JFrame {
 
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
         JButton assignOrderButton = new JButton("Assign Selected Order");
-        JButton trackOrderButton = new JButton("Track Selected Order"); // New button
+        JButton trackOrderButton = new JButton("Track Selected Order");
         buttonPanel.add(assignOrderButton);
         buttonPanel.add(trackOrderButton);
 
         assignOrderButton.addActionListener(e -> showAssignOrderDialog());
-        trackOrderButton.addActionListener(e -> showTrackingHistory()); // Add action listener
+        trackOrderButton.addActionListener(e -> showTrackingHistory());
 
         panel.add(scrollPane, BorderLayout.CENTER);
         panel.add(buttonPanel, BorderLayout.SOUTH);
@@ -82,7 +82,6 @@ public class WarehouseManagerDashboardFrame extends JFrame {
     }
 
     private JPanel createStockLevelsPanel() {
-        //... (existing method, no changes needed)
         JPanel panel = new JPanel(new BorderLayout(10, 10));
         panel.setBorder(BorderFactory.createTitledBorder("Stock Levels"));
         String columnNames = {"Product ID", "Product Name", "Quantity", "Status"};
@@ -117,7 +116,6 @@ public class WarehouseManagerDashboardFrame extends JFrame {
     }
 
     private void loadPendingOrders() {
-        //... (existing method, no changes needed)
         ordersTableModel.setRowCount(0);
         List<Order> pendingOrders = orderService.getOrdersByStatus("Pending");
         for (Order order : pendingOrders) {
@@ -126,7 +124,6 @@ public class WarehouseManagerDashboardFrame extends JFrame {
     }
 
     private void loadStockLevels() {
-        //... (existing method, no changes needed)
         stockTableModel.setRowCount(0);
         List<Product> products = productService.getAllProducts();
         for (Product product : products) {
@@ -136,7 +133,6 @@ public class WarehouseManagerDashboardFrame extends JFrame {
     }
 
     private void updateSelectedStock() {
-        //... (existing method, no changes needed)
         int selectedRow = stockTable.getSelectedRow();
         if (selectedRow == -1) {
             JOptionPane.showMessageDialog(this, "Please select a product to update.", "No Selection", JOptionPane.WARNING_MESSAGE);
@@ -161,7 +157,6 @@ public class WarehouseManagerDashboardFrame extends JFrame {
     }
 
     private void showAssignOrderDialog() {
-        //... (existing method, no changes needed)
         int selectedRow = ordersTable.getSelectedRow();
         if (selectedRow == -1) {
             JOptionPane.showMessageDialog(this, "Please select an order to assign.", "No Order Selected", JOptionPane.WARNING_MESSAGE);
