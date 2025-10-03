@@ -4,15 +4,23 @@ import com.logistics.models.DeliveryAgent;
 import com.logistics.models.Order;
 import com.logistics.services.OrderService;
 import com.logistics.utils.AppColors;
+import com.logistics.database.OrderDAO; // Required for fetching assigned orders
+
 import javax.swing.*;
 import java.awt.*;
 import java.util.List;
 
+/**
+ * The main dashboard for the Delivery Agent role.
+ * Includes panels for assigned deliveries, status updates, and history.
+ */
 public class DeliveryAgentDashboard extends JFrame {
 
     private final DeliveryAgent agent;
     private final OrderService orderService;
-    
+    private final OrderDAO orderDAO; // DAO dependency for fetching data
+
+    // Components for Assigned Deliveries Panel
     private JList<String> assignedOrdersList;
     private JTextArea deliveryDetailsArea;
     private JComboBox<String> statusUpdateCombo;
@@ -23,27 +31,33 @@ public class DeliveryAgentDashboard extends JFrame {
         super("Delivery Agent Dashboard - Profile: " + agent.getName());
         this.agent = agent;
         this.orderService = new OrderService();
+        this.orderDAO = new OrderDAO(); // Initialize the DAO
 
-      
+        // --- Frame Setup ---
         setSize(900, 600);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
         getContentPane().setBackground(AppColors.BACKGROUND_WHITE);
 
+        // --- Header ---
         add(createHeaderPanel(), BorderLayout.NORTH);
 
-   
+        // --- Main Content: Split Pane ---
         JSplitPane mainSplit = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,
                 createAssignedOrdersPanel(),
                 createDeliveryDetailsPanel());
         mainSplit.setDividerLocation(300);
         add(mainSplit, BorderLayout.CENTER);
 
+        // Load real data upon launch
         loadAssignedOrders();
         
         setVisible(true);
     }
     
+    // ==========================================================
+    // HEADER PANEL
+    // ==========================================================
     private JPanel createHeaderPanel() {
         JPanel headerPanel = new JPanel(new BorderLayout());
         headerPanel.setBackground(AppColors.PRIMARY_BLUE);
@@ -66,6 +80,9 @@ public class DeliveryAgentDashboard extends JFrame {
         return headerPanel;
     }
 
+    // ==========================================================
+    // LEFT PANEL: Assigned Deliveries & History
+    // ==========================================================
     private JPanel createAssignedOrdersPanel() {
         JPanel panel = new JPanel(new BorderLayout(10, 10));
         panel.setBackground(AppColors.SECONDARY_GRAY);
@@ -98,16 +115,27 @@ public class DeliveryAgentDashboard extends JFrame {
     }
 
     private void loadAssignedOrders() {
-
-        String[] orders = {
-            "ID: 101 - Pickup: Warehouse A - Status: Assigned",
-            "ID: 105 - Pickup: Customer Z - Status: En Route",
-            "ID: 109 - Pickup: Retailer B - Status: Pending Acceptance"
-        };
-        assignedOrdersList.setListData(orders);
+        // FIX: Fetch real assigned orders using the DAO
+        List<Order> orders = orderDAO.getOrdersByAgentId(agent.getUserID());
+        
+        DefaultListModel<String> model = new DefaultListModel<>();
+        
+        if (orders.isEmpty()) {
+             model.addElement("No orders currently assigned.");
+        } else {
+            for (Order order : orders) {
+                String display = String.format("ID: %d - Pickup: %s - Status: %s",
+                    order.getOrderID(), 
+                    order.getSourceAddress(), 
+                    order.getStatus());
+                model.addElement(display);
+            }
+        }
+        assignedOrdersList.setModel(model);
     }
     
     private int extractOrderId(String orderString) {
+        // Pull ID from "ID: XXX - ..."
         try {
             return Integer.parseInt(orderString.substring(4, orderString.indexOf(" - ")));
         } catch (Exception e) {
@@ -115,6 +143,9 @@ public class DeliveryAgentDashboard extends JFrame {
         }
     }
 
+    // ==========================================================
+    // RIGHT PANEL: Delivery Details & Status Update
+    // ==========================================================
     private JPanel createDeliveryDetailsPanel() {
         JPanel panel = new JPanel(new BorderLayout(10, 10));
         panel.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
@@ -159,18 +190,32 @@ public class DeliveryAgentDashboard extends JFrame {
     }
     
     private void loadDeliveryDetails(int orderId) {
+        Order order = orderDAO.getOrderById(orderId);
+        
+        if (order == null) {
+            deliveryDetailsArea.setText("Error: Order details not found.");
+            return;
+        }
+        
         String details = String.format(
             "Order ID: %d\n" +
             "Agent ID: %d\n" +
-            "Address: [Placeholder Address]\n" +
-            "Vehicle ID: V-404\n" +
-            "Pickup: 123 Main St, Warehouse A\n" +
-            "Drop-off: 456 Oak Ave, Customer Home\n" +
-            "Status: Assigned - Ready to Move\n" +
+            "Customer ID: %d\n" +
+            "Source: %s\n" +
+            "Destination: %s\n" +
+            "Type: %s\n" +
+            "Status: %s\n" +
+            "Payment Status: %s\n" +
             "--- ACTION ---\n" +
-            "Required: Pick up cargo, then update status.",
-            orderId,
-            agent.getUserID()
+            "Required: Change status to 'Picked Up' after loading cargo.",
+            order.getOrderID(),
+            agent.getUserID(),
+            order.getUserID(),
+            order.getSourceAddress(),
+            order.getDestinationAddress(),
+            order.getOrderType(),
+            order.getStatus(),
+            order.getPaymentStatus()
         );
         deliveryDetailsArea.setText(details);
         orderIdToUpdateField.setText(String.valueOf(orderId));
@@ -183,14 +228,20 @@ public class DeliveryAgentDashboard extends JFrame {
             int orderId = Integer.parseInt(orderIdToUpdateField.getText().trim());
             String newStatus = (String) statusUpdateCombo.getSelectedItem();
             
+            // This method call handles the status update and tracking record insertion via OrderService/DAO
             boolean success = orderService.agentAcceptsDelivery(orderId, agent.getUserID());
             
             if (success) {
+                // Since agentAcceptsDelivery only handles the initial acceptance, 
+                // we'll update the status directly via the DAO/service call here for subsequent status changes.
+                // Assuming OrderService has a generic update method, or use the Agent's method wrapper:
+                agent.updateStatus(orderId, newStatus); 
+                
                 updateMessageLabel.setText("Order " + orderId + " status updated to: " + newStatus);
                 updateMessageLabel.setForeground(AppColors.ACCENT_GREEN);
-                agent.updateStatus(orderId, newStatus);
+                loadAssignedOrders(); // Refresh the list
             } else {
-                updateMessageLabel.setText("Update failed! Check if Order ID is valid.");
+                updateMessageLabel.setText("Update failed! Order not assigned to you or invalid.");
                 updateMessageLabel.setForeground(AppColors.WARNING_RED);
             }
         } catch (NumberFormatException e) {
