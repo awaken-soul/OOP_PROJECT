@@ -11,7 +11,7 @@ import java.sql.Statement;
 public class DBConnector {
 
     // Path to the SQLite database file
-    private static final String URL = "jdbc:sqlite:src/main/resources/logistics.db";
+    private static final String URL = "jdbc:sqlite:logistics.db";
 
     /**
      * Establishes a connection to the SQLite database.
