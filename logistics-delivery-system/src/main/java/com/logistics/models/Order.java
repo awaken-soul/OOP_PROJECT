@@ -2,31 +2,22 @@ package com.logistics.models;
 
 import java.time.LocalDateTime;
 
-/**
- * Represents a single transaction in the logistics system. 
- * This can be a product Purchase, a cargo Shipment, or a Transport service request.
- */
 public class Order {
     
-    // Attributes from the Orders Table
+   
     private int orderID;
-    private int userID; // FK to User table (Customer)
-    private Integer productID; // Nullable if shipment/transport only
-    private String orderType; // Enum: Purchase, Shipment, Transport
-    private String sourceAddress; // Pickup location
-    private String destinationAddress; // Delivery location
-    private String status; // Enum: Pending, In Warehouse, Out for Delivery, Delivered
-    private Integer assignedAgentID; // FK to User table (Delivery Agent)
-    private Integer vehicleID; // FK to Vehicle table (optional)
-    private String paymentStatus; // Enum: Pending, Paid, COD
+    private int userID; 
+    private Integer productID;
+    private String orderType; 
+    private String sourceAddress;  
+    private String destinationAddress;  
+    private String status;  
+    private Integer assignedAgentID;  
+    private Integer vehicleID; 
+    private String paymentStatus;  
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
-    
-    // --- CONSTRUCTORS ---
 
-    /**
-     * Creation Constructor: Used when a customer places a new request.
-     */
     public Order(int userID, Integer productID, String orderType, String sourceAddress, String destinationAddress) {
         this.userID = userID;
         this.productID = productID;
@@ -41,9 +32,6 @@ public class Order {
         this.orderID = -1;
     }
 
-    /**
-     * Full Constructor: Used when retrieving an existing order from the database.
-     */
     public Order(int orderID, int userID, Integer productID, String orderType, String sourceAddress, String destinationAddress, 
                  String status, Integer assignedAgentID, Integer vehicleID, String paymentStatus, 
                  LocalDateTime createdAt, LocalDateTime updatedAt) {
@@ -60,8 +48,6 @@ public class Order {
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
     }
-    
-    // --- GETTERS AND SETTERS ---
     
     public int getOrderID() { return orderID; }
     public int getUserID() { return userID; }
