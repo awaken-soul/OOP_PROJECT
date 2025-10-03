@@ -2,10 +2,12 @@ package com.logistics.gui;
 
 import com.logistics.models.Order;
 import com.logistics.models.Product;
+import com.logistics.models.Tracking;
 import com.logistics.models.User;
 import com.logistics.models.Vehicle;
 import com.logistics.services.OrderService;
 import com.logistics.services.ProductService;
+import com.logistics.services.TrackingService;
 import com.logistics.services.UserService;
 import com.logistics.services.VehicleService;
 
@@ -25,12 +27,14 @@ public class WarehouseManagerDashboardFrame extends JFrame {
     private final UserService userService;
     private final VehicleService vehicleService;
     private final ProductService productService;
+    private final TrackingService trackingService; // New service
 
-    public WarehouseManagerDashboardFrame(User managerUser, OrderService orderService, UserService userService, VehicleService vehicleService, ProductService productService) {
+    public WarehouseManagerDashboardFrame(User managerUser, OrderService orderService, UserService userService, VehicleService vehicleService, ProductService productService, TrackingService trackingService) {
         this.orderService = orderService;
         this.userService = userService;
         this.vehicleService = vehicleService;
         this.productService = productService;
+        this.trackingService = trackingService; // Store the service
 
         setTitle("Warehouse Manager Dashboard");
         setSize(1100, 700);
@@ -38,15 +42,12 @@ public class WarehouseManagerDashboardFrame extends JFrame {
         setLocationRelativeTo(null);
         setLayout(new BorderLayout(10, 10));
 
-        // Main content split into two sections
         JSplitPane splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
         splitPane.setResizeWeight(0.5);
 
-        // Top panel for pending orders
         JPanel pendingOrdersPanel = createPendingOrdersPanel();
         splitPane.setTopComponent(pendingOrdersPanel);
 
-        // Bottom panel for stock levels
         JPanel stockLevelsPanel = createStockLevelsPanel();
         splitPane.setBottomComponent(stockLevelsPanel);
 
@@ -66,33 +67,57 @@ public class WarehouseManagerDashboardFrame extends JFrame {
         ordersTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         JScrollPane scrollPane = new JScrollPane(ordersTable);
 
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
         JButton assignOrderButton = new JButton("Assign Selected Order");
+        JButton trackOrderButton = new JButton("Track Selected Order"); // New button
+        buttonPanel.add(assignOrderButton);
+        buttonPanel.add(trackOrderButton);
+
         assignOrderButton.addActionListener(e -> showAssignOrderDialog());
+        trackOrderButton.addActionListener(e -> showTrackingHistory()); // Add action listener
 
         panel.add(scrollPane, BorderLayout.CENTER);
-        panel.add(assignOrderButton, BorderLayout.SOUTH);
+        panel.add(buttonPanel, BorderLayout.SOUTH);
         return panel;
     }
 
     private JPanel createStockLevelsPanel() {
+        //... (existing method, no changes needed)
         JPanel panel = new JPanel(new BorderLayout(10, 10));
         panel.setBorder(BorderFactory.createTitledBorder("Stock Levels"));
-
         String columnNames = {"Product ID", "Product Name", "Quantity", "Status"};
         stockTableModel = new DefaultTableModel(columnNames, 0);
         stockTable = new JTable(stockTableModel);
         stockTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         JScrollPane scrollPane = new JScrollPane(stockTable);
-
         JButton updateStockButton = new JButton("Update Selected Stock");
         updateStockButton.addActionListener(e -> updateSelectedStock());
-
         panel.add(scrollPane, BorderLayout.CENTER);
         panel.add(updateStockButton, BorderLayout.SOUTH);
         return panel;
     }
 
+    private void showTrackingHistory() {
+        int selectedRow = ordersTable.getSelectedRow();
+        if (selectedRow == -1) {
+            JOptionPane.showMessageDialog(this, "Please select an order to track.", "No Order Selected", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        Integer orderId = (Integer) ordersTable.getValueAt(selectedRow, 0);
+        List<Tracking> history = trackingService.getTrackingHistoryForOrder(orderId);
+
+        if (history.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "No tracking history found for this order.", "No History", JOptionPane.INFORMATION_MESSAGE);
+            return;
+        }
+
+        TrackingHistoryDialog dialog = new TrackingHistoryDialog(this, orderId, history);
+        dialog.setVisible(true);
+    }
+
     private void loadPendingOrders() {
+        //... (existing method, no changes needed)
         ordersTableModel.setRowCount(0);
         List<Order> pendingOrders = orderService.getOrdersByStatus("Pending");
         for (Order order : pendingOrders) {
@@ -101,6 +126,7 @@ public class WarehouseManagerDashboardFrame extends JFrame {
     }
 
     private void loadStockLevels() {
+        //... (existing method, no changes needed)
         stockTableModel.setRowCount(0);
         List<Product> products = productService.getAllProducts();
         for (Product product : products) {
@@ -110,23 +136,21 @@ public class WarehouseManagerDashboardFrame extends JFrame {
     }
 
     private void updateSelectedStock() {
+        //... (existing method, no changes needed)
         int selectedRow = stockTable.getSelectedRow();
         if (selectedRow == -1) {
             JOptionPane.showMessageDialog(this, "Please select a product to update.", "No Selection", JOptionPane.WARNING_MESSAGE);
             return;
         }
-
         Integer productId = (Integer) stockTable.getValueAt(selectedRow, 0);
         String productName = (String) stockTable.getValueAt(selectedRow, 1);
-
         String newQuantityStr = JOptionPane.showInputDialog(this, "Enter new quantity for " + productName + ":", "Update Stock", JOptionPane.PLAIN_MESSAGE);
-
         if (newQuantityStr!= null &&!newQuantityStr.trim().isEmpty()) {
             try {
                 int newQuantity = Integer.parseInt(newQuantityStr.trim());
                 if (productService.updateProductQuantity(productId, newQuantity)) {
                     JOptionPane.showMessageDialog(this, "Stock updated successfully.", "Success", JOptionPane.INFORMATION_MESSAGE);
-                    loadStockLevels(); // Refresh the table
+                    loadStockLevels();
                 } else {
                     JOptionPane.showMessageDialog(this, "Failed to update stock (quantity cannot be negative).", "Error", JOptionPane.ERROR_MESSAGE);
                 }
@@ -137,6 +161,7 @@ public class WarehouseManagerDashboardFrame extends JFrame {
     }
 
     private void showAssignOrderDialog() {
+        //... (existing method, no changes needed)
         int selectedRow = ordersTable.getSelectedRow();
         if (selectedRow == -1) {
             JOptionPane.showMessageDialog(this, "Please select an order to assign.", "No Order Selected", JOptionPane.WARNING_MESSAGE);
