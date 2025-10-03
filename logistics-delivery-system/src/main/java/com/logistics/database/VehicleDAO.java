@@ -91,4 +91,23 @@ public class VehicleDAO {
             return false;
         }
     }
+
+    public Vehicle getVehicleById(int vehicleId) {
+        String sql = "SELECT * FROM Vehicle WHERE vehicle_id = ?";
+        
+        try (Connection conn = DBConnector.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            
+            pstmt.setInt(1, vehicleId);
+            
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    return mapResultSetToVehicle(rs);
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("Database error retrieving vehicle: " + e.getMessage());
+        }
+        return null;
+    }
 }
