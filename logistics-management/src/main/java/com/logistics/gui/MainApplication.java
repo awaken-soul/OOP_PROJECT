@@ -41,15 +41,16 @@ public class MainApplication {
                 dashboard.setVisible(true);
                 break;
             case AGENT:
-                dashboard = new DeliveryAgentDashboardFrame(user, orderService, trackingService); // Pass trackingService
+                dashboard = new DeliveryAgentDashboardFrame(user, orderService, trackingService);
                 dashboard.setVisible(true);
                 break;
             case CUSTOMER:
-                dashboard = new CustomerDashboardFrame(user, orderService, productService, trackingService); // Pass trackingService
+                dashboard = new CustomerDashboardFrame(user, orderService, productService, trackingService);
                 dashboard.setVisible(true);
                 break;
             case MANAGER:
-                dashboard = new WarehouseManagerDashboardFrame(user, orderService, userService, vehicleService, productService);
+                // Pass trackingService to the constructor
+                dashboard = new WarehouseManagerDashboardFrame(user, orderService, userService, vehicleService, productService, trackingService);
                 dashboard.setVisible(true);
                 break;
             default:
