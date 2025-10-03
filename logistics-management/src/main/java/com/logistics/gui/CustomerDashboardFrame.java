@@ -1,9 +1,7 @@
 package com.logistics.gui;
 
-import com.logistics.models.Order;
-import com.logistics.models.Product;
-import com.logistics.models.Tracking;
-import com.logistics.models.User;
+import com.logistics.models.*;
+import com.logistics.services.ComplaintService;
 import com.logistics.services.OrderService;
 import com.logistics.services.ProductService;
 import com.logistics.services.TrackingService;
@@ -20,13 +18,15 @@ public class CustomerDashboardFrame extends JFrame {
     private final User customerUser;
     private final OrderService orderService;
     private final ProductService productService;
-    private final TrackingService trackingService; // New service
+    private final TrackingService trackingService;
+    private final ComplaintService complaintService; // New service
 
-    public CustomerDashboardFrame(User user, OrderService orderService, ProductService productService, TrackingService trackingService) {
+    public CustomerDashboardFrame(User user, OrderService orderService, ProductService productService, TrackingService trackingService, ComplaintService complaintService) {
         this.customerUser = user;
         this.orderService = orderService;
         this.productService = productService;
-        this.trackingService = trackingService; // Store the service
+        this.trackingService = trackingService;
+        this.complaintService = complaintService; // Store the service
 
         setTitle("Customer Dashboard");
         setSize(800, 600);
@@ -50,21 +50,60 @@ public class CustomerDashboardFrame extends JFrame {
 
         JPanel bottomPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
         JButton placeOrderButton = new JButton("Place New Order");
-        JButton trackOrderButton = new JButton("Track Selected Order"); // New button
+        JButton trackOrderButton = new JButton("Track Selected Order");
+        JButton fileComplaintButton = new JButton("File a Complaint"); // New button
         bottomPanel.add(placeOrderButton);
         bottomPanel.add(trackOrderButton);
+        bottomPanel.add(fileComplaintButton);
 
         add(welcomeLabel, BorderLayout.NORTH);
         add(tablePanel, BorderLayout.CENTER);
         add(bottomPanel, BorderLayout.SOUTH);
 
         placeOrderButton.addActionListener(e -> showPlaceOrderDialog());
-        trackOrderButton.addActionListener(e -> showTrackingHistory()); // Add action listener
+        trackOrderButton.addActionListener(e -> showTrackingHistory());
+        fileComplaintButton.addActionListener(e -> showComplaintDialog()); // Add action listener
 
         loadCustomerOrders();
     }
 
+    private void showComplaintDialog() {
+        JTextField subjectField = new JTextField();
+        JTextArea descriptionArea = new JTextArea(5, 30);
+
+        JPanel panel = new JPanel(new BorderLayout(5, 5));
+        JPanel formPanel = new JPanel(new GridLayout(0, 2, 5, 5));
+        formPanel.add(new JLabel("Subject:"));
+        formPanel.add(subjectField);
+        panel.add(formPanel, BorderLayout.NORTH);
+        panel.add(new JLabel("Description:"), BorderLayout.CENTER);
+        panel.add(new JScrollPane(descriptionArea), BorderLayout.SOUTH);
+
+        int result = JOptionPane.showConfirmDialog(this, panel, "File a Complaint", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+
+        if (result == JOptionPane.OK_OPTION) {
+            String subject = subjectField.getText();
+            String description = descriptionArea.getText();
+
+            if (subject.trim().isEmpty() |
+
+| description.trim().isEmpty()) {
+                JOptionPane.showMessageDialog(this, "Subject and Description cannot be empty.", "Invalid Input", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+            // For simplicity, we are not linking to a specific order, but this could be added.
+            Complaint newComplaint = new Complaint(customerUser.getUserId(), null, subject, description);
+            if (complaintService.submitComplaint(newComplaint)) {
+                JOptionPane.showMessageDialog(this, "Complaint submitted successfully.", "Success", JOptionPane.INFORMATION_MESSAGE);
+            } else {
+                JOptionPane.showMessageDialog(this, "Failed to submit complaint.", "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        }
+    }
+
     private void loadCustomerOrders() {
+        //... (existing method, no changes needed)
         tableModel.setRowCount(0);
         List<Order> orders = orderService.getOrdersForCustomer(customerUser.getUserId());
         for (Order order : orders) {
@@ -73,21 +112,18 @@ public class CustomerDashboardFrame extends JFrame {
     }
 
     private void showTrackingHistory() {
+        //... (existing method, no changes needed)
         int selectedRow = ordersTable.getSelectedRow();
         if (selectedRow == -1) {
             JOptionPane.showMessageDialog(this, "Please select an order to track.", "No Order Selected", JOptionPane.WARNING_MESSAGE);
             return;
         }
-
         Integer orderId = (Integer) ordersTable.getValueAt(selectedRow, 0);
         List<Tracking> history = trackingService.getTrackingHistoryForOrder(orderId);
-
         if (history.isEmpty()) {
             JOptionPane.showMessageDialog(this, "No tracking history found for this order yet.", "No History", JOptionPane.INFORMATION_MESSAGE);
             return;
         }
-
-        // Create and show the dialog
         TrackingHistoryDialog dialog = new TrackingHistoryDialog(this, orderId, history);
         dialog.setVisible(true);
     }
