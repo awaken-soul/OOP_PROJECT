@@ -28,6 +28,14 @@ public class OrderService {
      * @param newStatus The new status to set for the order.
      * @return true if the update was successful, false otherwise.
      */
+     public List<Order> getOrdersForAgent(int agentId) {
+        return orderDAO.findByAgentId(agentId);
+    }
+
+    public List<Order> getOrdersForCustomer(int userId) {
+        return orderDAO.findByUserId(userId);
+    }
+
     public boolean updateOrderStatus(int orderId, String newStatus) {
         // Business logic can be added here, e.g., checking if the status transition is valid.
         return orderDAO.updateStatus(orderId, newStatus);
