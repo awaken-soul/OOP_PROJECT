@@ -15,16 +15,15 @@ public class MainApplication {
     private static final VehicleDAO vehicleDAO = new VehicleDAO();
     private static final RetailerDAO retailerDAO = new RetailerDAO();
     private static final WarehouseDAO warehouseDAO = new WarehouseDAO();
-    private static final TrackingDAO trackingDAO = new TrackingDAO(); // New DAO
+    private static final TrackingDAO trackingDAO = new TrackingDAO();
 
     private static final UserService userService = new UserService(userDAO);
     private static final ProductService productService = new ProductService(productDAO);
     private static final VehicleService vehicleService = new VehicleService(vehicleDAO);
     private static final RetailerService retailerService = new RetailerService(retailerDAO);
     private static final WarehouseService warehouseService = new WarehouseService(warehouseDAO);
-    private static final TrackingService trackingService = new TrackingService(trackingDAO); // New Service
+    private static final TrackingService trackingService = new TrackingService(trackingDAO);
 
-    // Updated OrderService instantiation
     private static final OrderService orderService = new OrderService(orderDAO, productService, trackingService);
 
     public static void main(String args) {
@@ -42,11 +41,11 @@ public class MainApplication {
                 dashboard.setVisible(true);
                 break;
             case AGENT:
-                dashboard = new DeliveryAgentDashboardFrame(user, orderService);
+                dashboard = new DeliveryAgentDashboardFrame(user, orderService, trackingService); // Pass trackingService
                 dashboard.setVisible(true);
                 break;
             case CUSTOMER:
-                dashboard = new CustomerDashboardFrame(user, orderService, productService);
+                dashboard = new CustomerDashboardFrame(user, orderService, productService, trackingService); // Pass trackingService
                 dashboard.setVisible(true);
                 break;
             case MANAGER:
