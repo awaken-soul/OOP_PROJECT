@@ -1,20 +1,22 @@
 package com.logistics.gui;
 
+import com.logistics.database.OrderDAO;
 import com.logistics.database.UserDAO;
 import com.logistics.models.User;
+import com.logistics.services.OrderService;
 import com.logistics.services.UserService;
 
 import javax.swing.*;
 
 public class MainApplication {
 
-    // Instantiate all DAOs and Services here. This acts as our dependency injection hub.
+    // Instantiate all DAOs and Services here.
     private static final UserDAO userDAO = new UserDAO();
+    private static final OrderDAO orderDAO = new OrderDAO();
     private static final UserService userService = new UserService(userDAO);
-    //... instantiate other DAOs and Services as they are created
+    private static final OrderService orderService = new OrderService(orderDAO);
 
     public static void main(String args) {
-        // Use SwingUtilities to ensure UI is created on the Event Dispatch Thread for thread safety
         SwingUtilities.invokeLater(() -> {
             LoginFrame loginFrame = new LoginFrame(userService);
             loginFrame.setVisible(true);
@@ -22,7 +24,6 @@ public class MainApplication {
     }
 
     public static void showDashboardForUser(User user) {
-        // This method is called by LoginFrame upon successful login to navigate to the correct dashboard.
         JFrame dashboard;
         switch (user.getRole()) {
             case ADMIN:
@@ -30,11 +31,11 @@ public class MainApplication {
                 dashboard.setVisible(true);
                 break;
             case AGENT:
-                dashboard = new DeliveryAgentDashboardFrame(user);
+                dashboard = new DeliveryAgentDashboardFrame(user, orderService);
                 dashboard.setVisible(true);
                 break;
             case CUSTOMER:
-                dashboard = new CustomerDashboardFrame(user);
+                dashboard = new CustomerDashboardFrame(user, orderService);
                 dashboard.setVisible(true);
                 break;
             case MANAGER:
