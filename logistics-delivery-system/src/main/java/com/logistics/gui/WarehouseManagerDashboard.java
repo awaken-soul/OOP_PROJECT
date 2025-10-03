@@ -5,26 +5,17 @@ import com.logistics.models.WarehouseManager;
 import com.logistics.services.InventoryService;
 import com.logistics.services.TrackingService;
 import com.logistics.utils.AppColors;
-
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.util.List;
 
-/**
- * The main dashboard for the Warehouse Manager role.
- * Includes panels for stock management, product assignment, and shipment tracking.
- */
 public class WarehouseManagerDashboard extends JFrame {
 
     private final WarehouseManager manager;
     private final InventoryService inventoryService;
     private final TrackingService trackingService;
-    
-    // Placeholder Warehouse ID for simulation (as we only simulate one warehouse)
     private static final int WAREHOUSE_ID = 10; 
-
-    // Components
     private JTable stockTable;
     private DefaultTableModel stockTableModel;
     private JTextField assignOrderIdField;
@@ -38,16 +29,14 @@ public class WarehouseManagerDashboard extends JFrame {
         this.inventoryService = new InventoryService();
         this.trackingService = new TrackingService();
 
-        // --- Frame Setup ---
+       
         setSize(1100, 700);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
         getContentPane().setBackground(AppColors.BACKGROUND_WHITE);
 
-        // --- Header ---
         add(createHeaderPanel(), BorderLayout.NORTH);
 
-        // --- Main Content: Tabbed Pane ---
         JTabbedPane tabbedPane = new JTabbedPane();
         tabbedPane.setFont(new Font("Arial", Font.BOLD, 14));
         tabbedPane.addTab("Stock Levels", createStockLevelsPanel());
@@ -56,15 +45,11 @@ public class WarehouseManagerDashboard extends JFrame {
 
         add(tabbedPane, BorderLayout.CENTER);
         
-        // Load initial data
         loadStockData();
         
         setVisible(true);
     }
-    
-    // ==========================================================
-    // HEADER PANEL
-    // ==========================================================
+
     private JPanel createHeaderPanel() {
         JPanel headerPanel = new JPanel(new BorderLayout());
         headerPanel.setBackground(AppColors.PRIMARY_BLUE);
@@ -87,15 +72,11 @@ public class WarehouseManagerDashboard extends JFrame {
         return headerPanel;
     }
 
-    // ==========================================================
-    // TAB 1: STOCK LEVELS PANEL (Monitor Stock)
-    // ==========================================================
     private JPanel createStockLevelsPanel() {
         JPanel panel = new JPanel(new BorderLayout(10, 10));
         panel.setBackground(AppColors.SECONDARY_GRAY);
         panel.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
         
-        // Table Setup
         String[] columnNames = {"Product ID", "Name", "Stock Level", "Price", "Retailer ID", "Status"};
         stockTableModel = new DefaultTableModel(columnNames, 0) {
             @Override
@@ -122,18 +103,15 @@ public class WarehouseManagerDashboard extends JFrame {
     }
     
     private void loadStockData() {
-        // Clear existing data
+       
         stockTableModel.setRowCount(0);
         
-        // Call InventoryService to fetch stock data
         List<Inventory> inventoryList = inventoryService.getWarehouseStock(WAREHOUSE_ID);
 
-        // --- SIMULATION DATA (since we don't have Product insertion GUI yet) ---
         if (inventoryList.isEmpty()) {
-            // Simulate adding initial stock if DB is empty for demo purposes
+    
             Inventory simProduct1 = new Inventory("Laptop", "Business laptop", 1200.00, 50, WAREHOUSE_ID, 201);
             Inventory simProduct2 = new Inventory("Shipping Box", "Standard cardboard box", 2.50, 500, WAREHOUSE_ID, 202);
-            // Simulate status calculation based on stock
             stockTableModel.addRow(new Object[]{1001, simProduct1.getName(), 35, "$1200.00", 201, "Low Stock"});
             stockTableModel.addRow(new Object[]{1002, simProduct2.getName(), 450, "$2.50", 202, "Good"});
         } else {
@@ -150,18 +128,13 @@ public class WarehouseManagerDashboard extends JFrame {
             }
         }
         
-        manager.monitorStock(); // Log action
-    }
+        manager.monitorStock(); 
 
-    // ==========================================================
-    // TAB 2: ASSIGNMENT PANEL (Assign Products)
-    // ==========================================================
     private JPanel createAssignmentPanel() {
         JPanel panel = new JPanel(new BorderLayout(10, 10));
         panel.setBackground(AppColors.SECONDARY_GRAY);
         panel.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
-        
-        // --- Input Form ---
+     
         JPanel form = new JPanel(new GridLayout(5, 2, 10, 10));
         form.setBorder(BorderFactory.createTitledBorder("Dispatch Product for Delivery"));
 
@@ -189,7 +162,6 @@ public class WarehouseManagerDashboard extends JFrame {
         
         panel.add(form, BorderLayout.NORTH);
 
-        // --- Inbound/Outbound Status (Simulation) ---
         JTextArea statusArea = new JTextArea("Inbound Shipments (Needs Storage):\n- Shipment 801 (Truck 123) - Waiting Unload\n\nOutbound Queue (Ready to Ship):\n- Order 505 (Agent 105) - Ready for Pickup");
         statusArea.setBorder(BorderFactory.createTitledBorder("Warehouse Queue Status"));
         statusArea.setEditable(false);
@@ -206,20 +178,16 @@ public class WarehouseManagerDashboard extends JFrame {
 
             if (quantity <= 0) throw new NumberFormatException();
 
-            // 1. Call Inventory Service to reduce stock and log assignment
             boolean success = inventoryService.assignProductToOrder(orderId, productId, quantity);
             
             if (success) {
-                // 2. Log action and update message
                 manager.assignProducts(WAREHOUSE_ID, productId);
                 
                 assignMessageLabel.setText("Product ID " + productId + " assigned to Order " + orderId + ". Stock reduced.");
                 assignMessageLabel.setForeground(AppColors.ACCENT_GREEN);
-                
-                // Refresh stock view
+    
                 loadStockData();
-                
-                // Clear fields
+          
                 assignOrderIdField.setText("");
                 assignProductIdField.setText("");
                 assignQuantityField.setText("");
@@ -233,16 +201,12 @@ public class WarehouseManagerDashboard extends JFrame {
             assignMessageLabel.setForeground(AppColors.WARNING_RED);
         }
     }
-
-    // ==========================================================
-    // TAB 3: TRACKING PANEL (Track Shipments)
-    // ==========================================================
+        
     private JPanel createTrackingPanel() {
         JPanel panel = new JPanel(new BorderLayout(10, 10));
         panel.setBackground(AppColors.BACKGROUND_WHITE);
         panel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
-        // Top Search Panel
         JPanel searchPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 15, 10));
         searchPanel.setBackground(AppColors.SECONDARY_GRAY);
         searchPanel.setBorder(BorderFactory.createLineBorder(AppColors.SECONDARY_GRAY.darker()));
