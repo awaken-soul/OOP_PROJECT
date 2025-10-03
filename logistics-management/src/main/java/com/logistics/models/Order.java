@@ -16,6 +16,16 @@ public class Order {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
+    public Order(int userId, int productId, String orderType, String sourceAddress, String destinationAddress) {
+        this.userId = userId;
+        this.productId = productId;
+        this.orderType = orderType;
+        this.sourceAddress = sourceAddress;
+        this.destinationAddress = destinationAddress;
+        this.status = "Pending"; // Default status
+        this.paymentStatus = "Pending"; // Default payment status
+    }
+    
     public Order(int orderId, int userId, int productId, String orderType, String sourceAddress, String destinationAddress, String status, int assignedAgentId, int vehicleId, String paymentStatus, LocalDateTime createdAt, LocalDateTime updatedAt) {
         this.orderId = orderId;
         this.userId = userId;
