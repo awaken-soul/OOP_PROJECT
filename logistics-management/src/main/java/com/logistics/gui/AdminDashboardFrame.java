@@ -1,14 +1,17 @@
 package com.logistics.gui;
 
 import com.logistics.models.User;
+import com.logistics.services.VehicleService;
 
 import javax.swing.*;
-import javax.swing.border.TitledBorder;
 import java.awt.*;
 
 public class AdminDashboardFrame extends JFrame {
 
-    public AdminDashboardFrame(User adminUser) {
+    private final CardLayout cardLayout = new CardLayout();
+    private final JPanel contentPanel = new JPanel(cardLayout);
+
+    public AdminDashboardFrame(User adminUser, VehicleService vehicleService) {
         setTitle("Admin Dashboard");
         setSize(1000, 700);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -30,7 +33,6 @@ public class AdminDashboardFrame extends JFrame {
         JButton manageComplaintsButton = new JButton("Manage Complaints");
         JButton logoutButton = new JButton("Logout");
 
-        // Set consistent size for buttons
         Dimension buttonSize = new Dimension(180, 40);
         manageVendorsButton.setMaximumSize(buttonSize);
         manageVehiclesButton.setMaximumSize(buttonSize);
@@ -38,44 +40,29 @@ public class AdminDashboardFrame extends JFrame {
         logoutButton.setMaximumSize(buttonSize);
 
         navigationPanel.add(adminNameLabel);
-        navigationPanel.add(Box.createRigidArea(new Dimension(0, 20))); // Spacer
+        navigationPanel.add(Box.createRigidArea(new Dimension(0, 20)));
         navigationPanel.add(manageVendorsButton);
         navigationPanel.add(Box.createRigidArea(new Dimension(0, 10)));
         navigationPanel.add(manageVehiclesButton);
         navigationPanel.add(Box.createRigidArea(new Dimension(0, 10)));
         navigationPanel.add(manageComplaintsButton);
-        navigationPanel.add(Box.createVerticalGlue()); // Pushes logout to the bottom
+        navigationPanel.add(Box.createVerticalGlue());
         navigationPanel.add(logoutButton);
 
-        // Center Panel for displaying content
-        JPanel contentPanel = new JPanel(new GridLayout(2, 2, 10, 10));
-        contentPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        // Create the panels for the CardLayout
+        JPanel welcomePanel = new JPanel(new GridBagLayout());
+        welcomePanel.add(new JLabel("Welcome, Admin! Select an option from the left menu."));
+        ManageVehiclesPanel manageVehiclesPanel = new ManageVehiclesPanel(vehicleService);
 
-        // Placeholder panels based on wireframe [1]
-        JPanel complaintPanel = new JPanel();
-        complaintPanel.setBorder(BorderFactory.createTitledBorder(
-                BorderFactory.createEtchedBorder(), "Complaint Section", TitledBorder.CENTER, TitledBorder.TOP));
-
-        JPanel vendorPanel = new JPanel();
-        vendorPanel.setBorder(BorderFactory.createTitledBorder(
-                BorderFactory.createEtchedBorder(), "Vendor List", TitledBorder.CENTER, TitledBorder.TOP));
-
-        JPanel vehiclePanel = new JPanel();
-        vehiclePanel.setBorder(BorderFactory.createTitledBorder(
-                BorderFactory.createEtchedBorder(), "Vehicle Status", TitledBorder.CENTER, TitledBorder.TOP));
-
-        JPanel agentPanel = new JPanel();
-        agentPanel.setBorder(BorderFactory.createTitledBorder(
-                BorderFactory.createEtchedBorder(), "Agent Profile", TitledBorder.CENTER, TitledBorder.TOP));
-
-        contentPanel.add(complaintPanel);
-        contentPanel.add(vendorPanel);
-        contentPanel.add(vehiclePanel);
-        contentPanel.add(agentPanel);
+        // Add panels to the content panel with unique names
+        contentPanel.add(welcomePanel, "WELCOME");
+        contentPanel.add(manageVehiclesPanel, "MANAGE_VEHICLES");
 
         add(navigationPanel, BorderLayout.WEST);
         add(contentPanel, BorderLayout.CENTER);
 
-        // TODO: Add ActionListeners for buttons to swap content panels
+        // Add ActionListeners to switch panels
+        manageVehiclesButton.addActionListener(e -> cardLayout.show(contentPanel, "MANAGE_VEHICLES"));
+        // TODO: Add ActionListeners for other buttons
     }
 }
