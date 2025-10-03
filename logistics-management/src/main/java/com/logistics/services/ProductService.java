@@ -32,4 +32,17 @@ public class ProductService {
                .filter(product -> product.getQuantity() > 0)
                .collect(Collectors.toList());
     }
+    /**
+     * Updates the stock quantity for a specific product.
+     * @param productId The ID of the product to update.
+     * @param newQuantity The new quantity to set.
+     * @return true if the update was successful, false otherwise.
+     */
+    public boolean updateProductQuantity(int productId, int newQuantity) {
+        // Business logic, like checking for negative quantities, could be added here.
+        if (newQuantity < 0) {
+            return false; // Prevent setting negative stock
+        }
+        return productDAO.updateQuantity(productId, newQuantity);
+    }
 }
