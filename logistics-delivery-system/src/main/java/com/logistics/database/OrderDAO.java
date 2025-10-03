@@ -190,4 +190,23 @@ public class OrderDAO {
             return false;
         }
     }
+    public List<Order> getOrdersByAgentId(int agentId) {
+        List<Order> orders = new ArrayList<>();
+        String sql = "SELECT * FROM Orders WHERE assigned_agent_id = ? ORDER BY created_at DESC";
+        
+        try (Connection conn = DBConnector.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            
+            pstmt.setInt(1, agentId);
+            
+            try (ResultSet rs = pstmt.executeQuery()) {
+                while (rs.next()) {
+                    orders.add(mapResultSetToOrder(rs));
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("Database error retrieving orders by agent ID: " + e.getMessage());
+        }
+        return orders;
+    }
 }
