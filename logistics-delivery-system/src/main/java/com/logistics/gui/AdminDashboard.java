@@ -16,11 +16,11 @@ public class AdminDashboard extends JFrame {
     private final Admin admin;
     private final AdminService adminService;
 
-    // GUI Components (Instance variables)
+    // GUI Components (Instance variables, required for safe linking)
     private final JPanel contentPanel; // Panel using CardLayout
-    private final JPanel navPanel;     // Panel holding navigation buttons (The fix)
+    private final JPanel navPanel;     // Panel holding navigation buttons
 
-    // Components for Vehicle Management
+    // Components for Vehicle Management (Required for handleAddVehicle logic)
     private JTextField vehicleTypeField;
     private JTextField licensePlateField;
     private JTextField driverIdField;
@@ -31,7 +31,7 @@ public class AdminDashboard extends JFrame {
         this.admin = admin;
         this.adminService = new AdminService();
         
-        // Initialize core panels early
+        // Initialize core panels early (before adding to the frame)
         this.contentPanel = createContentPanel();
         this.navPanel = createNavigationPanel();
 
@@ -45,30 +45,30 @@ public class AdminDashboard extends JFrame {
         // --- 1. Header ---
         add(createHeaderPanel(), BorderLayout.NORTH);
 
-        // --- 2. Main Content Area (Layout matching wireframe: West Nav, Center Content) ---
+        // --- 2. Main Content Area (JSplitPane layout) ---
         JSplitPane mainSplit = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,
-                this.navPanel, 
-                this.contentPanel); // <-- Use instance variables here
+                this.navPanel, // Left side
+                this.contentPanel); // Right side
         mainSplit.setDividerLocation(180);
         mainSplit.setBorder(BorderFactory.createEmptyBorder());
         add(mainSplit, BorderLayout.CENTER);
 
-        // FINAL STEP: Link navigation buttons to the CardLayout panel safely
+        // FINAL STEP: Link navigation buttons to the CardLayout panel safely (Fixes AIOOBE)
         setupNavigationListeners();
 
         setVisible(true);
     }
     
     // ==========================================================
-    // LISTENER SETUP (THE CRITICAL FIX)
+    // LISTENER SETUP (THE CRITICAL FIX for navigation)
     // ==========================================================
     private void setupNavigationListeners() {
-        // Safely iterate through components in the stored navPanel reference
-        CardLayout cl = (CardLayout) (this.contentPanel.getLayout());
+        // Safely iterate through components using the stored navPanel reference
+        final CardLayout cl = (CardLayout) (this.contentPanel.getLayout());
         
         for (Component comp : navPanel.getComponents()) {
             if (comp instanceof JButton) {
-                // Attach a listener that tells the CardLayout to switch panels
+                // Attach a listener that switches the content panel based on the button's action command
                 ((JButton) comp).addActionListener(e -> {
                     cl.show(contentPanel, e.getActionCommand());
                 });
@@ -107,12 +107,12 @@ public class AdminDashboard extends JFrame {
         panel.setBackground(AppColors.SECONDARY_GRAY);
         panel.setBorder(BorderFactory.createEmptyBorder(15, 10, 15, 10));
         
-        // Navigation Links
+        // Navigation Links (Action command must match panel name in CardLayout)
         panel.add(createNavLink("Dashboard Overview", "Overview"));
         panel.add(createNavLink("Manage Vendors", "Vendors"));
         panel.add(createNavLink("Manage Vehicles", "Vehicles"));
         panel.add(createNavLink("Resolve Complaints", "Complaints"));
-        panel.add(createNavLink("Warehouse Info", "Warehouse"));
+        panel.add(createNavLink("Warehouse Info", "Warehouse")); // <-- Button command for the new panel
 
         return panel;
     }
@@ -134,13 +134,13 @@ public class AdminDashboard extends JFrame {
         JPanel panel = new JPanel(new CardLayout());
         panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         
-        // Add all sub-panels here
+        // Add all sub-panels here. Panel name must match button ActionCommand.
         panel.add(createOverviewPanel(), "Overview");
         panel.add(createVendorManagementPanel(), "Vendors");
         panel.add(createVehicleManagementPanel(), "Vehicles");
         panel.add(createComplaintsPanel(), "Complaints");
+        panel.add(createWarehouseInfoPanel(), "Warehouse"); // <-- NEW WAREHOUSE INFO PANEL ADDED
         
-        // NOTE: Listeners are added in setupNavigationListeners(), not here.
         return panel;
     }
     
@@ -149,13 +149,11 @@ public class AdminDashboard extends JFrame {
         JPanel panel = new JPanel(new GridLayout(1, 2, 20, 0));
         panel.setBackground(AppColors.BACKGROUND_WHITE);
         
-        // Vendor List (Placeholder) 
         JTextArea vendorList = new JTextArea("VENTOR LIST (Placeholder)\n- Retailer A (Pending)\n- Agent B (Approved)");
         vendorList.setBorder(BorderFactory.createTitledBorder("Active Vendors & Agents"));
         vendorList.setEditable(false);
         panel.add(new JScrollPane(vendorList));
 
-        // Warehouse Summary Card (Placeholder) 
         JTextArea warehouseSummary = new JTextArea("WAREHOUSE SUMMARY CARD\nTotal Stock: 5,400 units\nOrders in Queue: 12\nManager: Alice");
         warehouseSummary.setBorder(BorderFactory.createTitledBorder("Warehouse Overview"));
         warehouseSummary.setEditable(false);
@@ -306,6 +304,34 @@ public class AdminDashboard extends JFrame {
         });
         
         panel.add(resolutionPanel, BorderLayout.SOUTH);
+        
+        return panel;
+    }
+    
+    // --- 3.5 Warehouse Info Panel ---
+    private JPanel createWarehouseInfoPanel() {
+        JPanel panel = new JPanel(new BorderLayout(10, 10));
+        panel.setBackground(AppColors.BACKGROUND_WHITE);
+        panel.setBorder(BorderFactory.createTitledBorder(
+            BorderFactory.createLineBorder(AppColors.PRIMARY_BLUE), "Warehouse Management & Status"
+        ));
+        
+        JTextArea infoArea = new JTextArea(
+            "WAREHOUSE SYSTEM STATUS\n\n" +
+            "Warehouse 1 (ID: 10):\n" +
+            "- Manager: Charlie Manager\n" +
+            "- Capacity Used: 80%\n" +
+            "- Inbound Shipments Today: 3"
+        );
+        infoArea.setEditable(false);
+        infoArea.setFont(new Font("Arial", Font.PLAIN, 16));
+        
+        JButton manageButton = new JButton("Go to Manager Portal (Charlie)");
+        manageButton.setBackground(AppColors.ACCENT_GREEN.darker());
+        manageButton.setForeground(AppColors.BACKGROUND_WHITE);
+        
+        panel.add(new JScrollPane(infoArea), BorderLayout.CENTER);
+        panel.add(manageButton, BorderLayout.SOUTH);
         
         return panel;
     }
