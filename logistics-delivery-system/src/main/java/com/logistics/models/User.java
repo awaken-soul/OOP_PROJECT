@@ -44,6 +44,8 @@ public abstract class User {
     public String getEmail() { return email; }
     public String getPassword() { return password; } // Getter for plain password
     public String getRole() { return role; }
+    public String getContactNumber() { return contactNumber; } // <-- FIX 1
+    public String getAddress() { return address; }         // <-- FIX 1
     // ... (All other getters/setters remain the same)
     
     public void setUserID(int userID) { this.userID = userID; }
