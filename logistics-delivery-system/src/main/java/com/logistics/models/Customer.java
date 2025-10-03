@@ -4,17 +4,14 @@ import com.logistics.services.UserService;
 public class Customer extends User {
     
     public Customer(String name, String email, String passwordHash, String contactNumber, String address) {
-        // Calls the User registration constructor, setting the role to "Customer"
         super(name, email, passwordHash, "Customer", contactNumber, address);
     }
     
     public Customer(int userID, String name, String email, String passwordHash, String contactNumber, String address) {
-        // Calls the full User constructor, setting the role to "Customer"
         super(userID, name, email, passwordHash, "Customer", contactNumber, address);
     }
 
     public void placeOrder(String orderType, String details) {
-        // In the final system, this calls OrderService.placeNewOrder(...)
         System.out.println("Customer " + getName() + " requested a service:");
         System.out.println("  Type: " + orderType + ", Details: " + details);
     }
