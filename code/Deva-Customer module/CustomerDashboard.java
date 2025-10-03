@@ -217,7 +217,6 @@ public class CustomerDashboard extends JFrame {
 
         refreshRightPane();
     }
-
  
     // ---- Active Orders ----
     private void showActiveOrders(int userId) {
