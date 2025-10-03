@@ -97,13 +97,14 @@ public class CustomerDashboard extends JFrame {
         return button;
     }
 
-    // ---- Show Products (via DAO) ----
+    // ---- Show Products  ----
     private void showProducts() {
         rightPane.removeAll();
 
         String[] columns = {"Product ID", "Name", "Description", "Price", "Quantity"};
         DefaultTableModel model = new DefaultTableModel(columns, 0);
 
+        // Fetch products via DAO
         List<Product> products = productDAO.getAllProducts();
         for (Product p : products) {
             model.addRow(new Object[]{
@@ -166,7 +167,7 @@ public class CustomerDashboard extends JFrame {
                 return;
             }
 
-            // Multi-step order placement logic remains in UI (as you required)
+            // Multi-step order placement logic stays in UI
             String[] orderTypes = {"Purchase", "Shipment", "Transport"};
             String orderType = (String) JOptionPane.showInputDialog(
                     this, "Select order type:", "Order Type",
@@ -189,62 +190,23 @@ public class CustomerDashboard extends JFrame {
                 if (destinationAddress == null || destinationAddress.trim().isEmpty()) return;
             }
 
-            String paymentStatus = "Pending";
-            String status = "Pending";
-            int userId = user.getUserId();
+            // Call DAO instead of embedding SQL
+            boolean success = productDAO.placeOrderWithPayment(
+                    user.getUserId(), productId, qty, orderType, sourceAddress, destinationAddress);
 
-            try (Connection conn = DBConnection.getConnection()) {
-                conn.setAutoCommit(false);
-
-                int orderId = -1;
-                String insertSql = "INSERT INTO Orders (user_id, product_id, order_type, source_address, destination_address, status, payment_status) VALUES (?, ?, ?, ?, ?, ?, ?)";
-                try (PreparedStatement insertP = conn.prepareStatement(insertSql, Statement.RETURN_GENERATED_KEYS)) {
-                    insertP.setInt(1, userId);
-                    insertP.setInt(2, productId);
-                    insertP.setString(3, orderType);
-                    insertP.setString(4, sourceAddress);
-                    insertP.setString(5, destinationAddress);
-                    insertP.setString(6, status);
-                    insertP.setString(7, paymentStatus);
-                    insertP.executeUpdate();
-
-                    ResultSet keys = insertP.getGeneratedKeys();
-                    if (keys.next()) {
-                        orderId = keys.getInt(1);
-                    }
-                }
-
-                // update stock
-                productDAO.updateQuantity(productId, qty);
-
-                // create payment record
-                double price = Double.parseDouble(table.getValueAt(selectedRow, 3).toString());
-                double totalAmount = price * qty;
-                String paySql = "INSERT INTO Payment (order_id, amount, method, status) VALUES (?, ?, ?, ?)";
-                try (PreparedStatement psPay = conn.prepareStatement(paySql)) {
-                    psPay.setInt(1, orderId);
-                    psPay.setDouble(2, totalAmount);
-                    psPay.setString(3, "UPI");
-                    psPay.setString(4, "Pending");
-                    psPay.executeUpdate();
-                }
-
-                conn.commit();
+            if (success) {
                 table.setValueAt(availableQty - qty, selectedRow, 4);
-
                 JOptionPane.showMessageDialog(this,
                         "Order placed!\n\nProduct: " + productName +
                                 "\nQuantity: " + qty +
                                 "\nOrder Type: " + orderType +
                                 "\nFrom: " + sourceAddress +
                                 "\nTo: " + destinationAddress +
-                                "\nPayment status: " + paymentStatus,
+                                "\nPayment status: Pending",
                         "Success", JOptionPane.INFORMATION_MESSAGE);
-
-            } catch (SQLException ex) {
-                ex.printStackTrace();
+            } else {
                 JOptionPane.showMessageDialog(this,
-                        "Error placing order: " + ex.getMessage(),
+                        "Error placing order. Please try again.",
                         "Database Error", JOptionPane.ERROR_MESSAGE);
             }
         });
@@ -256,6 +218,7 @@ public class CustomerDashboard extends JFrame {
         refreshRightPane();
     }
 
+ 
     // ---- Active Orders ----
     private void showActiveOrders(int userId) {
         rightPane.removeAll();
