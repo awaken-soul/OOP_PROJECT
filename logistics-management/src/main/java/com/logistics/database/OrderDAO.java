@@ -111,6 +111,20 @@ public class OrderDAO implements Dao<Order> {
         }
     }
 
+    public boolean assignAgentAndVehicle(int orderId, int agentId, int vehicleId, String newStatus) {
+        String sql = "UPDATE orders SET assigned_agent_id =?, vehicle_id =?, status =?, updated_at = CURRENT_TIMESTAMP WHERE order_id =?";
+        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+            pstmt.setInt(1, agentId);
+            pstmt.setInt(2, vehicleId);
+            pstmt.setString(3, newStatus);
+            pstmt.setInt(4, orderId);
+            return pstmt.executeUpdate() > 0;
+        } catch (SQLException e) {
+            throw new DataAccessException("Error assigning agent to order.", e);
+        }
+    }
+
+
     @Override
     public boolean delete(Order order) {
         // Implementation for deleting an order
