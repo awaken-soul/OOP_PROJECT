@@ -107,6 +107,22 @@ public class UserDAO implements Dao<User> {
         }
     }
 
+    public List<User> findAvailableAgents() {
+        List<User> agents = new ArrayList<>();
+        // In a real system, 'available' might check a user's status.
+        // For now, we'll return all users with the AGENT role.
+        String sql = "SELECT * FROM users WHERE role = 'AGENT'";
+        try (Statement stmt = connection.createStatement();
+             ResultSet rs = stmt.executeQuery(sql)) {
+            while (rs.next()) {
+                agents.add(mapRowToUser(rs));
+            }
+        } catch (SQLException e) {
+            throw new DataAccessException("Error finding available agents.", e);
+        }
+        return agents;
+    }
+
     private User mapRowToUser(ResultSet rs) throws SQLException {
         return new User(
                 rs.getInt("user_id"),
