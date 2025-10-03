@@ -12,6 +12,7 @@ public class MainApplication {
         DBConnector.createTables(); 
     
         new UserDAO().initializeTestUsers(); 
+        new VehicleDAO().initializeTestVehicles();
         
         System.out.println("System initialization complete. Launching Login Frame...");
 
