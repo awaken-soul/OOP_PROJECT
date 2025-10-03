@@ -55,7 +55,7 @@ public class LoginFrame extends JFrame {
         emailField = new JTextField(20);
         gbc.gridy = 2;
         rightPanel.add(emailField, gbc);
--
+        
         gbc.gridy = 3;
         rightPanel.add(new JLabel("Password:"), gbc);
         passwordField = new JPasswordField(20);
