@@ -136,7 +136,9 @@ public class CustomerDashboardFrame extends JFrame {
         if (result == JOptionPane.OK_OPTION) {
             String subject = subjectField.getText();
             String description = descriptionArea.getText();
-            if (subject.trim().isEmpty() || description.trim().isEmpty()) {
+            if (subject.trim().isEmpty() |
+
+| description.trim().isEmpty()) {
                 JOptionPane.showMessageDialog(this, "Subject and Description cannot be empty.", "Invalid Input", JOptionPane.ERROR_MESSAGE);
                 return;
             }
@@ -194,7 +196,9 @@ public class CustomerDashboardFrame extends JFrame {
             Product selectedProduct = (Product) productComboBox.getSelectedItem();
             String source = sourceField.getText();
             String destination = destinationField.getText();
-            if (selectedProduct == null || destination.trim().isEmpty()) {
+            if (selectedProduct == null |
+
+| destination.trim().isEmpty()) {
                 JOptionPane.showMessageDialog(this, "Please select a product and enter a destination address.", "Invalid Input", JOptionPane.ERROR_MESSAGE);
                 return;
             }
