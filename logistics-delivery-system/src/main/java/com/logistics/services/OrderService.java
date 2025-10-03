@@ -35,12 +35,6 @@ public class OrderService {
         return order;
     }
     
-    // --- Business Logic: Agent Assignment ---
-
-    /**
-     * Finds the first available Agent and Vehicle and assigns them to the order.
-     * This fulfills the assignment requirement using actual DB availability.
-     */
     public boolean attemptToAssignAgent(int orderId) {
         Order order = orderDAO.getOrderById(orderId);
         if (order == null || !order.getStatus().equals("Pending")) return false;
@@ -48,13 +42,13 @@ public class OrderService {
         // 1. Get first available agent and vehicle
         List<DeliveryAgent> availableAgents = userDAO.getAvailableAgents(); 
         List<Vehicle> availableVehicles = vehicleDAO.getAvailableVehicles(); 
-
+    
         if (availableAgents.isEmpty() || availableVehicles.isEmpty()) {
             System.out.println("Assignment skipped for Order " + orderId + ": No agents/vehicles currently available.");
             return false;
         }
         
-        // 2. Assign the first available Agent/Vehicle (Simplest implementation of availability)
+        // 2. ASSIGNMENT LOGIC: Assign the first agent and vehicle found (The "Next Available" logic)
         DeliveryAgent agent = availableAgents.get(0);
         Vehicle vehicle = availableVehicles.get(0);
         
@@ -65,9 +59,9 @@ public class OrderService {
             agent.getUserID(), 
             vehicle.getVehicleID()
         );
-
+    
         if (success) {
-            // Update the vehicle status to 'On Delivery' and agent status
+            // Update the vehicle status to 'On Delivery' (takes it out of the available list for next order)
             vehicleDAO.updateVehicleStatus(vehicle.getVehicleID(), "On Delivery", vehicle.getCurrentLocation());
             System.out.println("Successfully assigned Agent " + agent.getUserID() + " to Order " + orderId + " with Vehicle " + vehicle.getVehicleID());
             return true;
@@ -75,6 +69,7 @@ public class OrderService {
         
         return false;
     }
+
     
     // --- Functional Requirement: Shipment Tracking ---
 
