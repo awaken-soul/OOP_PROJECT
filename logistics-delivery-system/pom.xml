@@ -37,7 +37,7 @@
             <configuration>
                 <archive>
                     <manifest>
-                        <mainClass>com.logistics.MainApp</mainClass> <!-- Replace with your actual main class -->
+                        <mainClass>com.logistics.gui.MainApplication</mainClass> <!-- Replace with your actual main class -->
                     </manifest>
                 </archive>
             </configuration>
