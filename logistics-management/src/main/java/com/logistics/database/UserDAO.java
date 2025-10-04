@@ -1,6 +1,7 @@
 package com.logistics.database;
 
 import com.logistics.models.User;
+import com.logistics.models.Role;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -30,21 +31,6 @@ public class UserDAO implements Dao<User> {
         return Optional.empty();
     }
 
-    public List<User> findAvailableAgents() {
-    List<User> agents = new ArrayList<>();
-    String sql = "SELECT * FROM users WHERE role = 'AGENT'";
-    try (Statement stmt = connection.createStatement();
-         ResultSet rs = stmt.executeQuery(sql)) {
-        while (rs.next()) {
-            agents.add(mapRowToUser(rs));
-        }
-    } catch (SQLException e) {
-        throw new DataAccessException("Error fetching available agents.", e);
-    }
-    return agents;
-}
-
-    
     @Override
     public List<User> findAll() {
         List<User> users = new ArrayList<>();
@@ -67,7 +53,7 @@ public class UserDAO implements Dao<User> {
             pstmt.setString(1, user.getName());
             pstmt.setString(2, user.getEmail());
             pstmt.setString(3, user.getPassword());
-            pstmt.setString(4, user.getRole());
+            pstmt.setString(4, user.getRole().name()); // Role -> String
             pstmt.setString(5, user.getContactNumber());
             pstmt.setString(6, user.getAddress());
 
@@ -92,7 +78,7 @@ public class UserDAO implements Dao<User> {
             pstmt.setString(1, user.getName());
             pstmt.setString(2, user.getEmail());
             pstmt.setString(3, user.getPassword());
-            pstmt.setString(4, user.getRole());
+            pstmt.setString(4, user.getRole().name()); // Role -> String
             pstmt.setString(5, user.getContactNumber());
             pstmt.setString(6, user.getAddress());
             pstmt.setInt(7, user.getUserId());
@@ -128,13 +114,28 @@ public class UserDAO implements Dao<User> {
         return Optional.empty();
     }
 
+    // New method to find all users with role AGENT
+    public List<User> findAvailableAgents() {
+        List<User> agents = new ArrayList<>();
+        String sql = "SELECT * FROM users WHERE role = 'AGENT'";
+        try (Statement stmt = connection.createStatement();
+             ResultSet rs = stmt.executeQuery(sql)) {
+            while (rs.next()) {
+                agents.add(mapRowToUser(rs));
+            }
+        } catch (SQLException e) {
+            throw new DataAccessException("Error fetching available agents.", e);
+        }
+        return agents;
+    }
+
     private User mapRowToUser(ResultSet rs) throws SQLException {
         return new User(
                 rs.getInt("user_id"),
                 rs.getString("name"),
                 rs.getString("email"),
                 rs.getString("password"),
-                rs.getString("role"),
+                Role.valueOf(rs.getString("role")), // String -> Role
                 rs.getString("contact_number"),
                 rs.getString("address")
         );
