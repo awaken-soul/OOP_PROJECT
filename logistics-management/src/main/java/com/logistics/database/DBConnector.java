@@ -1,212 +1,153 @@
 package com.logistics.database;
 
-import com.logistics.models.Order;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 
-import java.sql.*;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+public class DBConnector {
 
-public class OrderDAO implements Dao<Order> {
+    private static DBConnector instance;
+    private Connection connection;
 
-    private final Connection connection;
+    private DBConnector() {
+        try {
+            // Create a temporary SQLite database file
+            Path tempDb = Files.createTempFile("logistics", ".db");
+            String dbUrl = "jdbc:sqlite:" + tempDb.toAbsolutePath();
 
-    public OrderDAO() {
-        this.connection = DBConnector.getInstance().getConnection();
-    }
-
-    @Override
-    public Optional<Order> findById(int id) {
-        String sql = "SELECT * FROM orders WHERE order_id = ?";
-        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
-            pstmt.setInt(1, id);
-            ResultSet rs = pstmt.executeQuery();
-            if (rs.next()) {
-                return Optional.of(mapRowToOrder(rs));
-            }
-        } catch (SQLException e) {
-            throw new DataAccessException("Error finding order by id.", e);
-        }
-        return Optional.empty();
-    }
-
-    @Override
-    public List<Order> findAll() {
-        List<Order> orders = new ArrayList<>();
-        String sql = "SELECT * FROM orders";
-        try (Statement stmt = connection.createStatement();
-             ResultSet rs = stmt.executeQuery(sql)) {
-            while (rs.next()) {
-                orders.add(mapRowToOrder(rs));
-            }
-        } catch (SQLException e) {
-            throw new DataAccessException("Error finding all orders.", e);
-        }
-        return orders;
-    }
-
-    public List<Order> findByAgentId(int agentId) {
-        List<Order> orders = new ArrayList<>();
-        String sql = "SELECT * FROM orders WHERE assigned_agent_id = ?";
-        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
-            pstmt.setInt(1, agentId);
-            ResultSet rs = pstmt.executeQuery();
-            while (rs.next()) {
-                orders.add(mapRowToOrder(rs));
-            }
-        } catch (SQLException e) {
-            throw new DataAccessException("Error finding orders by agent id.", e);
-        }
-        return orders;
-    }
-
-    public List<Order> findByUserId(int userId) {
-        List<Order> orders = new ArrayList<>();
-        String sql = "SELECT * FROM orders WHERE user_id = ?";
-        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
-            pstmt.setInt(1, userId);
-            ResultSet rs = pstmt.executeQuery();
-            while (rs.next()) {
-                orders.add(mapRowToOrder(rs));
-            }
-        } catch (SQLException e) {
-            throw new DataAccessException("Error finding orders by user id.", e);
-        }
-        return orders;
-    }
-
-    @Override
-    public Optional<Integer> save(Order order) {
-        String sql = "INSERT INTO orders(user_id, product_id, order_type, source_address, destination_address, status, payment_status) VALUES(?,?,?,?,?,?,?)";
-        try (PreparedStatement pstmt = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
-            pstmt.setInt(1, order.getUserId());
-            pstmt.setInt(2, order.getProductId());
-            pstmt.setString(3, order.getOrderType());
-            pstmt.setString(4, order.getSourceAddress());
-            pstmt.setString(5, order.getDestinationAddress());
-            pstmt.setString(6, order.getStatus());
-            pstmt.setString(7, order.getPaymentStatus());
-
-            int affectedRows = pstmt.executeUpdate();
-            if (affectedRows > 0) {
-                try (ResultSet generatedKeys = pstmt.getGeneratedKeys()) {
-                    if (generatedKeys.next()) {
-                        return Optional.of(generatedKeys.getInt(1));
-                    }
-                }
-            }
-        } catch (SQLException e) {
-            throw new DataAccessException("Error saving order.", e);
-        }
-        return Optional.empty();
-    }
-
-    @Override
-    public boolean update(Order order) {
-        String sql = "UPDATE orders SET product_id=?, order_type=?, source_address=?, destination_address=?, status=?, payment_status=?, assigned_agent_id=?, vehicle_id=?, updated_at=CURRENT_TIMESTAMP WHERE order_id=?";
-        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
-            pstmt.setInt(1, order.getProductId());
-            pstmt.setString(2, order.getOrderType());
-            pstmt.setString(3, order.getSourceAddress());
-            pstmt.setString(4, order.getDestinationAddress());
-            pstmt.setString(5, order.getStatus());
-            pstmt.setString(6, order.getPaymentStatus());
-            pstmt.setObject(7, order.getAssignedAgentId(), java.sql.Types.INTEGER);
-            pstmt.setObject(8, order.getVehicleId(), java.sql.Types.INTEGER);
-            pstmt.setInt(9, order.getOrderId());
-
-            return pstmt.executeUpdate() > 0;
-        } catch (SQLException e) {
-            throw new DataAccessException("Error updating order.", e);
+            connection = DriverManager.getConnection(dbUrl);
+            System.out.println("Connection to SQLite has been established.");
+            
+            // Initialize schema (create tables)
+            initializeSchema();
+        } catch (SQLException | java.io.IOException e) {
+            System.err.println("Failed to connect to the database: " + e.getMessage());
+            throw new RuntimeException(e);
         }
     }
 
-    public boolean updateStatus(int orderId, String newStatus) {
-        String sql = "UPDATE orders SET status=?, updated_at=CURRENT_TIMESTAMP WHERE order_id=?";
-        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
-            pstmt.setString(1, newStatus);
-            pstmt.setInt(2, orderId);
-            return pstmt.executeUpdate() > 0;
-        } catch (SQLException e) {
-            throw new DataAccessException("Error updating order status.", e);
+    public static synchronized DBConnector getInstance() {
+        if (instance == null) {
+            instance = new DBConnector();
         }
+        return instance;
     }
 
-    public List<Order> findByStatus(String status) {
-        List<Order> orders = new ArrayList<>();
-        String sql = "SELECT * FROM orders WHERE status=?";
-        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
-            pstmt.setString(1, status);
-            ResultSet rs = pstmt.executeQuery();
-            while (rs.next()) {
-                orders.add(mapRowToOrder(rs));
-            }
-        } catch (SQLException e) {
-            throw new DataAccessException("Error finding orders by status.", e);
-        }
-        return orders;
+    public Connection getConnection() {
+        return connection;
     }
 
-    public boolean assignAgentAndVehicle(int orderId, Integer agentId, Integer vehicleId, String newStatus) {
-        String sql = "UPDATE orders SET assigned_agent_id=?, vehicle_id=?, status=?, updated_at=CURRENT_TIMESTAMP WHERE order_id=?";
-        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
-            if (agentId != null) {
-                pstmt.setInt(1, agentId);
-            } else {
-                pstmt.setNull(1, Types.INTEGER);
-            }
+    private void initializeSchema() {
+        try (Statement stmt = connection.createStatement()) {
+            // Users Table
+            stmt.execute("CREATE TABLE IF NOT EXISTS users (" +
+                    "user_id INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                    "name TEXT NOT NULL, " +
+                    "email TEXT UNIQUE NOT NULL, " +
+                    "password TEXT NOT NULL, " +
+                    "role TEXT NOT NULL CHECK(role IN ('CUSTOMER', 'ADMIN', 'AGENT', 'MANAGER')), " +
+                    "contact_number TEXT, " +
+                    "address TEXT)");
 
-            if (vehicleId != null) {
-                pstmt.setInt(2, vehicleId);
-            } else {
-                pstmt.setNull(2, Types.INTEGER);
-            }
+            // Warehouse Table
+            stmt.execute("CREATE TABLE IF NOT EXISTS warehouse (" +
+                    "warehouse_id INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                    "name TEXT NOT NULL, " +
+                    "address TEXT, " +
+                    "capacity INTEGER, " +
+                    "manager_id INTEGER, " +
+                    "FOREIGN KEY (manager_id) REFERENCES users(user_id))");
 
-            pstmt.setString(3, newStatus);
-            pstmt.setInt(4, orderId);
+            // Retailer Table
+            stmt.execute("CREATE TABLE IF NOT EXISTS retailer (" +
+                    "retailer_id INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                    "name TEXT NOT NULL, " +
+                    "address TEXT, " +
+                    "contact_number TEXT)");
 
-            return pstmt.executeUpdate() > 0;
+            // Product Table
+            stmt.execute("CREATE TABLE IF NOT EXISTS product (" +
+                    "product_id INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                    "name TEXT NOT NULL, " +
+                    "description TEXT, " +
+                    "price REAL, " +
+                    "quantity INTEGER, " +
+                    "warehouse_id INTEGER, " +
+                    "retailer_id INTEGER, " +
+                    "FOREIGN KEY (warehouse_id) REFERENCES warehouse(warehouse_id), " +
+                    "FOREIGN KEY (retailer_id) REFERENCES retailer(retailer_id))");
+
+            // Vehicle Table
+            stmt.execute("CREATE TABLE IF NOT EXISTS vehicles (" +
+                    "vehicle_id INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                    "vehicle_type TEXT NOT NULL, " +
+                    "license_plate TEXT UNIQUE NOT NULL, " +
+                    "status TEXT NOT NULL, " +
+                    "driver_id INTEGER, " +
+                    "current_location TEXT, " +
+                    "FOREIGN KEY (driver_id) REFERENCES users(user_id))");
+
+            // Orders Table
+            stmt.execute("CREATE TABLE IF NOT EXISTS orders (" +
+                    "order_id INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                    "user_id INTEGER NOT NULL, " +
+                    "product_id INTEGER, " +
+                    "order_type TEXT NOT NULL, " +
+                    "source_address TEXT NOT NULL, " +
+                    "destination_address TEXT NOT NULL, " +
+                    "status TEXT NOT NULL, " +
+                    "assigned_agent_id INTEGER, " +
+                    "vehicle_id INTEGER, " +
+                    "payment_status TEXT NOT NULL, " +
+                    "created_at DATETIME DEFAULT CURRENT_TIMESTAMP, " +
+                    "updated_at DATETIME DEFAULT CURRENT_TIMESTAMP, " +
+                    "FOREIGN KEY (user_id) REFERENCES users(user_id), " +
+                    "FOREIGN KEY (product_id) REFERENCES product(product_id), " +
+                    "FOREIGN KEY (assigned_agent_id) REFERENCES users(user_id), " +
+                    "FOREIGN KEY (vehicle_id) REFERENCES vehicles(vehicle_id))");
+
+            // Payment Table
+            stmt.execute("CREATE TABLE IF NOT EXISTS payment (" +
+                    "payment_id INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                    "order_id INTEGER NOT NULL, " +
+                    "amount REAL, " +
+                    "method TEXT, " +
+                    "status TEXT, " +
+                    "payment_date DATETIME, " +
+                    "FOREIGN KEY (order_id) REFERENCES orders(order_id))");
+
+            // Tracking Table
+            stmt.execute("CREATE TABLE IF NOT EXISTS tracking (" +
+                    "tracking_id INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                    "order_id INTEGER NOT NULL, " +
+                    "agent_id INTEGER, " +
+                    "current_status TEXT, " +
+                    "location TEXT, " +
+                    "updated_at DATETIME, " +
+                    "FOREIGN KEY (order_id) REFERENCES orders(order_id), " +
+                    "FOREIGN KEY (agent_id) REFERENCES users(user_id))");
+
+            // Complaints Table
+            stmt.execute("CREATE TABLE IF NOT EXISTS complaints (" +
+                    "complaint_id INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                    "user_id INTEGER NOT NULL, " +
+                    "order_id INTEGER, " +
+                    "subject TEXT NOT NULL, " +
+                    "description TEXT NOT NULL, " +
+                    "status TEXT NOT NULL, " +
+                    "created_at DATETIME DEFAULT CURRENT_TIMESTAMP, " +
+                    "FOREIGN KEY (user_id) REFERENCES users(user_id), " +
+                    "FOREIGN KEY (order_id) REFERENCES orders(order_id))");
+
+            System.out.println("Database schema initialized successfully.");
+
         } catch (SQLException e) {
-            throw new DataAccessException("Error assigning agent and vehicle to order.", e);
+            System.err.println("Error initializing database schema: " + e.getMessage());
+            throw new RuntimeException(e);
         }
-    }
-
-    public boolean updatePaymentStatus(int orderId, String newPaymentStatus) {
-        String sql = "UPDATE orders SET payment_status=? WHERE order_id=?";
-        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
-            pstmt.setString(1, newPaymentStatus);
-            pstmt.setInt(2, orderId);
-            return pstmt.executeUpdate() > 0;
-        } catch (SQLException e) {
-            throw new DataAccessException("Error updating order payment status.", e);
-        }
-    }
-
-    @Override
-    public boolean delete(Order order) {
-        String sql = "DELETE FROM orders WHERE order_id=?";
-        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
-            pstmt.setInt(1, order.getOrderId());
-            return pstmt.executeUpdate() > 0;
-        } catch (SQLException e) {
-            throw new DataAccessException("Error deleting order.", e);
-        }
-    }
-
-    private Order mapRowToOrder(ResultSet rs) throws SQLException {
-        return new Order(
-                rs.getInt("order_id"),
-                rs.getInt("user_id"),
-                rs.getInt("product_id"),
-                rs.getString("order_type"),
-                rs.getString("source_address"),
-                rs.getString("destination_address"),
-                rs.getString("status"),
-                rs.getObject("assigned_agent_id") != null ? rs.getInt("assigned_agent_id") : null,
-                rs.getObject("vehicle_id") != null ? rs.getInt("vehicle_id") : null,
-                rs.getString("payment_status"),
-                rs.getTimestamp("created_at").toLocalDateTime(),
-                rs.getTimestamp("updated_at").toLocalDateTime()
-        );
     }
 }
