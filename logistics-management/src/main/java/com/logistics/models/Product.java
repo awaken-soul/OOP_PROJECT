@@ -6,10 +6,10 @@ public class Product {
     private String description;
     private double price;
     private int quantity;
-    private int warehouseId;
-    private int retailerId;
+    private Integer warehouseId; // Use Integer to allow null
+    private Integer retailerId;  // Use Integer to allow null
 
-    public Product(int productId, String name, String description, double price, int quantity, int warehouseId, int retailerId) {
+    public Product(int productId, String name, String description, double price, int quantity, Integer warehouseId, Integer retailerId) {
         this.productId = productId;
         this.name = name;
         this.description = description;
@@ -22,16 +22,22 @@ public class Product {
     // Getters and Setters
     public int getProductId() { return productId; }
     public void setProductId(int productId) { this.productId = productId; }
+
     public String getName() { return name; }
     public void setName(String name) { this.name = name; }
+
     public String getDescription() { return description; }
     public void setDescription(String description) { this.description = description; }
+
     public double getPrice() { return price; }
     public void setPrice(double price) { this.price = price; }
+
     public int getQuantity() { return quantity; }
     public void setQuantity(int quantity) { this.quantity = quantity; }
-    public int getWarehouseId() { return warehouseId; }
-    public void setWarehouseId(int warehouseId) { this.warehouseId = warehouseId; }
-    public int getRetailerId() { return retailerId; }
-    public void setRetailerId(int retailerId) { this.retailerId = retailerId; }
+
+    public Integer getWarehouseId() { return warehouseId; }
+    public void setWarehouseId(Integer warehouseId) { this.warehouseId = warehouseId; }
+
+    public Integer getRetailerId() { return retailerId; }
+    public void setRetailerId(Integer retailerId) { this.retailerId = retailerId; }
 }
