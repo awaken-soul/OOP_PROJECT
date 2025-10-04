@@ -23,7 +23,7 @@ public class OrderDAO implements Dao<Order> {
             ResultSet rs = pstmt.executeQuery();
             if (rs.next()) return Optional.of(mapRowToOrder(rs));
         } catch (SQLException e) {
-            throw new RuntimeException("Error finding order by id.", e);
+            throw new DataAccessException("Error finding order by id.", e);
         }
         return Optional.empty();
     }
@@ -36,7 +36,7 @@ public class OrderDAO implements Dao<Order> {
              ResultSet rs = stmt.executeQuery(sql)) {
             while (rs.next()) orders.add(mapRowToOrder(rs));
         } catch (SQLException e) {
-            throw new RuntimeException("Error finding all orders.", e);
+            throw new DataAccessException("Error finding all orders.", e);
         }
         return orders;
     }
@@ -52,11 +52,15 @@ public class OrderDAO implements Dao<Order> {
             pstmt.setString(5, order.getDestinationAddress());
             pstmt.setString(6, order.getStatus());
             pstmt.setString(7, order.getPaymentStatus());
-            pstmt.executeUpdate();
-            ResultSet keys = pstmt.getGeneratedKeys();
-            if (keys.next()) return Optional.of(keys.getInt(1));
+
+            int affectedRows = pstmt.executeUpdate();
+            if (affectedRows > 0) {
+                try (ResultSet keys = pstmt.getGeneratedKeys()) {
+                    if (keys.next()) return Optional.of(keys.getInt(1));
+                }
+            }
         } catch (SQLException e) {
-            throw new RuntimeException("Error saving order.", e);
+            throw new DataAccessException("Error saving order.", e);
         }
         return Optional.empty();
     }
@@ -69,7 +73,7 @@ public class OrderDAO implements Dao<Order> {
             pstmt.setInt(2, order.getOrderId());
             return pstmt.executeUpdate() > 0;
         } catch (SQLException e) {
-            throw new RuntimeException("Error updating order.", e);
+            throw new DataAccessException("Error updating order.", e);
         }
     }
 
@@ -80,10 +84,87 @@ public class OrderDAO implements Dao<Order> {
             pstmt.setInt(1, order.getOrderId());
             return pstmt.executeUpdate() > 0;
         } catch (SQLException e) {
-            throw new RuntimeException("Error deleting order.", e);
+            throw new DataAccessException("Error deleting order.", e);
         }
     }
 
+    // --- Additional methods used in OrderService ---
+
+    public List<Order> findByAgentId(int agentId) {
+        List<Order> orders = new ArrayList<>();
+        String sql = "SELECT * FROM orders WHERE assigned_agent_id = ?";
+        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+            pstmt.setInt(1, agentId);
+            ResultSet rs = pstmt.executeQuery();
+            while (rs.next()) orders.add(mapRowToOrder(rs));
+        } catch (SQLException e) {
+            throw new DataAccessException("Error finding orders by agent id.", e);
+        }
+        return orders;
+    }
+
+    public List<Order> findByUserId(int userId) {
+        List<Order> orders = new ArrayList<>();
+        String sql = "SELECT * FROM orders WHERE user_id = ?";
+        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+            pstmt.setInt(1, userId);
+            ResultSet rs = pstmt.executeQuery();
+            while (rs.next()) orders.add(mapRowToOrder(rs));
+        } catch (SQLException e) {
+            throw new DataAccessException("Error finding orders by user id.", e);
+        }
+        return orders;
+    }
+
+    public boolean updateStatus(int orderId, String newStatus) {
+        String sql = "UPDATE orders SET status = ?, updated_at = CURRENT_TIMESTAMP WHERE order_id = ?";
+        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+            pstmt.setString(1, newStatus);
+            pstmt.setInt(2, orderId);
+            return pstmt.executeUpdate() > 0;
+        } catch (SQLException e) {
+            throw new DataAccessException("Error updating order status.", e);
+        }
+    }
+
+    public boolean updatePaymentStatus(int orderId, String newPaymentStatus) {
+        String sql = "UPDATE orders SET payment_status = ?, updated_at = CURRENT_TIMESTAMP WHERE order_id = ?";
+        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+            pstmt.setString(1, newPaymentStatus);
+            pstmt.setInt(2, orderId);
+            return pstmt.executeUpdate() > 0;
+        } catch (SQLException e) {
+            throw new DataAccessException("Error updating payment status.", e);
+        }
+    }
+
+    public boolean assignAgentAndVehicle(int orderId, int agentId, int vehicleId, String newStatus) {
+        String sql = "UPDATE orders SET assigned_agent_id = ?, vehicle_id = ?, status = ?, updated_at = CURRENT_TIMESTAMP WHERE order_id = ?";
+        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+            pstmt.setInt(1, agentId);
+            pstmt.setInt(2, vehicleId);
+            pstmt.setString(3, newStatus);
+            pstmt.setInt(4, orderId);
+            return pstmt.executeUpdate() > 0;
+        } catch (SQLException e) {
+            throw new DataAccessException("Error assigning agent and vehicle.", e);
+        }
+    }
+
+    public List<Order> findByStatus(String status) {
+        List<Order> orders = new ArrayList<>();
+        String sql = "SELECT * FROM orders WHERE status = ?";
+        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+            pstmt.setString(1, status);
+            ResultSet rs = pstmt.executeQuery();
+            while (rs.next()) orders.add(mapRowToOrder(rs));
+        } catch (SQLException e) {
+            throw new DataAccessException("Error finding orders by status.", e);
+        }
+        return orders;
+    }
+
+    // --- Helper method ---
     private Order mapRowToOrder(ResultSet rs) throws SQLException {
         return new Order(
                 rs.getInt("order_id"),
@@ -96,8 +177,8 @@ public class OrderDAO implements Dao<Order> {
                 rs.getInt("assigned_agent_id"),
                 rs.getInt("vehicle_id"),
                 rs.getString("payment_status"),
-                rs.getTimestamp("created_at").toLocalDateTime(),
-                rs.getTimestamp("updated_at").toLocalDateTime()
+                rs.getTimestamp("created_at") != null ? rs.getTimestamp("created_at").toLocalDateTime() : null,
+                rs.getTimestamp("updated_at") != null ? rs.getTimestamp("updated_at").toLocalDateTime() : null
         );
     }
 }
