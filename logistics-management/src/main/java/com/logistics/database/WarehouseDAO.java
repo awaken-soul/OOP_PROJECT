@@ -17,7 +17,7 @@ public class WarehouseDAO implements Dao<Warehouse> {
 
     @Override
     public Optional<Warehouse> findById(int id) {
-        String sql = "SELECT * FROM warehouse WHERE warehouse_id =?";
+        String sql = "SELECT * FROM warehouse WHERE warehouse_id = ?";
         try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
             pstmt.setInt(1, id);
             ResultSet rs = pstmt.executeQuery();
@@ -48,12 +48,22 @@ public class WarehouseDAO implements Dao<Warehouse> {
     @Override
     public Optional<Integer> save(Warehouse warehouse) {
         String sql = "INSERT INTO warehouse(name, address, capacity, manager_id) VALUES(?,?,?,?)";
-        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+        try (PreparedStatement pstmt = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             pstmt.setString(1, warehouse.getName());
             pstmt.setString(2, warehouse.getAddress());
             pstmt.setInt(3, warehouse.getCapacity());
             pstmt.setInt(4, warehouse.getManagerId());
-            return pstmt.executeUpdate() > 0;
+            int affectedRows = pstmt.executeUpdate();
+
+            if (affectedRows == 0) return Optional.empty();
+
+            try (ResultSet generatedKeys = pstmt.getGeneratedKeys()) {
+                if (generatedKeys.next()) {
+                    return Optional.of(generatedKeys.getInt(1));
+                } else {
+                    return Optional.empty();
+                }
+            }
         } catch (SQLException e) {
             throw new DataAccessException("Error saving warehouse.", e);
         }
@@ -61,7 +71,7 @@ public class WarehouseDAO implements Dao<Warehouse> {
 
     @Override
     public boolean update(Warehouse warehouse) {
-        String sql = "UPDATE warehouse SET name =?, address =?, capacity =?, manager_id =? WHERE warehouse_id =?";
+        String sql = "UPDATE warehouse SET name = ?, address = ?, capacity = ?, manager_id = ? WHERE warehouse_id = ?";
         try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
             pstmt.setString(1, warehouse.getName());
             pstmt.setString(2, warehouse.getAddress());
@@ -76,7 +86,7 @@ public class WarehouseDAO implements Dao<Warehouse> {
 
     @Override
     public boolean delete(Warehouse warehouse) {
-        String sql = "DELETE FROM warehouse WHERE warehouse_id =?";
+        String sql = "DELETE FROM warehouse WHERE warehouse_id = ?";
         try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
             pstmt.setInt(1, warehouse.getWarehouseId());
             return pstmt.executeUpdate() > 0;
