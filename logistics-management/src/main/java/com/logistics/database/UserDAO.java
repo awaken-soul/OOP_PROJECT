@@ -18,7 +18,7 @@ public class UserDAO implements Dao<User> {
 
     @Override
     public Optional<User> findById(int id) {
-        String sql = "SELECT * FROM users WHERE user_id =?";
+        String sql = "SELECT * FROM users WHERE user_id = ?";
         try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
             pstmt.setInt(1, id);
             ResultSet rs = pstmt.executeQuery();
@@ -32,7 +32,7 @@ public class UserDAO implements Dao<User> {
     }
 
     public Optional<User> findByEmail(String email) {
-        String sql = "SELECT * FROM users WHERE email =?";
+        String sql = "SELECT * FROM users WHERE email = ?";
         try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
             pstmt.setString(1, email);
             ResultSet rs = pstmt.executeQuery();
@@ -63,15 +63,23 @@ public class UserDAO implements Dao<User> {
     @Override
     public Optional<Integer> save(User user) {
         String sql = "INSERT INTO users(name, email, password, role, contact_number, address) VALUES(?,?,?,?,?,?)";
-        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+        try (PreparedStatement pstmt = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             pstmt.setString(1, user.getName());
             pstmt.setString(2, user.getEmail());
             pstmt.setString(3, user.getPassword());
             pstmt.setString(4, user.getRole().name());
             pstmt.setString(5, user.getContactNumber());
             pstmt.setString(6, user.getAddress());
+
             int affectedRows = pstmt.executeUpdate();
-            return affectedRows > 0;
+            if (affectedRows > 0) {
+                try (ResultSet generatedKeys = pstmt.getGeneratedKeys()) {
+                    if (generatedKeys.next()) {
+                        return Optional.of(generatedKeys.getInt(1));
+                    }
+                }
+            }
+            return Optional.empty();
         } catch (SQLException e) {
             throw new DataAccessException("Error saving user to the database.", e);
         }
@@ -79,7 +87,7 @@ public class UserDAO implements Dao<User> {
 
     @Override
     public boolean update(User user) {
-        String sql = "UPDATE users SET name =?, email =?, password =?, role =?, contact_number =?, address =? WHERE user_id =?";
+        String sql = "UPDATE users SET name = ?, email = ?, password = ?, role = ?, contact_number = ?, address = ? WHERE user_id = ?";
         try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
             pstmt.setString(1, user.getName());
             pstmt.setString(2, user.getEmail());
@@ -88,8 +96,7 @@ public class UserDAO implements Dao<User> {
             pstmt.setString(5, user.getContactNumber());
             pstmt.setString(6, user.getAddress());
             pstmt.setInt(7, user.getUserId());
-            int affectedRows = pstmt.executeUpdate();
-            return affectedRows > 0;
+            return pstmt.executeUpdate() > 0;
         } catch (SQLException e) {
             throw new DataAccessException("Error updating user.", e);
         }
@@ -97,11 +104,10 @@ public class UserDAO implements Dao<User> {
 
     @Override
     public boolean delete(User user) {
-        String sql = "DELETE FROM users WHERE user_id =?";
+        String sql = "DELETE FROM users WHERE user_id = ?";
         try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
             pstmt.setInt(1, user.getUserId());
-            int affectedRows = pstmt.executeUpdate();
-            return affectedRows > 0;
+            return pstmt.executeUpdate() > 0;
         } catch (SQLException e) {
             throw new DataAccessException("Error deleting user.", e);
         }
@@ -109,8 +115,6 @@ public class UserDAO implements Dao<User> {
 
     public List<User> findAvailableAgents() {
         List<User> agents = new ArrayList<>();
-        // In a real system, 'available' might check a user's status.
-        // For now, we'll return all users with the AGENT role.
         String sql = "SELECT * FROM users WHERE role = 'AGENT'";
         try (Statement stmt = connection.createStatement();
              ResultSet rs = stmt.executeQuery(sql)) {
