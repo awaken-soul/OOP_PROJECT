@@ -30,6 +30,21 @@ public class UserDAO implements Dao<User> {
         return Optional.empty();
     }
 
+    public List<User> findAvailableAgents() {
+    List<User> agents = new ArrayList<>();
+    String sql = "SELECT * FROM users WHERE role = 'AGENT'";
+    try (Statement stmt = connection.createStatement();
+         ResultSet rs = stmt.executeQuery(sql)) {
+        while (rs.next()) {
+            agents.add(mapRowToUser(rs));
+        }
+    } catch (SQLException e) {
+        throw new DataAccessException("Error fetching available agents.", e);
+    }
+    return agents;
+}
+
+    
     @Override
     public List<User> findAll() {
         List<User> users = new ArrayList<>();
