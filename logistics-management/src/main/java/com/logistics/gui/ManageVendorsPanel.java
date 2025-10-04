@@ -12,13 +12,13 @@ import java.util.List;
 
 public class ManageVendorsPanel extends JPanel {
 
-    private final RetailerService retailerService;
-    private final WarehouseService warehouseService;
+    private RetailerService retailerService;
+    private WarehouseService warehouseService;
 
-    private final JTable retailerTable;
-    private final DefaultTableModel retailerTableModel;
-    private final JTable warehouseTable;
-    private final DefaultTableModel warehouseTableModel;
+    private JTable retailerTable;
+    private DefaultTableModel retailerTableModel;
+    private JTable warehouseTable;
+    private DefaultTableModel warehouseTableModel;
 
     public ManageVendorsPanel(RetailerService retailerService, WarehouseService warehouseService) {
         this.retailerService = retailerService;
