@@ -14,7 +14,7 @@ public class DBConnector {
     private DBConnector() {
         try {
             // Path to your existing DB file
-            String dbPath = "logistics.db"; // make sure this path is correct relative to your project
+            String dbPath = "src/main/resources/logistics.db"; // make sure this path is correct relative to your project
             File dbFile = new File(dbPath);
 
             if (!dbFile.exists()) {
