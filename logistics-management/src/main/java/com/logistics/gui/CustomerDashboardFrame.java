@@ -20,7 +20,9 @@ public class CustomerDashboardFrame extends JFrame {
     private final ComplaintService complaintService;
     private final PaymentService paymentService;
 
-    public CustomerDashboardFrame(User user, OrderService orderService, ProductService productService, TrackingService trackingService, ComplaintService complaintService, PaymentService paymentService) {
+    public CustomerDashboardFrame(User user, OrderService orderService, ProductService productService, 
+                                  TrackingService trackingService, ComplaintService complaintService, 
+                                  PaymentService paymentService) {
         this.customerUser = user;
         this.orderService = orderService;
         this.productService = productService;
@@ -41,7 +43,7 @@ public class CustomerDashboardFrame extends JFrame {
         JPanel tablePanel = new JPanel(new BorderLayout());
         tablePanel.setBorder(BorderFactory.createTitledBorder("My Orders"));
 
-        String columnNames = {"Order ID", "Destination", "Status", "Payment Status"};
+        String[] columnNames = {"Order ID", "Destination", "Status", "Payment Status"};
         tableModel = new DefaultTableModel(columnNames, 0);
         ordersTable = new JTable(tableModel);
         ordersTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -74,7 +76,12 @@ public class CustomerDashboardFrame extends JFrame {
         tableModel.setRowCount(0);
         List<Order> orders = orderService.getOrdersForCustomer(customerUser.getUserId());
         for (Order order : orders) {
-            tableModel.addRow(new Object{order.getOrderId(), order.getDestinationAddress(), order.getStatus(), order.getPaymentStatus()});
+            tableModel.addRow(new Object[]{
+                order.getOrderId(),
+                order.getDestinationAddress(),
+                order.getStatus(),
+                order.getPaymentStatus()
+            });
         }
     }
 
@@ -93,8 +100,8 @@ public class CustomerDashboardFrame extends JFrame {
             return;
         }
 
-        Optional<Order> orderOpt = orderService.getOrdersForCustomer(customerUser.getUserId()).stream()
-               .filter(o -> o.getOrderId() == orderId).findFirst();
+        Optional<Order> orderOpt = orderService.getOrdersForCustomer(customerUser.getUserId())
+                .stream().filter(o -> o.getOrderId() == orderId).findFirst();
 
         if (orderOpt.isPresent()) {
             Order order = orderOpt.get();
@@ -132,13 +139,12 @@ public class CustomerDashboardFrame extends JFrame {
         panel.add(formPanel, BorderLayout.NORTH);
         panel.add(new JLabel("Description:"), BorderLayout.CENTER);
         panel.add(new JScrollPane(descriptionArea), BorderLayout.SOUTH);
+
         int result = JOptionPane.showConfirmDialog(this, panel, "File a Complaint", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
         if (result == JOptionPane.OK_OPTION) {
             String subject = subjectField.getText();
             String description = descriptionArea.getText();
-            if (subject.trim().isEmpty() |
-
-| description.trim().isEmpty()) {
+            if (subject.trim().isEmpty() || description.trim().isEmpty()) {
                 JOptionPane.showMessageDialog(this, "Subject and Description cannot be empty.", "Invalid Input", JOptionPane.ERROR_MESSAGE);
                 return;
             }
@@ -173,7 +179,7 @@ public class CustomerDashboardFrame extends JFrame {
             JOptionPane.showMessageDialog(this, "Sorry, no products are available to order at this time.", "No Products", JOptionPane.INFORMATION_MESSAGE);
             return;
         }
-        JComboBox<Product> productComboBox = new JComboBox<>(availableProducts.toArray(new Product));
+        JComboBox<Product> productComboBox = new JComboBox<>(availableProducts.toArray(new Product[0]));
         productComboBox.setRenderer(new DefaultListCellRenderer() {
             @Override
             public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
@@ -182,6 +188,7 @@ public class CustomerDashboardFrame extends JFrame {
                 return this;
             }
         });
+
         JTextField sourceField = new JTextField(customerUser.getAddress());
         JTextField destinationField = new JTextField();
         JPanel panel = new JPanel(new GridLayout(0, 2, 5, 5));
@@ -191,14 +198,13 @@ public class CustomerDashboardFrame extends JFrame {
         panel.add(sourceField);
         panel.add(new JLabel("Destination Address:"));
         panel.add(destinationField);
+
         int result = JOptionPane.showConfirmDialog(this, panel, "Place New Order", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
         if (result == JOptionPane.OK_OPTION) {
             Product selectedProduct = (Product) productComboBox.getSelectedItem();
             String source = sourceField.getText();
             String destination = destinationField.getText();
-            if (selectedProduct == null |
-
-| destination.trim().isEmpty()) {
+            if (selectedProduct == null || destination.trim().isEmpty()) {
                 JOptionPane.showMessageDialog(this, "Please select a product and enter a destination address.", "Invalid Input", JOptionPane.ERROR_MESSAGE);
                 return;
             }
