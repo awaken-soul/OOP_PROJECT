@@ -1,12 +1,10 @@
 package com.logistics.database;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.io.File;
 
 public class DBConnector {
 
@@ -15,30 +13,21 @@ public class DBConnector {
 
     private DBConnector() {
         try {
-            // Copy DB from JAR to temporary file
-            String dbName = "logistics.db";
-            File tempFile = File.createTempFile("logistics-temp-", ".db");
-            tempFile.deleteOnExit();
+            // Path to your existing DB file
+            String dbPath = "logistics.db"; // make sure this path is correct relative to your project
+            File dbFile = new File(dbPath);
 
-            try (InputStream is = getClass().getResourceAsStream("/database/" + dbName);
-                 FileOutputStream fos = new FileOutputStream(tempFile)) {
-
-                if (is == null) {
-                    throw new RuntimeException("Database file not found in resources: " + dbName);
-                }
-
-                byte[] buffer = new byte[1024];
-                int bytesRead;
-                while ((bytesRead = is.read(buffer)) != -1) {
-                    fos.write(buffer, 0, bytesRead);
-                }
+            if (!dbFile.exists()) {
+                throw new RuntimeException("Database file not found: " + dbFile.getAbsolutePath());
             }
 
-            // Load JDBC driver and connect
+            // Load JDBC driver
             Class.forName("org.sqlite.JDBC");
-            connection = DriverManager.getConnection("jdbc:sqlite:" + tempFile.getAbsolutePath());
 
-            // Initialize tables if they don't exist
+            // Connect
+            connection = DriverManager.getConnection("jdbc:sqlite:" + dbFile.getAbsolutePath());
+
+            // Initialize tables if needed
             initializeTables();
 
         } catch (Exception e) {
