@@ -1,23 +1,122 @@
-@Override
-public Optional<Integer> save(Vehicle vehicle) {
-    String sql = "INSERT INTO vehicles(vehicle_type, license_plate, status, current_location) VALUES(?,?,?,?)";
-    try (PreparedStatement pstmt = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
-        pstmt.setString(1, vehicle.getVehicleType());
-        pstmt.setString(2, vehicle.getLicensePlate());
-        pstmt.setString(3, vehicle.getStatus());
-        pstmt.setString(4, vehicle.getCurrentLocation());
-        int affectedRows = pstmt.executeUpdate();
+package com.logistics.database;
 
-        if (affectedRows == 0) return Optional.empty();
+import com.logistics.models.Vehicle;
 
-        try (ResultSet generatedKeys = pstmt.getGeneratedKeys()) {
-            if (generatedKeys.next()) {
-                return Optional.of(generatedKeys.getInt(1));
-            } else {
-                return Optional.empty();
+import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+
+public class VehicleDAO implements Dao<Vehicle> {
+
+    private final Connection connection;
+
+    public VehicleDAO() {
+        this.connection = DBConnector.getInstance().getConnection();
+    }
+
+    @Override
+    public Optional<Vehicle> findById(int id) {
+        String sql = "SELECT * FROM vehicles WHERE vehicle_id = ?";
+        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+            pstmt.setInt(1, id);
+            ResultSet rs = pstmt.executeQuery();
+            if (rs.next()) {
+                return Optional.of(mapRowToVehicle(rs));
             }
+        } catch (SQLException e) {
+            throw new DataAccessException("Error finding vehicle by id.", e);
         }
-    } catch (SQLException e) {
-        throw new DataAccessException("Error saving vehicle.", e);
+        return Optional.empty();
+    }
+
+    @Override
+    public List<Vehicle> findAll() {
+        List<Vehicle> vehicles = new ArrayList<>();
+        String sql = "SELECT * FROM vehicles";
+        try (Statement stmt = connection.createStatement();
+             ResultSet rs = stmt.executeQuery(sql)) {
+            while (rs.next()) {
+                vehicles.add(mapRowToVehicle(rs));
+            }
+        } catch (SQLException e) {
+            throw new DataAccessException("Error finding all vehicles.", e);
+        }
+        return vehicles;
+    }
+
+    public List<Vehicle> findAvailableVehicles() {
+        List<Vehicle> vehicles = new ArrayList<>();
+        String sql = "SELECT * FROM vehicles WHERE status = 'Available'";
+        try (Statement stmt = connection.createStatement();
+             ResultSet rs = stmt.executeQuery(sql)) {
+            while (rs.next()) {
+                vehicles.add(mapRowToVehicle(rs));
+            }
+        } catch (SQLException e) {
+            throw new DataAccessException("Error finding available vehicles.", e);
+        }
+        return vehicles;
+    }
+
+    @Override
+    public Optional<Integer> save(Vehicle vehicle) {
+        String sql = "INSERT INTO vehicles(vehicle_type, license_plate, status, current_location) VALUES(?,?,?,?)";
+        try (PreparedStatement pstmt = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+            pstmt.setString(1, vehicle.getVehicleType());
+            pstmt.setString(2, vehicle.getLicensePlate());
+            pstmt.setString(3, vehicle.getStatus());
+            pstmt.setString(4, vehicle.getCurrentLocation());
+            int affectedRows = pstmt.executeUpdate();
+
+            if (affectedRows == 0) return Optional.empty();
+
+            try (ResultSet generatedKeys = pstmt.getGeneratedKeys()) {
+                if (generatedKeys.next()) {
+                    return Optional.of(generatedKeys.getInt(1));
+                } else {
+                    return Optional.empty();
+                }
+            }
+        } catch (SQLException e) {
+            throw new DataAccessException("Error saving vehicle.", e);
+        }
+    }
+
+    @Override
+    public boolean update(Vehicle vehicle) {
+        String sql = "UPDATE vehicles SET vehicle_type = ?, license_plate = ?, status = ?, current_location = ? WHERE vehicle_id = ?";
+        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+            pstmt.setString(1, vehicle.getVehicleType());
+            pstmt.setString(2, vehicle.getLicensePlate());
+            pstmt.setString(3, vehicle.getStatus());
+            pstmt.setString(4, vehicle.getCurrentLocation());
+            pstmt.setInt(5, vehicle.getVehicleId());
+            return pstmt.executeUpdate() > 0;
+        } catch (SQLException e) {
+            throw new DataAccessException("Error updating vehicle.", e);
+        }
+    }
+
+    @Override
+    public boolean delete(Vehicle vehicle) {
+        String sql = "DELETE FROM vehicles WHERE vehicle_id = ?";
+        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+            pstmt.setInt(1, vehicle.getVehicleId());
+            return pstmt.executeUpdate() > 0;
+        } catch (SQLException e) {
+            throw new DataAccessException("Error deleting vehicle.", e);
+        }
+    }
+
+    private Vehicle mapRowToVehicle(ResultSet rs) throws SQLException {
+        return new Vehicle(
+                rs.getInt("vehicle_id"),
+                rs.getString("vehicle_type"),
+                rs.getString("license_plate"),
+                rs.getString("status"),
+                rs.getInt("driver_id"),
+                rs.getString("current_location")
+        );
     }
 }
