@@ -216,13 +216,21 @@ public class WarehouseManagerDashboardFrame extends JFrame {
         panel.add(new JLabel("Select Vehicle:"));
         panel.add(vehicleComboBox);
 
-        int result = JOptionPane.showConfirmDialog(this, panel, "Assign Order ID: " + orderId, JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+        int result = JOptionPane.showConfirmDialog(this, panel, "Assign Order ID: " + orderId,
+                JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+
         if (result == JOptionPane.OK_OPTION) {
             User selectedAgent = (User) agentComboBox.getSelectedItem();
             Vehicle selectedVehicle = (Vehicle) vehicleComboBox.getSelectedItem();
-            if (orderService.assignOrderToAgent(orderId, selectedAgent.getUserId(), selectedVehicle.getVehicleId())) {
-                JOptionPane.showMessageDialog(this, "Order assigned successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
-                loadPendingOrders();
-            } else {
-                JOptionPane.showMessageDialog(this, "Failed to assign the order.", "Error", JOptionPane.ERROR_MESSAGE);
-           
+
+            if (selectedAgent != null && selectedVehicle != null) {
+                if (orderService.assignOrderToAgent(orderId, selectedAgent.getUserId(), selectedVehicle.getVehicleId())) {
+                    JOptionPane.showMessageDialog(this, "Order assigned successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
+                    loadPendingOrders();
+                } else {
+                    JOptionPane.showMessageDialog(this, "Failed to assign the order.", "Error", JOptionPane.ERROR_MESSAGE);
+                }
+            }
+        }
+    }
+}
