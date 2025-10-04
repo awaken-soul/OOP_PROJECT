@@ -17,7 +17,7 @@ public class WarehouseDAO implements Dao<Warehouse> {
 
     @Override
     public Optional<Warehouse> findById(int id) {
-        String sql = "SELECT * FROM warehouse WHERE warehouse_id = ?";
+        String sql = "SELECT * FROM warehouse WHERE warehouse_id=?";
         try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
             pstmt.setInt(1, id);
             ResultSet rs = pstmt.executeQuery();
@@ -52,32 +52,40 @@ public class WarehouseDAO implements Dao<Warehouse> {
             pstmt.setString(1, warehouse.getName());
             pstmt.setString(2, warehouse.getAddress());
             pstmt.setInt(3, warehouse.getCapacity());
-            pstmt.setInt(4, warehouse.getManagerId());
+            if (warehouse.getManagerId() != null) {
+                pstmt.setInt(4, warehouse.getManagerId());
+            } else {
+                pstmt.setNull(4, Types.INTEGER);
+            }
+
             int affectedRows = pstmt.executeUpdate();
-
-            if (affectedRows == 0) return Optional.empty();
-
-            try (ResultSet generatedKeys = pstmt.getGeneratedKeys()) {
-                if (generatedKeys.next()) {
-                    return Optional.of(generatedKeys.getInt(1));
-                } else {
-                    return Optional.empty();
+            if (affectedRows > 0) {
+                try (ResultSet generatedKeys = pstmt.getGeneratedKeys()) {
+                    if (generatedKeys.next()) {
+                        return Optional.of(generatedKeys.getInt(1));
+                    }
                 }
             }
         } catch (SQLException e) {
             throw new DataAccessException("Error saving warehouse.", e);
         }
+        return Optional.empty();
     }
 
     @Override
     public boolean update(Warehouse warehouse) {
-        String sql = "UPDATE warehouse SET name = ?, address = ?, capacity = ?, manager_id = ? WHERE warehouse_id = ?";
+        String sql = "UPDATE warehouse SET name=?, address=?, capacity=?, manager_id=? WHERE warehouse_id=?";
         try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
             pstmt.setString(1, warehouse.getName());
             pstmt.setString(2, warehouse.getAddress());
             pstmt.setInt(3, warehouse.getCapacity());
-            pstmt.setInt(4, warehouse.getManagerId());
+            if (warehouse.getManagerId() != null) {
+                pstmt.setInt(4, warehouse.getManagerId());
+            } else {
+                pstmt.setNull(4, Types.INTEGER);
+            }
             pstmt.setInt(5, warehouse.getWarehouseId());
+
             return pstmt.executeUpdate() > 0;
         } catch (SQLException e) {
             throw new DataAccessException("Error updating warehouse.", e);
@@ -86,7 +94,7 @@ public class WarehouseDAO implements Dao<Warehouse> {
 
     @Override
     public boolean delete(Warehouse warehouse) {
-        String sql = "DELETE FROM warehouse WHERE warehouse_id = ?";
+        String sql = "DELETE FROM warehouse WHERE warehouse_id=?";
         try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
             pstmt.setInt(1, warehouse.getWarehouseId());
             return pstmt.executeUpdate() > 0;
@@ -95,13 +103,29 @@ public class WarehouseDAO implements Dao<Warehouse> {
         }
     }
 
+    public List<Warehouse> findByManagerId(int managerId) {
+        List<Warehouse> warehouses = new ArrayList<>();
+        String sql = "SELECT * FROM warehouse WHERE manager_id=?";
+        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+            pstmt.setInt(1, managerId);
+            ResultSet rs = pstmt.executeQuery();
+            while (rs.next()) {
+                warehouses.add(mapRowToWarehouse(rs));
+            }
+        } catch (SQLException e) {
+            throw new DataAccessException("Error finding warehouses by manager id.", e);
+        }
+        return warehouses;
+    }
+
     private Warehouse mapRowToWarehouse(ResultSet rs) throws SQLException {
+        Integer managerId = rs.getObject("manager_id") != null ? rs.getInt("manager_id") : null;
         return new Warehouse(
                 rs.getInt("warehouse_id"),
                 rs.getString("name"),
                 rs.getString("address"),
                 rs.getInt("capacity"),
-                rs.getInt("manager_id")
+                managerId
         );
     }
 }
