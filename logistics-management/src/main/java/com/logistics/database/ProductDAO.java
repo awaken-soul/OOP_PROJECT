@@ -17,7 +17,7 @@ public class ProductDAO implements Dao<Product> {
 
     @Override
     public Optional<Product> findById(int id) {
-        String sql = "SELECT * FROM product WHERE product_id =?";
+        String sql = "SELECT * FROM product WHERE product_id = ?";
         try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
             pstmt.setInt(1, id);
             ResultSet rs = pstmt.executeQuery();
@@ -47,42 +47,7 @@ public class ProductDAO implements Dao<Product> {
 
     @Override
     public Optional<Integer> save(Product product) {
-        // Placeholder for future implementation
-        return false;
-    }
-
-    @Override
-    public boolean update(Product product) {
-        // Placeholder for future implementation
-        return false;
-    }
-
-    public boolean updateQuantity(int productId, int newQuantity) {
-        String sql = "UPDATE product SET quantity =? WHERE product_id =?";
-        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
-            pstmt.setInt(1, newQuantity);
-            pstmt.setInt(2, productId);
-            return pstmt.executeUpdate() > 0;
-        } catch (SQLException e) {
-            throw new DataAccessException("Error updating product quantity.", e);
-        }
-    }
-
-    @Override
-    public boolean delete(Product product) {
-        // Placeholder for future implementation
-        return false;
-    }
-
-    private Product mapRowToProduct(ResultSet rs) throws SQLException {
-        return new Product(
-                rs.getInt("product_id"),
-                rs.getString("name"),
-                rs.getString("description"),
-                rs.getDouble("price"),
-                rs.getInt("quantity"),
-                rs.getInt("warehouse_id"),
-                rs.getInt("retailer_id")
-        );
-    }
-}
+        String sql = "INSERT INTO product(name, description, price, quantity, warehouse_id, retailer_id) VALUES(?,?,?,?,?,?)";
+        try (PreparedStatement pstmt = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+            pstmt.setString(1, product.getName());
+            pstmt.setString(2, product.getDescription
