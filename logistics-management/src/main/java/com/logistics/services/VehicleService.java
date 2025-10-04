@@ -4,6 +4,7 @@ import com.logistics.database.VehicleDAO;
 import com.logistics.models.Vehicle;
 
 import java.util.List;
+import java.util.Optional;
 
 public class VehicleService {
 
@@ -22,7 +23,8 @@ public class VehicleService {
     }
 
     public boolean addVehicle(Vehicle vehicle) {
-        return vehicleDAO.save(vehicle).isPresent();
+        Optional<Integer> generatedId = vehicleDAO.save(vehicle);
+        return generatedId.isPresent();
     }
 
     public boolean updateVehicle(Vehicle vehicle) {
