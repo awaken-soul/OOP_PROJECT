@@ -19,7 +19,7 @@ public class ManageComplaintsPanel extends JPanel {
         setLayout(new BorderLayout(10, 10));
         setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
-        String columnNames = {"ID", "User ID", "Order ID", "Subject", "Status", "Date"};
+        String[] columnNames = {"ID", "User ID", "Order ID", "Subject", "Status", "Date"};
         tableModel = new DefaultTableModel(columnNames, 0);
         complaintsTable = new JTable(tableModel);
         complaintsTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -44,13 +44,13 @@ public class ManageComplaintsPanel extends JPanel {
         tableModel.setRowCount(0);
         List<Complaint> complaints = complaintService.getAllComplaints();
         for (Complaint complaint : complaints) {
-            tableModel.addRow(new Object{
-                    complaint.getComplaintId(),
-                    complaint.getUserId(),
-                    complaint.getOrderId() == null? "N/A" : complaint.getOrderId(),
-                    complaint.getSubject(),
-                    complaint.getStatus(),
-                    complaint.getCreatedAt()
+            tableModel.addRow(new Object[]{
+                complaint.getComplaintId(),
+                complaint.getUserId(),
+                complaint.getOrderId() == null ? "N/A" : complaint.getOrderId(),
+                complaint.getSubject(),
+                complaint.getStatus(),
+                complaint.getCreatedAt()
             });
         }
     }
@@ -63,7 +63,7 @@ public class ManageComplaintsPanel extends JPanel {
         }
         int complaintId = (int) tableModel.getValueAt(selectedRow, 0);
         Complaint complaint = getSelectedComplaint(complaintId);
-        if (complaint!= null) {
+        if (complaint != null) {
             JTextArea textArea = new JTextArea(10, 40);
             textArea.setText(complaint.getDescription());
             textArea.setWrapStyleWord(true);
@@ -82,7 +82,7 @@ public class ManageComplaintsPanel extends JPanel {
         }
         int complaintId = (int) tableModel.getValueAt(selectedRow, 0);
         Complaint complaint = getSelectedComplaint(complaintId);
-        if (complaint!= null && complaint.getStatus().equals("Open")) {
+        if (complaint != null && complaint.getStatus().equals("Open")) {
             int choice = JOptionPane.showConfirmDialog(this, "Mark complaint #" + complaintId + " as Resolved?", "Confirm Resolution", JOptionPane.YES_NO_OPTION);
             if (choice == JOptionPane.YES_OPTION) {
                 if (complaintService.resolveComplaint(complaintId)) {
@@ -92,14 +92,14 @@ public class ManageComplaintsPanel extends JPanel {
                     JOptionPane.showMessageDialog(this, "Failed to resolve complaint.", "Error", JOptionPane.ERROR_MESSAGE);
                 }
             }
-        } else if (complaint!= null) {
+        } else if (complaint != null) {
             JOptionPane.showMessageDialog(this, "This complaint has already been resolved.", "Already Resolved", JOptionPane.INFORMATION_MESSAGE);
         }
     }
 
     private Complaint getSelectedComplaint(int complaintId) {
         return complaintService.getAllComplaints().stream()
-               .filter(c -> c.getComplaintId() == complaintId)
-               .findFirst().orElse(null);
+                .filter(c -> c.getComplaintId() == complaintId)
+                .findFirst().orElse(null);
     }
 }
