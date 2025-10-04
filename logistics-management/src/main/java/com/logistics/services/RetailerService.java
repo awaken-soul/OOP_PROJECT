@@ -18,8 +18,7 @@ public class RetailerService {
     }
 
     public boolean addRetailer(Retailer retailer) {
-        // Business logic, like checking for duplicate names, could be added here.
-        return retailerDAO.save(retailer);
+        return retailerDAO.save(retailer).isPresent();
     }
 
     public boolean updateRetailer(Retailer retailer) {
