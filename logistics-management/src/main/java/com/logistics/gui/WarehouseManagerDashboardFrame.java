@@ -18,16 +18,16 @@ import java.util.List;
 
 public class WarehouseManagerDashboardFrame extends JFrame {
 
-    private final JTable ordersTable;
-    private final DefaultTableModel ordersTableModel;
-    private final JTable stockTable;
-    private final DefaultTableModel stockTableModel;
+    private JTable ordersTable;
+    private DefaultTableModel ordersTableModel;
+    private JTable stockTable;
+    private DefaultTableModel stockTableModel;
 
-    private final OrderService orderService;
-    private final UserService userService;
-    private final VehicleService vehicleService;
-    private final ProductService productService;
-    private final TrackingService trackingService;
+    private OrderService orderService;
+    private UserService userService;
+    private VehicleService vehicleService;
+    private ProductService productService;
+    private TrackingService trackingService;
 
     public WarehouseManagerDashboardFrame(User managerUser, OrderService orderService, UserService userService,
                                           VehicleService vehicleService, ProductService productService,
