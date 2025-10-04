@@ -46,7 +46,7 @@ public class ProductDAO implements Dao<Product> {
     }
 
     @Override
-    public boolean save(Product product) {
+    public Optional<Integer> save(Product product) {
         // Placeholder for future implementation
         return false;
     }
