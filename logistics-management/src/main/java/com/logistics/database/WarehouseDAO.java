@@ -1,6 +1,7 @@
 package com.logistics.database;
 
 import com.logistics.models.Warehouse;
+
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -20,11 +21,9 @@ public class WarehouseDAO implements Dao<Warehouse> {
         try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
             pstmt.setInt(1, id);
             ResultSet rs = pstmt.executeQuery();
-            if (rs.next()) {
-                return Optional.of(mapRowToWarehouse(rs));
-            }
+            if (rs.next()) return Optional.of(mapRowToWarehouse(rs));
         } catch (SQLException e) {
-            throw new DataAccessException("Error finding warehouse by id.", e);
+            throw new RuntimeException("Error finding warehouse by id.", e);
         }
         return Optional.empty();
     }
@@ -35,11 +34,9 @@ public class WarehouseDAO implements Dao<Warehouse> {
         String sql = "SELECT * FROM warehouse";
         try (Statement stmt = connection.createStatement();
              ResultSet rs = stmt.executeQuery(sql)) {
-            while (rs.next()) {
-                warehouses.add(mapRowToWarehouse(rs));
-            }
+            while (rs.next()) warehouses.add(mapRowToWarehouse(rs));
         } catch (SQLException e) {
-            throw new DataAccessException("Error finding all warehouses.", e);
+            throw new RuntimeException("Error finding all warehouses.", e);
         }
         return warehouses;
     }
@@ -52,55 +49,16 @@ public class WarehouseDAO implements Dao<Warehouse> {
             pstmt.setString(2, warehouse.getAddress());
             pstmt.setInt(3, warehouse.getCapacity());
             pstmt.setInt(4, warehouse.getManagerId());
-
-            int affectedRows = pstmt.executeUpdate();
-            if (affectedRows > 0) {
-                try (ResultSet generatedKeys = pstmt.getGeneratedKeys()) {
-                    if (generatedKeys.next()) {
-                        return Optional.of(generatedKeys.getInt(1));
-                    }
-                }
-            }
+            pstmt.executeUpdate();
+            ResultSet keys = pstmt.getGeneratedKeys();
+            if (keys.next()) return Optional.of(keys.getInt(1));
         } catch (SQLException e) {
-            throw new DataAccessException("Error saving warehouse.", e);
+            throw new RuntimeException("Error saving warehouse.", e);
         }
         return Optional.empty();
     }
 
     @Override
     public boolean update(Warehouse warehouse) {
-        String sql = "UPDATE warehouse SET name=?, address=?, capacity=?, manager_id=? WHERE warehouse_id=?";
-        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
-            pstmt.setString(1, warehouse.getName());
-            pstmt.setString(2, warehouse.getAddress());
-            pstmt.setInt(3, warehouse.getCapacity());
-            pstmt.setInt(4, warehouse.getManagerId());
-            pstmt.setInt(5, warehouse.getId());
-            return pstmt.executeUpdate() > 0;
-        } catch (SQLException e) {
-            throw new DataAccessException("Error updating warehouse.", e);
-        }
-    }
-
-    @Override
-    public boolean delete(Warehouse warehouse) {
-        String sql = "DELETE FROM warehouse WHERE warehouse_id=?";
-        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
-            pstmt.setInt(1, warehouse.getId());
-            return pstmt.executeUpdate() > 0;
-        } catch (SQLException e) {
-            throw new DataAccessException("Error deleting warehouse.", e);
-        }
-    }
-
-    private Warehouse mapRowToWarehouse(ResultSet rs) throws SQLException {
-        return new Warehouse(
-                rs.getInt("warehouse_id"),
-                rs.getString("name"),
-                rs.getString("address"),
-                rs.getInt("capacity"),
-                rs.getInt("manager_id")
-        );
-    }
-}
-
+        String sql = "UPDATE warehouse SET name = ?, address = ?, capacity = ?, manager_id = ? WHERE warehouse_id = ?";
+        try (PreparedStatement pstmt =
