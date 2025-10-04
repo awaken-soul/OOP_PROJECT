@@ -162,8 +162,9 @@ public class ProductDAO implements Dao<Product> {
     }
 
     private Product mapRowToProduct(ResultSet rs) throws SQLException {
-        Integer warehouseId = rs.getObject("warehouse_id") != null ? rs.getInt("warehouse_id") : null;
-        Integer retailerId = rs.getObject("retailer_id") != null ? rs.getInt("retailer_id") : null;
+        // Correct null-safe conversion
+        Integer warehouseId = (Integer) rs.getObject("warehouse_id");
+        Integer retailerId = (Integer) rs.getObject("retailer_id");
 
         return new Product(
                 rs.getInt("product_id"),
