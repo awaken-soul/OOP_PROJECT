@@ -4,6 +4,7 @@ import com.logistics.database.WarehouseDAO;
 import com.logistics.models.Warehouse;
 
 import java.util.List;
+import java.util.Optional;
 
 public class WarehouseService {
 
@@ -18,7 +19,8 @@ public class WarehouseService {
     }
 
     public boolean addWarehouse(Warehouse warehouse) {
-        return warehouseDAO.save(warehouse).isPresent();
+        Optional<Integer> generatedId = warehouseDAO.save(warehouse);
+        return generatedId.isPresent();
     }
 
     public boolean updateWarehouse(Warehouse warehouse) {
