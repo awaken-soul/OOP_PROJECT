@@ -77,7 +77,14 @@ public class OrderDAO implements Dao<Order> {
 
     @Override
     public Optional<Integer> save(Order order) {
-        String sql = "INSERT INTO orders(user_id, product_id, order_type, source_address, destination_address, status, payment_status) VALUES(?,?,?,?,?,?,?)";
+        String sql = """
+            INSERT INTO orders(
+                user_id, product_id, order_type, 
+                source_address, destination_address, 
+                status, payment_status
+            ) VALUES(?,?,?,?,?,?,?)
+        """;
+
         try (PreparedStatement pstmt = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             pstmt.setInt(1, order.getUserId());
             pstmt.setInt(2, order.getProductId());
@@ -103,17 +110,24 @@ public class OrderDAO implements Dao<Order> {
 
     @Override
     public boolean update(Order order) {
-        String sql = "UPDATE orders SET product_id=?, order_type=?, source_address=?, destination_address=?, status=?, payment_status=?, assigned_agent_id=?, vehicle_id=?, updated_at=CURRENT_TIMESTAMP WHERE order_id=?";
+        String sql = """
+            UPDATE orders SET 
+                user_id=?, product_id=?, order_type=?, 
+                source_address=?, destination_address=?, 
+                status=?, assigned_agent_id=?, vehicle_id=?, payment_status=?, updated_at=CURRENT_TIMESTAMP
+            WHERE order_id=?
+        """;
         try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
-            pstmt.setInt(1, order.getProductId());
-            pstmt.setString(2, order.getOrderType());
-            pstmt.setString(3, order.getSourceAddress());
-            pstmt.setString(4, order.getDestinationAddress());
-            pstmt.setString(5, order.getStatus());
-            pstmt.setString(6, order.getPaymentStatus());
-            pstmt.setObject(7, order.getAssignedAgentId(), java.sql.Types.INTEGER);
-            pstmt.setObject(8, order.getVehicleId(), java.sql.Types.INTEGER);
-            pstmt.setInt(9, order.getOrderId());
+            pstmt.setInt(1, order.getUserId());
+            pstmt.setInt(2, order.getProductId());
+            pstmt.setString(3, order.getOrderType());
+            pstmt.setString(4, order.getSourceAddress());
+            pstmt.setString(5, order.getDestinationAddress());
+            pstmt.setString(6, order.getStatus());
+            pstmt.setInt(7, order.getAssignedAgentId());
+            pstmt.setInt(8, order.getVehicleId());
+            pstmt.setString(9, order.getPaymentStatus());
+            pstmt.setInt(10, order.getOrderId());
 
             return pstmt.executeUpdate() > 0;
         } catch (SQLException e) {
@@ -132,6 +146,45 @@ public class OrderDAO implements Dao<Order> {
         }
     }
 
+    public boolean assignAgentAndVehicle(int orderId, int agentId, int vehicleId, String newStatus) {
+        String sql = """
+            UPDATE orders SET 
+                assigned_agent_id=?, vehicle_id=?, status=?, updated_at=CURRENT_TIMESTAMP
+            WHERE order_id=?
+        """;
+        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+            pstmt.setInt(1, agentId);
+            pstmt.setInt(2, vehicleId);
+            pstmt.setString(3, newStatus);
+            pstmt.setInt(4, orderId);
+            return pstmt.executeUpdate() > 0;
+        } catch (SQLException e) {
+            throw new DataAccessException("Error assigning agent and vehicle.", e);
+        }
+    }
+
+    public boolean updatePaymentStatus(int orderId, String newPaymentStatus) {
+        String sql = "UPDATE orders SET payment_status=? WHERE order_id=?";
+        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+            pstmt.setString(1, newPaymentStatus);
+            pstmt.setInt(2, orderId);
+            return pstmt.executeUpdate() > 0;
+        } catch (SQLException e) {
+            throw new DataAccessException("Error updating payment status.", e);
+        }
+    }
+
+    @Override
+    public boolean delete(Order order) {
+        String sql = "DELETE FROM orders WHERE order_id=?";
+        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+            pstmt.setInt(1, order.getOrderId());
+            return pstmt.executeUpdate() > 0;
+        } catch (SQLException e) {
+            throw new DataAccessException("Error deleting order.", e);
+        }
+    }
+
     public List<Order> findByStatus(String status) {
         List<Order> orders = new ArrayList<>();
         String sql = "SELECT * FROM orders WHERE status=?";
@@ -147,52 +200,6 @@ public class OrderDAO implements Dao<Order> {
         return orders;
     }
 
-    public boolean assignAgentAndVehicle(int orderId, Integer agentId, Integer vehicleId, String newStatus) {
-        String sql = "UPDATE orders SET assigned_agent_id=?, vehicle_id=?, status=?, updated_at=CURRENT_TIMESTAMP WHERE order_id=?";
-        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
-            if (agentId != null) {
-                pstmt.setInt(1, agentId);
-            } else {
-                pstmt.setNull(1, Types.INTEGER);
-            }
-
-            if (vehicleId != null) {
-                pstmt.setInt(2, vehicleId);
-            } else {
-                pstmt.setNull(2, Types.INTEGER);
-            }
-
-            pstmt.setString(3, newStatus);
-            pstmt.setInt(4, orderId);
-
-            return pstmt.executeUpdate() > 0;
-        } catch (SQLException e) {
-            throw new DataAccessException("Error assigning agent and vehicle to order.", e);
-        }
-    }
-
-    public boolean updatePaymentStatus(int orderId, String newPaymentStatus) {
-        String sql = "UPDATE orders SET payment_status=? WHERE order_id=?";
-        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
-            pstmt.setString(1, newPaymentStatus);
-            pstmt.setInt(2, orderId);
-            return pstmt.executeUpdate() > 0;
-        } catch (SQLException e) {
-            throw new DataAccessException("Error updating order payment status.", e);
-        }
-    }
-
-    @Override
-    public boolean delete(Order order) {
-        String sql = "DELETE FROM orders WHERE order_id=?";
-        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
-            pstmt.setInt(1, order.getOrderId());
-            return pstmt.executeUpdate() > 0;
-        } catch (SQLException e) {
-            throw new DataAccessException("Error deleting order.", e);
-        }
-    }
-
     private Order mapRowToOrder(ResultSet rs) throws SQLException {
         return new Order(
                 rs.getInt("order_id"),
@@ -202,12 +209,11 @@ public class OrderDAO implements Dao<Order> {
                 rs.getString("source_address"),
                 rs.getString("destination_address"),
                 rs.getString("status"),
-                rs.getObject("assigned_agent_id") != null ? rs.getInt("assigned_agent_id") : null,
-                rs.getObject("vehicle_id") != null ? rs.getInt("vehicle_id") : null,
+                rs.getInt("assigned_agent_id"),
+                rs.getInt("vehicle_id"),
                 rs.getString("payment_status"),
                 rs.getTimestamp("created_at").toLocalDateTime(),
                 rs.getTimestamp("updated_at").toLocalDateTime()
         );
     }
 }
-
