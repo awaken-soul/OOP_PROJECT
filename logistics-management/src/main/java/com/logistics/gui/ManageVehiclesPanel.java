@@ -19,7 +19,8 @@ public class ManageVehiclesPanel extends JPanel {
         setLayout(new BorderLayout(10, 10));
         setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
-        String columnNames = {"ID", "Type", "License Plate", "Status", "Current Location"};
+        // ✅ Fixed columnNames declaration
+        String[] columnNames = {"ID", "Type", "License Plate", "Status", "Current Location"};
         tableModel = new DefaultTableModel(columnNames, 0);
         vehiclesTable = new JTable(tableModel);
         vehiclesTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -47,7 +48,8 @@ public class ManageVehiclesPanel extends JPanel {
         tableModel.setRowCount(0);
         List<Vehicle> vehicles = vehicleService.getAllVehicles();
         for (Vehicle vehicle : vehicles) {
-            tableModel.addRow(new Object{
+            // ✅ Fixed Object array initialization
+            tableModel.addRow(new Object[]{
                     vehicle.getVehicleId(),
                     vehicle.getVehicleType(),
                     vehicle.getLicensePlate(),
@@ -79,10 +81,10 @@ public class ManageVehiclesPanel extends JPanel {
 
         int vehicleId = (int) tableModel.getValueAt(selectedRow, 0);
         Vehicle vehicleToEdit = vehicleService.getAllVehicles().stream()
-               .filter(v -> v.getVehicleId() == vehicleId)
-               .findFirst().orElse(null);
+                .filter(v -> v.getVehicleId() == vehicleId)
+                .findFirst().orElse(null);
 
-        if (vehicleToEdit!= null) {
+        if (vehicleToEdit != null) {
             VehicleDialog dialog = new VehicleDialog(vehicleToEdit);
             if (dialog.isConfirmed()) {
                 Vehicle updatedVehicle = dialog.getVehicle();
@@ -105,10 +107,10 @@ public class ManageVehiclesPanel extends JPanel {
 
         int vehicleId = (int) tableModel.getValueAt(selectedRow, 0);
         Vehicle vehicleToDelete = vehicleService.getAllVehicles().stream()
-               .filter(v -> v.getVehicleId() == vehicleId)
-               .findFirst().orElse(null);
+                .filter(v -> v.getVehicleId() == vehicleId)
+                .findFirst().orElse(null);
 
-        if (vehicleToDelete!= null) {
+        if (vehicleToDelete != null) {
             int choice = JOptionPane.showConfirmDialog(this,
                     "Are you sure you want to delete vehicle: " + vehicleToDelete.getLicensePlate() + "?",
                     "Confirm Deletion", JOptionPane.YES_NO_OPTION);
@@ -127,7 +129,12 @@ public class ManageVehiclesPanel extends JPanel {
     private static class VehicleDialog {
         private final JTextField typeField = new JTextField();
         private final JTextField licensePlateField = new JTextField();
-        private final JComboBox<String> statusComboBox = new JComboBox<>(new String{"Available", "On Delivery", "Maintenance"});
+
+        // ✅ Fixed String array initialization
+        private final JComboBox<String> statusComboBox = new JComboBox<>(new String[]{
+                "Available", "On Delivery", "Maintenance"
+        });
+
         private final JTextField locationField = new JTextField();
         private Vehicle vehicle;
         private boolean confirmed = false;
@@ -144,7 +151,7 @@ public class ManageVehiclesPanel extends JPanel {
             panel.add(new JLabel("Current Location:"));
             panel.add(locationField);
 
-            if (vehicle!= null) {
+            if (vehicle != null) {
                 typeField.setText(vehicle.getVehicleType());
                 licensePlateField.setText(vehicle.getLicensePlate());
                 statusComboBox.setSelectedItem(vehicle.getStatus());
@@ -152,12 +159,17 @@ public class ManageVehiclesPanel extends JPanel {
             }
 
             int result = JOptionPane.showConfirmDialog(null, panel,
-                    vehicle == null? "Add New Vehicle" : "Edit Vehicle",
+                    vehicle == null ? "Add New Vehicle" : "Edit Vehicle",
                     JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
 
             if (result == JOptionPane.OK_OPTION) {
                 if (vehicle == null) {
-                    this.vehicle = new Vehicle(typeField.getText(), licensePlateField.getText(), (String) statusComboBox.getSelectedItem(), locationField.getText());
+                    this.vehicle = new Vehicle(
+                            typeField.getText(),
+                            licensePlateField.getText(),
+                            (String) statusComboBox.getSelectedItem(),
+                            locationField.getText()
+                    );
                 } else {
                     this.vehicle.setVehicleType(typeField.getText());
                     this.vehicle.setLicensePlate(licensePlateField.getText());
