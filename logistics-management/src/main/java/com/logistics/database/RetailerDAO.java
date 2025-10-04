@@ -17,7 +17,7 @@ public class RetailerDAO implements Dao<Retailer> {
 
     @Override
     public Optional<Retailer> findById(int id) {
-        String sql = "SELECT * FROM retailer WHERE retailer_id = ?";
+        String sql = "SELECT * FROM retailer WHERE retailer_id =?";
         try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
             pstmt.setInt(1, id);
             ResultSet rs = pstmt.executeQuery();
@@ -52,16 +52,17 @@ public class RetailerDAO implements Dao<Retailer> {
             pstmt.setString(1, retailer.getName());
             pstmt.setString(2, retailer.getAddress());
             pstmt.setString(3, retailer.getContactNumber());
-
             int affectedRows = pstmt.executeUpdate();
-            if (affectedRows > 0) {
-                try (ResultSet generatedKeys = pstmt.getGeneratedKeys()) {
-                    if (generatedKeys.next()) {
-                        return Optional.of(generatedKeys.getInt(1));
-                    }
+
+            if (affectedRows == 0) return Optional.empty();
+
+            try (ResultSet generatedKeys = pstmt.getGeneratedKeys()) {
+                if (generatedKeys.next()) {
+                    return Optional.of(generatedKeys.getInt(1));
+                } else {
+                    return Optional.empty();
                 }
             }
-            return Optional.empty();
         } catch (SQLException e) {
             throw new DataAccessException("Error saving retailer.", e);
         }
@@ -69,7 +70,7 @@ public class RetailerDAO implements Dao<Retailer> {
 
     @Override
     public boolean update(Retailer retailer) {
-        String sql = "UPDATE retailer SET name = ?, address = ?, contact_number = ? WHERE retailer_id = ?";
+        String sql = "UPDATE retailer SET name =?, address =?, contact_number =? WHERE retailer_id =?";
         try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
             pstmt.setString(1, retailer.getName());
             pstmt.setString(2, retailer.getAddress());
@@ -83,7 +84,7 @@ public class RetailerDAO implements Dao<Retailer> {
 
     @Override
     public boolean delete(Retailer retailer) {
-        String sql = "DELETE FROM retailer WHERE retailer_id = ?";
+        String sql = "DELETE FROM retailer WHERE retailer_id =?";
         try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
             pstmt.setInt(1, retailer.getRetailerId());
             return pstmt.executeUpdate() > 0;
