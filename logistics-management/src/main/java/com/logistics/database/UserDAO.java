@@ -61,7 +61,7 @@ public class UserDAO implements Dao<User> {
     }
 
     @Override
-    public boolean save(User user) {
+    public Optional<Integer> save(User user) {
         String sql = "INSERT INTO users(name, email, password, role, contact_number, address) VALUES(?,?,?,?,?,?)";
         try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
             pstmt.setString(1, user.getName());
