@@ -70,16 +70,17 @@ public class UserDAO implements Dao<User> {
             pstmt.setString(4, user.getRole().name());
             pstmt.setString(5, user.getContactNumber());
             pstmt.setString(6, user.getAddress());
-
             int affectedRows = pstmt.executeUpdate();
-            if (affectedRows > 0) {
-                try (ResultSet generatedKeys = pstmt.getGeneratedKeys()) {
-                    if (generatedKeys.next()) {
-                        return Optional.of(generatedKeys.getInt(1));
-                    }
+
+            if (affectedRows == 0) return Optional.empty();
+
+            try (ResultSet generatedKeys = pstmt.getGeneratedKeys()) {
+                if (generatedKeys.next()) {
+                    return Optional.of(generatedKeys.getInt(1));
+                } else {
+                    return Optional.empty();
                 }
             }
-            return Optional.empty();
         } catch (SQLException e) {
             throw new DataAccessException("Error saving user to the database.", e);
         }
