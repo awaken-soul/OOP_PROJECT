@@ -1,12 +1,12 @@
 package com.logistics.database;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.nio.file.Paths;
 
 public class DBConnector {
 
@@ -15,17 +15,35 @@ public class DBConnector {
 
     private DBConnector() {
         try {
-            // Load database from resources
-            URL dbUrl = getClass().getClassLoader().getResource("logistics.db");
-            if (dbUrl == null) {
-                throw new RuntimeException("Database file 'logistics.db' not found in resources.");
+            // Copy DB from JAR to temporary file
+            String dbName = "logistics.db";
+            File tempFile = File.createTempFile("logistics-temp-", ".db");
+            tempFile.deleteOnExit();
+
+            try (InputStream is = getClass().getResourceAsStream("/database/" + dbName);
+                 FileOutputStream fos = new FileOutputStream(tempFile)) {
+
+                if (is == null) {
+                    throw new RuntimeException("Database file not found in resources: " + dbName);
+                }
+
+                byte[] buffer = new byte[1024];
+                int bytesRead;
+                while ((bytesRead = is.read(buffer)) != -1) {
+                    fos.write(buffer, 0, bytesRead);
+                }
             }
-            String path = Paths.get(dbUrl.toURI()).toString();
-            connection = DriverManager.getConnection("jdbc:sqlite:" + path);
-            System.out.println("Connection to SQLite has been established.");
-            initializeSchema();
-        } catch (SQLException | URISyntaxException e) {
-            throw new RuntimeException("Failed to connect to the database: " + e.getMessage(), e);
+
+            // Load JDBC driver and connect
+            Class.forName("org.sqlite.JDBC");
+            connection = DriverManager.getConnection("jdbc:sqlite:" + tempFile.getAbsolutePath());
+
+            // Initialize tables if they don't exist
+            initializeTables();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException("Failed to initialize database connection", e);
         }
     }
 
@@ -40,72 +58,47 @@ public class DBConnector {
         return connection;
     }
 
-    private void initializeSchema() {
+    private void initializeTables() {
+        String userTable = "CREATE TABLE IF NOT EXISTS users (" +
+                "id INTEGER PRIMARY KEY AUTOINCREMENT," +
+                "name TEXT NOT NULL," +
+                "email TEXT UNIQUE NOT NULL," +
+                "password TEXT NOT NULL" +
+                ");";
+
+        String productTable = "CREATE TABLE IF NOT EXISTS products (" +
+                "id INTEGER PRIMARY KEY AUTOINCREMENT," +
+                "name TEXT NOT NULL," +
+                "price REAL NOT NULL," +
+                "quantity INTEGER NOT NULL" +
+                ");";
+
+        String orderTable = "CREATE TABLE IF NOT EXISTS orders (" +
+                "id INTEGER PRIMARY KEY AUTOINCREMENT," +
+                "user_id INTEGER NOT NULL," +
+                "product_id INTEGER NOT NULL," +
+                "quantity INTEGER NOT NULL," +
+                "status TEXT NOT NULL," +
+                "FOREIGN KEY(user_id) REFERENCES users(id)," +
+                "FOREIGN KEY(product_id) REFERENCES products(id)" +
+                ");";
+
+        String paymentTable = "CREATE TABLE IF NOT EXISTS payments (" +
+                "id INTEGER PRIMARY KEY AUTOINCREMENT," +
+                "order_id INTEGER NOT NULL," +
+                "amount REAL NOT NULL," +
+                "status TEXT NOT NULL," +
+                "FOREIGN KEY(order_id) REFERENCES orders(id)" +
+                ");";
+
         try (Statement stmt = connection.createStatement()) {
-            stmt.execute("CREATE TABLE IF NOT EXISTS users (" +
-                    "user_id INTEGER PRIMARY KEY AUTOINCREMENT," +
-                    "name TEXT NOT NULL," +
-                    "email TEXT UNIQUE NOT NULL," +
-                    "password TEXT NOT NULL," +
-                    "role TEXT NOT NULL CHECK(role IN ('CUSTOMER', 'ADMIN', 'AGENT', 'MANAGER'))," +
-                    "contact_number TEXT," +
-                    "address TEXT)");
-
-            stmt.execute("CREATE TABLE IF NOT EXISTS warehouse (" +
-                    "warehouse_id INTEGER PRIMARY KEY AUTOINCREMENT," +
-                    "name TEXT NOT NULL," +
-                    "address TEXT," +
-                    "capacity INTEGER," +
-                    "manager_id INTEGER," +
-                    "FOREIGN KEY (manager_id) REFERENCES users(user_id))");
-
-            stmt.execute("CREATE TABLE IF NOT EXISTS retailer (" +
-                    "retailer_id INTEGER PRIMARY KEY AUTOINCREMENT," +
-                    "name TEXT NOT NULL," +
-                    "address TEXT," +
-                    "contact_number TEXT)");
-
-            stmt.execute("CREATE TABLE IF NOT EXISTS product (" +
-                    "product_id INTEGER PRIMARY KEY AUTOINCREMENT," +
-                    "name TEXT NOT NULL," +
-                    "description TEXT," +
-                    "price REAL," +
-                    "quantity INTEGER," +
-                    "warehouse_id INTEGER," +
-                    "retailer_id INTEGER," +
-                    "FOREIGN KEY (warehouse_id) REFERENCES warehouse(warehouse_id)," +
-                    "FOREIGN KEY (retailer_id) REFERENCES retailer(retailer_id))");
-
-            stmt.execute("CREATE TABLE IF NOT EXISTS vehicles (" +
-                    "vehicle_id INTEGER PRIMARY KEY AUTOINCREMENT," +
-                    "vehicle_type TEXT NOT NULL," +
-                    "license_plate TEXT UNIQUE NOT NULL," +
-                    "status TEXT NOT NULL," +
-                    "driver_id INTEGER," +
-                    "current_location TEXT," +
-                    "FOREIGN KEY (driver_id) REFERENCES users(user_id))");
-
-            stmt.execute("CREATE TABLE IF NOT EXISTS orders (" +
-                    "order_id INTEGER PRIMARY KEY AUTOINCREMENT," +
-                    "user_id INTEGER NOT NULL," +
-                    "product_id INTEGER," +
-                    "order_type TEXT NOT NULL," +
-                    "source_address TEXT NOT NULL," +
-                    "destination_address TEXT NOT NULL," +
-                    "status TEXT NOT NULL," +
-                    "assigned_agent_id INTEGER," +
-                    "vehicle_id INTEGER," +
-                    "payment_status TEXT NOT NULL," +
-                    "created_at DATETIME DEFAULT CURRENT_TIMESTAMP," +
-                    "updated_at DATETIME DEFAULT CURRENT_TIMESTAMP," +
-                    "FOREIGN KEY (user_id) REFERENCES users(user_id)," +
-                    "FOREIGN KEY (product_id) REFERENCES product(product_id)," +
-                    "FOREIGN KEY (assigned_agent_id) REFERENCES users(user_id)," +
-                    "FOREIGN KEY (vehicle_id) REFERENCES vehicles(vehicle_id))");
-
-            System.out.println("Database schema initialized successfully.");
+            stmt.execute(userTable);
+            stmt.execute(productTable);
+            stmt.execute(orderTable);
+            stmt.execute(paymentTable);
         } catch (SQLException e) {
-            throw new RuntimeException("Error initializing database schema: " + e.getMessage(), e);
+            e.printStackTrace();
+            throw new RuntimeException("Failed to create database tables", e);
         }
     }
 }
