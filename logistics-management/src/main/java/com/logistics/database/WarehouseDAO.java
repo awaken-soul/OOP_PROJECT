@@ -46,7 +46,7 @@ public class WarehouseDAO implements Dao<Warehouse> {
     }
 
     @Override
-    public boolean save(Warehouse warehouse) {
+    public Optional<Integer> save(Warehouse warehouse) {
         String sql = "INSERT INTO warehouse(name, address, capacity, manager_id) VALUES(?,?,?,?)";
         try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
             pstmt.setString(1, warehouse.getName());
