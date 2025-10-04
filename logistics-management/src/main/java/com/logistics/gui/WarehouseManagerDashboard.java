@@ -29,7 +29,9 @@ public class WarehouseManagerDashboardFrame extends JFrame {
     private final ProductService productService;
     private final TrackingService trackingService;
 
-    public WarehouseManagerDashboardFrame(User managerUser, OrderService orderService, UserService userService, VehicleService vehicleService, ProductService productService, TrackingService trackingService) {
+    public WarehouseManagerDashboardFrame(User managerUser, OrderService orderService, UserService userService,
+                                          VehicleService vehicleService, ProductService productService,
+                                          TrackingService trackingService) {
         this.orderService = orderService;
         this.userService = userService;
         this.vehicleService = vehicleService;
@@ -61,7 +63,7 @@ public class WarehouseManagerDashboardFrame extends JFrame {
         JPanel panel = new JPanel(new BorderLayout(10, 10));
         panel.setBorder(BorderFactory.createTitledBorder("Pending Orders for Assignment"));
 
-        String columnNames = {"Order ID", "Customer ID", "Product ID", "Destination"};
+        String[] columnNames = {"Order ID", "Customer ID", "Product ID", "Destination"};
         ordersTableModel = new DefaultTableModel(columnNames, 0);
         ordersTable = new JTable(ordersTableModel);
         ordersTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -84,13 +86,16 @@ public class WarehouseManagerDashboardFrame extends JFrame {
     private JPanel createStockLevelsPanel() {
         JPanel panel = new JPanel(new BorderLayout(10, 10));
         panel.setBorder(BorderFactory.createTitledBorder("Stock Levels"));
-        String columnNames = {"Product ID", "Product Name", "Quantity", "Status"};
+
+        String[] columnNames = {"Product ID", "Product Name", "Quantity", "Status"};
         stockTableModel = new DefaultTableModel(columnNames, 0);
         stockTable = new JTable(stockTableModel);
         stockTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         JScrollPane scrollPane = new JScrollPane(stockTable);
+
         JButton updateStockButton = new JButton("Update Selected Stock");
         updateStockButton.addActionListener(e -> updateSelectedStock());
+
         panel.add(scrollPane, BorderLayout.CENTER);
         panel.add(updateStockButton, BorderLayout.SOUTH);
         return panel;
@@ -119,7 +124,12 @@ public class WarehouseManagerDashboardFrame extends JFrame {
         ordersTableModel.setRowCount(0);
         List<Order> pendingOrders = orderService.getOrdersByStatus("Pending");
         for (Order order : pendingOrders) {
-            ordersTableModel.addRow(new Object{order.getOrderId(), order.getUserId(), order.getProductId(), order.getDestinationAddress()});
+            ordersTableModel.addRow(new Object[]{
+                order.getOrderId(),
+                order.getUserId(),
+                order.getProductId(),
+                order.getDestinationAddress()
+            });
         }
     }
 
@@ -127,8 +137,14 @@ public class WarehouseManagerDashboardFrame extends JFrame {
         stockTableModel.setRowCount(0);
         List<Product> products = productService.getAllProducts();
         for (Product product : products) {
-            String status = product.getQuantity() > 10? "In Stock" : (product.getQuantity() > 0? "Low Stock" : "Out of Stock");
-            stockTableModel.addRow(new Object{product.getProductId(), product.getName(), product.getQuantity(), status});
+            String status = product.getQuantity() > 10 ? "In Stock" :
+                            (product.getQuantity() > 0 ? "Low Stock" : "Out of Stock");
+            stockTableModel.addRow(new Object[]{
+                product.getProductId(),
+                product.getName(),
+                product.getQuantity(),
+                status
+            });
         }
     }
 
@@ -138,10 +154,12 @@ public class WarehouseManagerDashboardFrame extends JFrame {
             JOptionPane.showMessageDialog(this, "Please select a product to update.", "No Selection", JOptionPane.WARNING_MESSAGE);
             return;
         }
+
         Integer productId = (Integer) stockTable.getValueAt(selectedRow, 0);
         String productName = (String) stockTable.getValueAt(selectedRow, 1);
         String newQuantityStr = JOptionPane.showInputDialog(this, "Enter new quantity for " + productName + ":", "Update Stock", JOptionPane.PLAIN_MESSAGE);
-        if (newQuantityStr!= null &&!newQuantityStr.trim().isEmpty()) {
+
+        if (newQuantityStr != null && !newQuantityStr.trim().isEmpty()) {
             try {
                 int newQuantity = Integer.parseInt(newQuantityStr.trim());
                 if (productService.updateProductQuantity(productId, newQuantity)) {
@@ -162,16 +180,17 @@ public class WarehouseManagerDashboardFrame extends JFrame {
             JOptionPane.showMessageDialog(this, "Please select an order to assign.", "No Order Selected", JOptionPane.WARNING_MESSAGE);
             return;
         }
+
         Integer orderId = (Integer) ordersTable.getValueAt(selectedRow, 0);
         List<User> availableAgents = userService.getAvailableAgents();
         List<Vehicle> availableVehicles = vehicleService.getAvailableVehicles();
-        if (availableAgents.isEmpty() |
 
-| availableVehicles.isEmpty()) {
+        if (availableAgents.isEmpty() || availableVehicles.isEmpty()) {
             JOptionPane.showMessageDialog(this, "No available agents or vehicles to assign.", "Assignment Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
-        JComboBox<User> agentComboBox = new JComboBox<>(availableAgents.toArray(new User));
+
+        JComboBox<User> agentComboBox = new JComboBox<>(availableAgents.toArray(new User[0]));
         agentComboBox.setRenderer(new DefaultListCellRenderer() {
             @Override
             public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
@@ -180,7 +199,8 @@ public class WarehouseManagerDashboardFrame extends JFrame {
                 return this;
             }
         });
-        JComboBox<Vehicle> vehicleComboBox = new JComboBox<>(availableVehicles.toArray(new Vehicle));
+
+        JComboBox<Vehicle> vehicleComboBox = new JComboBox<>(availableVehicles.toArray(new Vehicle[0]));
         vehicleComboBox.setRenderer(new DefaultListCellRenderer() {
             @Override
             public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
@@ -189,11 +209,13 @@ public class WarehouseManagerDashboardFrame extends JFrame {
                 return this;
             }
         });
+
         JPanel panel = new JPanel(new GridLayout(0, 2, 5, 5));
         panel.add(new JLabel("Select Agent:"));
         panel.add(agentComboBox);
         panel.add(new JLabel("Select Vehicle:"));
         panel.add(vehicleComboBox);
+
         int result = JOptionPane.showConfirmDialog(this, panel, "Assign Order ID: " + orderId, JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
         if (result == JOptionPane.OK_OPTION) {
             User selectedAgent = (User) agentComboBox.getSelectedItem();
@@ -203,7 +225,4 @@ public class WarehouseManagerDashboardFrame extends JFrame {
                 loadPendingOrders();
             } else {
                 JOptionPane.showMessageDialog(this, "Failed to assign the order.", "Error", JOptionPane.ERROR_MESSAGE);
-            }
-        }
-    }
-}
+           
