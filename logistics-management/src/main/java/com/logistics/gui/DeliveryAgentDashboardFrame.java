@@ -30,22 +30,25 @@ public class DeliveryAgentDashboardFrame extends JFrame {
         setLocationRelativeTo(null);
         setLayout(new BorderLayout(10, 10));
 
+        // --- Top Panel ---
         JPanel topPanel = new JPanel(new BorderLayout());
         topPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 0, 10));
         JLabel welcomeLabel = new JLabel("Welcome, Agent " + agentUser.getName());
         welcomeLabel.setFont(new Font("Arial", Font.BOLD, 16));
         topPanel.add(welcomeLabel, BorderLayout.WEST);
 
+        // --- Center Panel ---
         JPanel centerPanel = new JPanel(new BorderLayout());
         centerPanel.setBorder(BorderFactory.createTitledBorder("Assigned Deliveries"));
 
-        String columnNames = {"Order ID", "Destination Address", "Status", "Last Updated"};
+        String[] columnNames = {"Order ID", "Destination Address", "Status", "Last Updated"};
         tableModel = new DefaultTableModel(columnNames, 0);
         deliveriesTable = new JTable(tableModel);
         deliveriesTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         JScrollPane scrollPane = new JScrollPane(deliveriesTable);
         centerPanel.add(scrollPane, BorderLayout.CENTER);
 
+        // --- Bottom Panel ---
         JPanel bottomPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
         JButton updateStatusButton = new JButton("Update Status");
         JButton viewHistoryButton = new JButton("View History");
@@ -56,9 +59,11 @@ public class DeliveryAgentDashboardFrame extends JFrame {
         add(centerPanel, BorderLayout.CENTER);
         add(bottomPanel, BorderLayout.SOUTH);
 
+        // --- Button Actions ---
         updateStatusButton.addActionListener(e -> updateSelectedOrderStatus());
         viewHistoryButton.addActionListener(e -> showTrackingHistory());
 
+        // Load data
         loadAgentOrders();
     }
 
@@ -66,7 +71,12 @@ public class DeliveryAgentDashboardFrame extends JFrame {
         tableModel.setRowCount(0);
         List<Order> orders = orderService.getOrdersForAgent(agentUser.getUserId());
         for (Order order : orders) {
-            tableModel.addRow(new Object{order.getOrderId(), order.getDestinationAddress(), order.getStatus(), order.getUpdatedAt()});
+            tableModel.addRow(new Object[]{
+                order.getOrderId(),
+                order.getDestinationAddress(),
+                order.getStatus(),
+                order.getUpdatedAt()
+            });
         }
     }
 
@@ -99,9 +109,14 @@ public class DeliveryAgentDashboardFrame extends JFrame {
         Integer orderId = (Integer) deliveriesTable.getValueAt(selectedRow, 0);
         String currentStatus = (String) deliveriesTable.getValueAt(selectedRow, 2);
 
-        String newStatus = JOptionPane.showInputDialog(this, "Enter new status for Order ID " + orderId + ":", "Update Status", JOptionPane.PLAIN_MESSAGE);
+        String newStatus = JOptionPane.showInputDialog(
+            this,
+            "Enter new status for Order ID " + orderId + ":",
+            "Update Status",
+            JOptionPane.PLAIN_MESSAGE
+        );
 
-        if (newStatus!= null &&!newStatus.trim().isEmpty() &&!newStatus.equals(currentStatus)) {
+        if (newStatus != null && !newStatus.trim().isEmpty() && !newStatus.equals(currentStatus)) {
             if (orderService.updateOrderStatus(orderId, newStatus.trim())) {
                 JOptionPane.showMessageDialog(this, "Order status updated successfully.", "Success", JOptionPane.INFORMATION_MESSAGE);
                 loadAgentOrders();
@@ -111,3 +126,4 @@ public class DeliveryAgentDashboardFrame extends JFrame {
         }
     }
 }
+
