@@ -22,7 +22,7 @@ public class VehicleService {
     }
 
     public boolean addVehicle(Vehicle vehicle) {
-        return vehicleDAO.save(vehicle);
+        return vehicleDAO.save(vehicle).isPresent();
     }
 
     public boolean updateVehicle(Vehicle vehicle) {
