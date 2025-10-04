@@ -19,7 +19,8 @@ public class UserService {
             System.err.println("Registration failed: Email already in use.");
             return false;
         }
-        return userDAO.save(user).isPresent();
+        Optional<Integer> generatedId = userDAO.save(user);
+        return generatedId.isPresent();
     }
 
     public Optional<User> authenticate(String email, String plainPassword) {
