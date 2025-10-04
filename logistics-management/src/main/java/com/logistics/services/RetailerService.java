@@ -4,6 +4,7 @@ import com.logistics.database.RetailerDAO;
 import com.logistics.models.Retailer;
 
 import java.util.List;
+import java.util.Optional;
 
 public class RetailerService {
 
@@ -18,7 +19,8 @@ public class RetailerService {
     }
 
     public boolean addRetailer(Retailer retailer) {
-        return retailerDAO.save(retailer).isPresent();
+        Optional<Integer> generatedId = retailerDAO.save(retailer);
+        return generatedId.isPresent();
     }
 
     public boolean updateRetailer(Retailer retailer) {
