@@ -38,7 +38,8 @@ public class ManageVendorsPanel extends JPanel {
         JPanel panel = new JPanel(new BorderLayout(10, 10));
         panel.setBorder(BorderFactory.createTitledBorder("Manage Retailers"));
 
-        String columnNames = {"ID", "Name", "Address", "Contact Number"};
+        // ✅ Fixed String[] declaration
+        String[] columnNames = {"ID", "Name", "Address", "Contact Number"};
         retailerTableModel = new DefaultTableModel(columnNames, 0);
         retailerTable = new JTable(retailerTableModel);
         retailerTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -66,7 +67,8 @@ public class ManageVendorsPanel extends JPanel {
         JPanel panel = new JPanel(new BorderLayout(10, 10));
         panel.setBorder(BorderFactory.createTitledBorder("Manage Warehouses"));
 
-        String columnNames = {"ID", "Name", "Address", "Capacity", "Manager ID"};
+        // ✅ Fixed String[] declaration
+        String[] columnNames = {"ID", "Name", "Address", "Capacity", "Manager ID"};
         warehouseTableModel = new DefaultTableModel(columnNames, 0);
         warehouseTable = new JTable(warehouseTableModel);
         warehouseTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -94,7 +96,8 @@ public class ManageVendorsPanel extends JPanel {
         retailerTableModel.setRowCount(0);
         List<Retailer> retailers = retailerService.getAllRetailers();
         for (Retailer retailer : retailers) {
-            retailerTableModel.addRow(new Object{
+            // ✅ Fixed Object[] initialization
+            retailerTableModel.addRow(new Object[]{
                     retailer.getRetailerId(),
                     retailer.getName(),
                     retailer.getAddress(),
@@ -107,7 +110,8 @@ public class ManageVendorsPanel extends JPanel {
         warehouseTableModel.setRowCount(0);
         List<Warehouse> warehouses = warehouseService.getAllWarehouses();
         for (Warehouse warehouse : warehouses) {
-            warehouseTableModel.addRow(new Object{
+            // ✅ Fixed Object[] initialization
+            warehouseTableModel.addRow(new Object[]{
                     warehouse.getWarehouseId(),
                     warehouse.getName(),
                     warehouse.getAddress(),
@@ -130,8 +134,9 @@ public class ManageVendorsPanel extends JPanel {
         int selectedRow = retailerTable.getSelectedRow();
         if (selectedRow == -1) return;
         int retailerId = (int) retailerTableModel.getValueAt(selectedRow, 0);
-        Retailer retailer = retailerService.getAllRetailers().stream().filter(r -> r.getRetailerId() == retailerId).findFirst().orElse(null);
-        if (retailer!= null) {
+        Retailer retailer = retailerService.getAllRetailers().stream()
+                .filter(r -> r.getRetailerId() == retailerId).findFirst().orElse(null);
+        if (retailer != null) {
             RetailerDialog dialog = new RetailerDialog(retailer);
             if (dialog.isConfirmed()) {
                 if (retailerService.updateRetailer(dialog.getRetailer())) {
@@ -145,9 +150,12 @@ public class ManageVendorsPanel extends JPanel {
         int selectedRow = retailerTable.getSelectedRow();
         if (selectedRow == -1) return;
         int retailerId = (int) retailerTableModel.getValueAt(selectedRow, 0);
-        Retailer retailer = retailerService.getAllRetailers().stream().filter(r -> r.getRetailerId() == retailerId).findFirst().orElse(null);
-        if (retailer!= null) {
-            if (JOptionPane.showConfirmDialog(this, "Delete " + retailer.getName() + "?", "Confirm", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
+        Retailer retailer = retailerService.getAllRetailers().stream()
+                .filter(r -> r.getRetailerId() == retailerId).findFirst().orElse(null);
+        if (retailer != null) {
+            if (JOptionPane.showConfirmDialog(this,
+                    "Delete " + retailer.getName() + "?",
+                    "Confirm", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
                 if (retailerService.deleteRetailer(retailer)) {
                     loadRetailers();
                 }
@@ -168,8 +176,9 @@ public class ManageVendorsPanel extends JPanel {
         int selectedRow = warehouseTable.getSelectedRow();
         if (selectedRow == -1) return;
         int warehouseId = (int) warehouseTableModel.getValueAt(selectedRow, 0);
-        Warehouse warehouse = warehouseService.getAllWarehouses().stream().filter(w -> w.getWarehouseId() == warehouseId).findFirst().orElse(null);
-        if (warehouse!= null) {
+        Warehouse warehouse = warehouseService.getAllWarehouses().stream()
+                .filter(w -> w.getWarehouseId() == warehouseId).findFirst().orElse(null);
+        if (warehouse != null) {
             WarehouseDialog dialog = new WarehouseDialog(warehouse);
             if (dialog.isConfirmed()) {
                 if (warehouseService.updateWarehouse(dialog.getWarehouse())) {
@@ -183,9 +192,12 @@ public class ManageVendorsPanel extends JPanel {
         int selectedRow = warehouseTable.getSelectedRow();
         if (selectedRow == -1) return;
         int warehouseId = (int) warehouseTableModel.getValueAt(selectedRow, 0);
-        Warehouse warehouse = warehouseService.getAllWarehouses().stream().filter(w -> w.getWarehouseId() == warehouseId).findFirst().orElse(null);
-        if (warehouse!= null) {
-            if (JOptionPane.showConfirmDialog(this, "Delete " + warehouse.getName() + "?", "Confirm", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
+        Warehouse warehouse = warehouseService.getAllWarehouses().stream()
+                .filter(w -> w.getWarehouseId() == warehouseId).findFirst().orElse(null);
+        if (warehouse != null) {
+            if (JOptionPane.showConfirmDialog(this,
+                    "Delete " + warehouse.getName() + "?",
+                    "Confirm", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
                 if (warehouseService.deleteWarehouse(warehouse)) {
                     loadWarehouses();
                 }
@@ -196,24 +208,34 @@ public class ManageVendorsPanel extends JPanel {
     private static class RetailerDialog {
         private Retailer retailer;
         private boolean confirmed = false;
+
         public RetailerDialog(Retailer r) {
             this.retailer = r;
-            JTextField nameField = new JTextField(r == null? "" : r.getName());
-            JTextField addressField = new JTextField(r == null? "" : r.getAddress());
-            JTextField contactField = new JTextField(r == null? "" : r.getContactNumber());
+            JTextField nameField = new JTextField(r == null ? "" : r.getName());
+            JTextField addressField = new JTextField(r == null ? "" : r.getAddress());
+            JTextField contactField = new JTextField(r == null ? "" : r.getContactNumber());
+
             JPanel panel = new JPanel(new GridLayout(0, 2, 5, 5));
             panel.add(new JLabel("Name:")); panel.add(nameField);
             panel.add(new JLabel("Address:")); panel.add(addressField);
             panel.add(new JLabel("Contact:")); panel.add(contactField);
-            int result = JOptionPane.showConfirmDialog(null, panel, r == null? "Add Retailer" : "Edit Retailer", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+
+            int result = JOptionPane.showConfirmDialog(null, panel,
+                    r == null ? "Add Retailer" : "Edit Retailer",
+                    JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+
             if (result == JOptionPane.OK_OPTION) {
-                if (r == null) this.retailer = new Retailer(nameField.getText(), addressField.getText(), contactField.getText());
+                if (r == null)
+                    this.retailer = new Retailer(nameField.getText(), addressField.getText(), contactField.getText());
                 else {
-                    r.setName(nameField.getText()); r.setAddress(addressField.getText()); r.setContactNumber(contactField.getText());
+                    r.setName(nameField.getText());
+                    r.setAddress(addressField.getText());
+                    r.setContactNumber(contactField.getText());
                 }
                 confirmed = true;
             }
         }
+
         public Retailer getRetailer() { return retailer; }
         public boolean isConfirmed() { return confirmed; }
     }
@@ -221,28 +243,39 @@ public class ManageVendorsPanel extends JPanel {
     private static class WarehouseDialog {
         private Warehouse warehouse;
         private boolean confirmed = false;
+
         public WarehouseDialog(Warehouse w) {
             this.warehouse = w;
-            JTextField nameField = new JTextField(w == null? "" : w.getName());
-            JTextField addressField = new JTextField(w == null? "" : w.getAddress());
-            JTextField capacityField = new JTextField(w == null? "" : String.valueOf(w.getCapacity()));
-            JTextField managerIdField = new JTextField(w == null? "" : String.valueOf(w.getManagerId()));
+            JTextField nameField = new JTextField(w == null ? "" : w.getName());
+            JTextField addressField = new JTextField(w == null ? "" : w.getAddress());
+            JTextField capacityField = new JTextField(w == null ? "" : String.valueOf(w.getCapacity()));
+            JTextField managerIdField = new JTextField(w == null ? "" : String.valueOf(w.getManagerId()));
+
             JPanel panel = new JPanel(new GridLayout(0, 2, 5, 5));
             panel.add(new JLabel("Name:")); panel.add(nameField);
             panel.add(new JLabel("Address:")); panel.add(addressField);
             panel.add(new JLabel("Capacity:")); panel.add(capacityField);
             panel.add(new JLabel("Manager ID:")); panel.add(managerIdField);
-            int result = JOptionPane.showConfirmDialog(null, panel, w == null? "Add Warehouse" : "Edit Warehouse", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+
+            int result = JOptionPane.showConfirmDialog(null, panel,
+                    w == null ? "Add Warehouse" : "Edit Warehouse",
+                    JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+
             if (result == JOptionPane.OK_OPTION) {
                 int capacity = Integer.parseInt(capacityField.getText());
                 int managerId = Integer.parseInt(managerIdField.getText());
-                if (w == null) this.warehouse = new Warehouse(nameField.getText(), addressField.getText(), capacity, managerId);
+                if (w == null)
+                    this.warehouse = new Warehouse(nameField.getText(), addressField.getText(), capacity, managerId);
                 else {
-                    w.setName(nameField.getText()); w.setAddress(addressField.getText()); w.setCapacity(capacity); w.setManagerId(managerId);
+                    w.setName(nameField.getText());
+                    w.setAddress(addressField.getText());
+                    w.setCapacity(capacity);
+                    w.setManagerId(managerId);
                 }
                 confirmed = true;
             }
         }
+
         public Warehouse getWarehouse() { return warehouse; }
         public boolean isConfirmed() { return confirmed; }
     }
