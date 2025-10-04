@@ -55,3 +55,14 @@ public class DBConnector {
             stmt.execute("CREATE TABLE IF NOT EXISTS users (" +
                     "user_id INTEGER PRIMARY KEY AUTOINCREMENT, " +
                     "name TEXT NOT NULL, " +
+                    "email TEXT UNIQUE NOT NULL, " +
+                    "password TEXT NOT NULL, " +
+                    "role TEXT NOT NULL CHECK(role IN ('CUSTOMER', 'ADMIN', 'AGENT', 'MANAGER'))" +
+                    ")");
+            // Add your other table creation statements here...
+            System.out.println("Database schema initialized successfully.");
+        } catch (SQLException e) {
+            System.err.println("Error initializing database schema: " + e.getMessage());
+        }
+    }
+}
