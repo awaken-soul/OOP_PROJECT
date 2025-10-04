@@ -1,4 +1,3 @@
-
 package com.logistics.database;
 
 import java.sql.Connection;
