@@ -46,7 +46,7 @@ public class RetailerDAO implements Dao<Retailer> {
     }
 
     @Override
-    public boolean save(Retailer retailer) {
+    public Optional<Integer> save(Retailer retailer) {
         String sql = "INSERT INTO retailer(name, address, contact_number) VALUES(?,?,?)";
         try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
             pstmt.setString(1, retailer.getName());
