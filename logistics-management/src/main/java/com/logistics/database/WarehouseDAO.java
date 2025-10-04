@@ -61,4 +61,36 @@ public class WarehouseDAO implements Dao<Warehouse> {
     @Override
     public boolean update(Warehouse warehouse) {
         String sql = "UPDATE warehouse SET name = ?, address = ?, capacity = ?, manager_id = ? WHERE warehouse_id = ?";
-        try (PreparedStatement pstmt =
+        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+            pstmt.setString(1, warehouse.getName());
+            pstmt.setString(2, warehouse.getAddress());
+            pstmt.setInt(3, warehouse.getCapacity());
+            pstmt.setInt(4, warehouse.getManagerId());
+            pstmt.setInt(5, warehouse.getWarehouseId());
+            return pstmt.executeUpdate() > 0;
+        } catch (SQLException e) {
+            throw new RuntimeException("Error updating warehouse.", e);
+        }
+    }
+
+    @Override
+    public boolean delete(Warehouse warehouse) {
+        String sql = "DELETE FROM warehouse WHERE warehouse_id = ?";
+        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+            pstmt.setInt(1, warehouse.getWarehouseId());
+            return pstmt.executeUpdate() > 0;
+        } catch (SQLException e) {
+            throw new RuntimeException("Error deleting warehouse.", e);
+        }
+    }
+
+    private Warehouse mapRowToWarehouse(ResultSet rs) throws SQLException {
+        return new Warehouse(
+                rs.getInt("warehouse_id"),
+                rs.getString("name"),
+                rs.getString("address"),
+                rs.getInt("capacity"),
+                rs.getInt("manager_id")
+        );
+    }
+}
