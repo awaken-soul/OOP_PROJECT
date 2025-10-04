@@ -46,7 +46,7 @@ public class MainApplication {
 
     private static final OrderService orderService = new OrderService(orderDAO, productService, trackingService);
 
-    public static void main(String args) {
+    public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
             LoginFrame loginFrame = new LoginFrame(userService);
             loginFrame.setVisible(true);
