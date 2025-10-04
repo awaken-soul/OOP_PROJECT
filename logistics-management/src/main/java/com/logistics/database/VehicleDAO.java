@@ -60,7 +60,7 @@ public class VehicleDAO implements Dao<Vehicle> {
     }
 
     @Override
-    public boolean save(Vehicle vehicle) {
+    public Optional<Integer> save(Vehicle vehicle) {
         String sql = "INSERT INTO vehicles(vehicle_type, license_plate, status, current_location) VALUES(?,?,?,?)";
         try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
             pstmt.setString(1, vehicle.getVehicleType());
