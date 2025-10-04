@@ -17,7 +17,7 @@ public class VehicleDAO implements Dao<Vehicle> {
 
     @Override
     public Optional<Vehicle> findById(int id) {
-        String sql = "SELECT * FROM vehicles WHERE vehicle_id =?";
+        String sql = "SELECT * FROM vehicles WHERE vehicle_id = ?";
         try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
             pstmt.setInt(1, id);
             ResultSet rs = pstmt.executeQuery();
@@ -62,12 +62,21 @@ public class VehicleDAO implements Dao<Vehicle> {
     @Override
     public Optional<Integer> save(Vehicle vehicle) {
         String sql = "INSERT INTO vehicles(vehicle_type, license_plate, status, current_location) VALUES(?,?,?,?)";
-        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+        try (PreparedStatement pstmt = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             pstmt.setString(1, vehicle.getVehicleType());
             pstmt.setString(2, vehicle.getLicensePlate());
             pstmt.setString(3, vehicle.getStatus());
             pstmt.setString(4, vehicle.getCurrentLocation());
-            return pstmt.executeUpdate() > 0;
+
+            int affectedRows = pstmt.executeUpdate();
+            if (affectedRows > 0) {
+                try (ResultSet generatedKeys = pstmt.getGeneratedKeys()) {
+                    if (generatedKeys.next()) {
+                        return Optional.of(generatedKeys.getInt(1));
+                    }
+                }
+            }
+            return Optional.empty();
         } catch (SQLException e) {
             throw new DataAccessException("Error saving vehicle.", e);
         }
@@ -75,7 +84,7 @@ public class VehicleDAO implements Dao<Vehicle> {
 
     @Override
     public boolean update(Vehicle vehicle) {
-        String sql = "UPDATE vehicles SET vehicle_type =?, license_plate =?, status =?, current_location =? WHERE vehicle_id =?";
+        String sql = "UPDATE vehicles SET vehicle_type = ?, license_plate = ?, status = ?, current_location = ? WHERE vehicle_id = ?";
         try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
             pstmt.setString(1, vehicle.getVehicleType());
             pstmt.setString(2, vehicle.getLicensePlate());
@@ -90,7 +99,7 @@ public class VehicleDAO implements Dao<Vehicle> {
 
     @Override
     public boolean delete(Vehicle vehicle) {
-        String sql = "DELETE FROM vehicles WHERE vehicle_id =?";
+        String sql = "DELETE FROM vehicles WHERE vehicle_id = ?";
         try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
             pstmt.setInt(1, vehicle.getVehicleId());
             return pstmt.executeUpdate() > 0;
