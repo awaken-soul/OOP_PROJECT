@@ -62,6 +62,7 @@ public class MainApplication {
                 break;
             case AGENT:
                 dashboard = new DeliveryAgentDashboardFrame(user, orderService, trackingService);
+                System.out.println("Role: " + user.getRole());
                 dashboard.setVisible(true);
                 break;
             case CUSTOMER:
