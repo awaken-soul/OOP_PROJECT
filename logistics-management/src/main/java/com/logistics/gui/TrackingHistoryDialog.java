@@ -18,16 +18,16 @@ public class TrackingHistoryDialog extends JDialog {
         setLocationRelativeTo(owner);
         setLayout(new BorderLayout(10, 10));
 
-        String columnNames = {"Status", "Location / Note", "Timestamp"};
+        String[] columnNames = {"Status", "Location / Note", "Timestamp"};
         tableModel = new DefaultTableModel(columnNames, 0);
         trackingTable = new JTable(tableModel);
         trackingTable.setFillsViewportHeight(true);
 
         for (Tracking entry : trackingHistory) {
-            tableModel.addRow(new Object{
-                    entry.getCurrentStatus(),
-                    entry.getLocation(),
-                    entry.getUpdatedAt()
+            tableModel.addRow(new Object[]{
+                entry.getCurrentStatus(),
+                entry.getLocation(),
+                entry.getUpdatedAt()
             });
         }
 
