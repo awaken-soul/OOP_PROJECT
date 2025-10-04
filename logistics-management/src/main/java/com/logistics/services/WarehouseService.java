@@ -18,7 +18,7 @@ public class WarehouseService {
     }
 
     public boolean addWarehouse(Warehouse warehouse) {
-        return warehouseDAO.save(warehouse);
+        return warehouseDAO.save(warehouse).isPresent();
     }
 
     public boolean updateWarehouse(Warehouse warehouse) {
