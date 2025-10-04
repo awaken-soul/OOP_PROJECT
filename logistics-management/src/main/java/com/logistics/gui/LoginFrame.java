@@ -53,9 +53,7 @@ public class LoginFrame extends JFrame {
         String email = emailField.getText();
         String password = new String(passwordField.getPassword());
 
-        if (email.isEmpty() |
-
-| password.isEmpty()) {
+        if (email.isEmpty() || password.isEmpty()) {
             JOptionPane.showMessageDialog(this, "Email and password cannot be empty.", "Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
