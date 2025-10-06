@@ -1,45 +1,49 @@
 package com.logistics.service;
 
 import com.logistics.data.ShipmentDao;
+import com.logistics.data.WarehouseDao;
 import com.logistics.model.Shipment;
+import com.logistics.model.Warehouse;
+
 import java.util.List;
 
 /**
- * Service layer for handling business logic related to Agent operations.
+ * Provides business logic for agent operations.
  */
 public class AgentService {
 
     private final ShipmentDao shipmentDao;
+    private final WarehouseDao warehouseDao; // <-- ADD THIS
 
-    public AgentService(ShipmentDao shipmentDao) {
+    // --- FIX 1: UPDATE THE CONSTRUCTOR ---
+    public AgentService(ShipmentDao shipmentDao, WarehouseDao warehouseDao) {
         this.shipmentDao = shipmentDao;
+        this.warehouseDao = warehouseDao; // <-- ADD THIS
     }
 
-    /**
-     * Retrieves all shipments that are available for an agent to accept.
-     * These are shipments with the status 'REQUESTED'.
-     * @return A list of available shipments.
-     */
     public List<Shipment> getAvailableShipments() {
-        return shipmentDao.findByStatus("REQUESTED");
+        return shipmentDao.findShipmentsByStatus("REQUESTED");
     }
 
-    /**
-     * Retrieves all shipments assigned to a specific agent.
-     * @param agentId The ID of the agent.
-     * @return A list of the agent's assigned shipments.
-     */
-    public List<Shipment> getMyShipments(int agentId) {
-        return shipmentDao.findByAgentId(agentId);
+    public List<Shipment> getMyAcceptedShipments(int agentId) {
+        return shipmentDao.findShipmentsByAgentId(agentId);
     }
 
-    /**
-     * Assigns a shipment to an agent and updates its status.
-     * @param shipmentId The ID of the shipment to accept.
-     * @param agentId The ID of the agent accepting the shipment.
-     * @return true if the operation was successful.
-     */
     public boolean acceptShipment(int shipmentId, int agentId) {
         return shipmentDao.updateShipmentAgentAndStatus(shipmentId, agentId, "ACCEPTED");
     }
+
+    public boolean moveShipmentToWarehouse(int shipmentId, int warehouseId) {
+        return shipmentDao.updateShipmentWarehouseAndStatus(shipmentId, warehouseId, "IN_WAREHOUSE");
+    }
+
+    public boolean markShipmentDelivered(int shipmentId) {
+        return shipmentDao.updateShipmentStatus(shipmentId, "DELIVERED");
+    }
+
+    // --- FIX 2: ADD THE MISSING METHOD ---
+    public List<Warehouse> getAllWarehouses() {
+        return warehouseDao.getAllWarehouses();
+    }
 }
+

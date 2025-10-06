@@ -25,8 +25,8 @@ public class ShipmentDao {
      */
     public boolean createShipment(int customerId, int productId, String source, String destination) {
         String sql = "INSERT INTO shipments (customerId, productId, source, destination, status) VALUES (?, ?, ?, ?, 'REQUESTED')";
-        try (Connection conn = Database.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+        Connection conn = Database.getConnection();
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setInt(1, customerId);
             stmt.setInt(2, productId);
@@ -49,17 +49,16 @@ public class ShipmentDao {
      * @return A list of Shipment objects.
      */
     public List<Shipment> findByCustomerId(int customerId) {
-        // This query joins shipments with products to get the product name for easy display.
         String sql = "SELECT s.*, p.name AS productName FROM shipments s JOIN products p ON s.productId = p.id WHERE s.customerId = ?";
         List<Shipment> shipments = new ArrayList<>();
-        try (Connection conn = Database.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+        Connection conn = Database.getConnection();
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setInt(1, customerId);
-            ResultSet rs = stmt.executeQuery();
-
-            while (rs.next()) {
-                shipments.add(mapRowToShipment(rs));
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    shipments.add(mapRowToShipment(rs));
+                }
             }
         } catch (SQLException e) {
             System.err.println("Error finding shipments by customer ID.");
@@ -74,17 +73,17 @@ public class ShipmentDao {
      * @param status The status to search for (e.g., "REQUESTED").
      * @return A list of Shipment objects.
      */
-    public List<Shipment> findByStatus(String status) {
+    public List<Shipment> findShipmentsByStatus(String status) {
         String sql = "SELECT s.*, p.name AS productName FROM shipments s JOIN products p ON s.productId = p.id WHERE s.status = ?";
         List<Shipment> shipments = new ArrayList<>();
-        try (Connection conn = Database.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+        Connection conn = Database.getConnection();
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setString(1, status);
-            ResultSet rs = stmt.executeQuery();
-
-            while (rs.next()) {
-                shipments.add(mapRowToShipment(rs));
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    shipments.add(mapRowToShipment(rs));
+                }
             }
         } catch (SQLException e) {
             System.err.println("Error finding shipments by status.");
@@ -92,22 +91,24 @@ public class ShipmentDao {
         }
         return shipments;
     }
-     /**
+
+    /**
      * Finds all shipments assigned to a specific agent.
      *
      * @param agentId The ID of the agent.
      * @return A list of Shipment objects.
      */
-    public List<Shipment> findByAgentId(int agentId) {
+    public List<Shipment> findShipmentsByAgentId(int agentId) {
         String sql = "SELECT s.*, p.name AS productName FROM shipments s JOIN products p ON s.productId = p.id WHERE s.agentId = ?";
         List<Shipment> shipments = new ArrayList<>();
-        try (Connection conn = Database.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+        Connection conn = Database.getConnection();
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setInt(1, agentId);
-            ResultSet rs = stmt.executeQuery();
-            while (rs.next()) {
-                shipments.add(mapRowToShipment(rs));
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    shipments.add(mapRowToShipment(rs));
+                }
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -126,8 +127,8 @@ public class ShipmentDao {
      */
     public boolean updateShipmentAgentAndStatus(int shipmentId, int agentId, String newStatus) {
         String sql = "UPDATE shipments SET agentId = ?, status = ? WHERE id = ?";
-        try (Connection conn = Database.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+        Connection conn = Database.getConnection();
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setInt(1, agentId);
             stmt.setString(2, newStatus);
@@ -146,12 +147,13 @@ public class ShipmentDao {
      *
      * @param shipmentId The ID of the shipment to update.
      * @param warehouseId The ID of the warehouse to assign.
-     * @param newStatus  The new status of the shipment.
+     * @param newStatus   The new status of the shipment.
      * @return true if the update was successful, false otherwise.
      */
     public boolean updateShipmentWarehouseAndStatus(int shipmentId, int warehouseId, String newStatus) {
         String sql = "UPDATE shipments SET warehouseId = ?, status = ? WHERE id = ?";
-        try (Connection conn = Database.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
+        Connection conn = Database.getConnection();
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, warehouseId);
             stmt.setString(2, newStatus);
             stmt.setInt(3, shipmentId);
@@ -161,6 +163,27 @@ public class ShipmentDao {
             return false;
         }
     }
+
+    /**
+     * Updates only the status of a shipment. Used for marking as "DELIVERED".
+     *
+     * @param shipmentId The ID of the shipment to update.
+     * @param newStatus  The new status.
+     * @return true if the update was successful, false otherwise.
+     */
+    public boolean updateShipmentStatus(int shipmentId, String newStatus) {
+        String sql = "UPDATE shipments SET status = ? WHERE id = ?";
+        Connection conn = Database.getConnection();
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, newStatus);
+            stmt.setInt(2, shipmentId);
+            return stmt.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
 
     /**
      * Helper method to map a row from the ResultSet to a Shipment object.

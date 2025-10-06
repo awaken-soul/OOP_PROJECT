@@ -12,7 +12,7 @@ public class AdminService {
     private final WarehouseDao warehouseDao;
     private final AuthService authService; // Uses another service for creating users
 
-    public AdminService(WarehouseDao warehouseDao, AuthService authService) {
+    public AdminService(AuthService authService, WarehouseDao warehouseDao) {
         this.warehouseDao = warehouseDao;
         this.authService = authService;
     }

@@ -16,8 +16,10 @@ public class WarehouseDao {
      */
     public boolean createWarehouse(String name, String location) {
         String sql = "INSERT INTO warehouses (name, location) VALUES (?, ?)";
-        try (Connection conn = Database.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+        // Get the single, shared connection from the Database class.
+        Connection conn = Database.getConnection();
+        // The try-with-resources statement now only manages the PreparedStatement.
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, name);
             stmt.setString(2, location);
             return stmt.executeUpdate() > 0;
@@ -34,15 +36,17 @@ public class WarehouseDao {
     public List<Warehouse> getAllWarehouses() {
         List<Warehouse> warehouses = new ArrayList<>();
         String sql = "SELECT * FROM warehouses";
-        try (Connection conn = Database.getConnection();
-             Statement stmt = conn.createStatement();
+        // Get the single, shared connection from the Database class.
+        Connection conn = Database.getConnection();
+        // The try-with-resources statement now only manages the Statement and ResultSet.
+        try (Statement stmt = conn.createStatement();
              ResultSet rs = stmt.executeQuery(sql)) {
 
             while (rs.next()) {
                 warehouses.add(new Warehouse(
-                    rs.getInt("id"),
-                    rs.getString("name"),
-                    rs.getString("location")
+                        rs.getInt("id"),
+                        rs.getString("name"),
+                        rs.getString("location")
                 ));
             }
         } catch (SQLException e) {
@@ -51,3 +55,4 @@ public class WarehouseDao {
         return warehouses;
     }
 }
+

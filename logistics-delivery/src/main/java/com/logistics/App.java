@@ -1,26 +1,26 @@
 package com.logistics;
 
+import com.logistics.data.Database;
 import com.logistics.ui.MainFrame;
 import javax.swing.SwingUtilities;
 
 /**
- * The main entry point for the Logistics Management application.
- * This class is responsible for initializing and launching the user interface.
+ * Main entry point for the application.
+ * Initializes the database and launches the GUI.
  */
 public class App {
-    
-    /**
-     * The main method that starts the application.
-     * @param args Command line arguments (not used).
-     */
     public static void main(String[] args) {
-        // Swing GUI should be created and updated on the Event Dispatch Thread (EDT).
-        // SwingUtilities.invokeLater ensures that this happens.
+        // Initialize the database connection on startup.
+        Database.getConnection();
+
+        // Add a shutdown hook to cleanly close the database connection when the JVM terminates.
+        // This is important for releasing the file lock on logistics.db.
+        Runtime.getRuntime().addShutdownHook(new Thread(Database::close));
+
+        // Run the GUI on the Event Dispatch Thread for thread safety.
         SwingUtilities.invokeLater(() -> {
-            // Create the main application window (JFrame) and make it visible.
-            // The MainFrame constructor will handle the creation of all necessary
-            // services and panels.
-            new MainFrame().setVisible(true);
+            MainFrame mainFrame = new MainFrame();
+            mainFrame.setVisible(true);
         });
     }
 }

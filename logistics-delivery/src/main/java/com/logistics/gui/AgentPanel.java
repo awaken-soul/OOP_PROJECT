@@ -73,8 +73,9 @@ public class AgentPanel extends JPanel {
 
     private void attachListeners() {
         acceptButton.addActionListener(this::handleAcceptShipment);
-        toWarehouseButton.addActionListener(e -> handleUpdateStatus("IN_WAREHOUSE"));
-        deliverButton.addActionListener(e -> handleUpdateStatus("DELIVERED"));
+        // --- FIX: Each button now calls its own specific handler ---
+        toWarehouseButton.addActionListener(this::handleMoveToWarehouse);
+        deliverButton.addActionListener(this::handleDeliver);
     }
 
     private void handleAcceptShipment(ActionEvent e) {
@@ -93,27 +94,40 @@ public class AgentPanel extends JPanel {
         }
     }
 
-    private void handleUpdateStatus(String newStatus) {
-        Shipment selected = myShipmentsList.getSelectedValue();
-        if (selected == null) {
-            JOptionPane.showMessageDialog(this, "Please select one of your jobs to update.", "Selection Error", JOptionPane.ERROR_MESSAGE);
+    // --- FIX: Created a specific handler for moving to a warehouse ---
+    private void handleMoveToWarehouse(ActionEvent e) {
+        Shipment selectedShipment = myShipmentsList.getSelectedValue();
+        Warehouse selectedWarehouse = (Warehouse) warehouseComboBox.getSelectedItem();
+
+        if (selectedShipment == null || selectedWarehouse == null) {
+            JOptionPane.showMessageDialog(this, "Please select one of your jobs and a warehouse.", "Selection Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
 
-        Integer warehouseId = null;
-        if (newStatus.equals("IN_WAREHOUSE")) {
-            Warehouse selectedWarehouse = (Warehouse) warehouseComboBox.getSelectedItem();
-            if (selectedWarehouse == null) {
-                JOptionPane.showMessageDialog(this, "Please select a warehouse.", "Selection Error", JOptionPane.ERROR_MESSAGE);
-                return;
-            }
-            warehouseId = selectedWarehouse.getId();
-        }
-
-        boolean success = agentService.updateShipmentStatus(selected.getId(), newStatus, warehouseId);
+        // Call the correct 2-argument method
+        boolean success = agentService.moveShipmentToWarehouse(selectedShipment.getId(), selectedWarehouse.getId());
 
         if (success) {
-            JOptionPane.showMessageDialog(this, "Shipment status updated!");
+            JOptionPane.showMessageDialog(this, "Shipment moved to warehouse!");
+            refreshLists();
+        } else {
+            JOptionPane.showMessageDialog(this, "Failed to update status.", "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    // --- FIX: Created a specific handler for delivering a shipment ---
+    private void handleDeliver(ActionEvent e) {
+        Shipment selectedShipment = myShipmentsList.getSelectedValue();
+        if (selectedShipment == null) {
+            JOptionPane.showMessageDialog(this, "Please select one of your jobs to mark as delivered.", "Selection Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        // Call the correct 1-argument method
+        boolean success = agentService.markShipmentDelivered(selectedShipment.getId());
+
+        if (success) {
+            JOptionPane.showMessageDialog(this, "Shipment marked as delivered!");
             refreshLists();
         } else {
             JOptionPane.showMessageDialog(this, "Failed to update status.", "Error", JOptionPane.ERROR_MESSAGE);
@@ -125,17 +139,18 @@ public class AgentPanel extends JPanel {
         // Refresh available shipments
         availableShipmentsModel.clear();
         List<Shipment> available = agentService.getAvailableShipments();
-        available.forEach(availableShipmentsModel::addElement);
+        if(available != null) available.forEach(availableShipmentsModel::addElement);
 
         // Refresh agent's own shipments
         myShipmentsModel.clear();
-        List<Shipment> myJobs = agentService.getShipmentsByAgent(currentAgent.getId());
-        myJobs.forEach(myShipmentsModel::addElement);
+        // --- FIX: Calling the correct method name ---
+        List<Shipment> myJobs = agentService.getMyAcceptedShipments(currentAgent.getId());
+        if(myJobs != null) myJobs.forEach(myShipmentsModel::addElement);
 
         // Refresh warehouse dropdown
         warehouseComboBox.removeAllItems();
         List<Warehouse> warehouses = agentService.getAllWarehouses();
-        warehouses.forEach(warehouseComboBox::addItem);
+        if(warehouses != null) warehouses.forEach(warehouseComboBox::addItem);
     }
 }
 

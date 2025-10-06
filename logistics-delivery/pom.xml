@@ -1,35 +1,31 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w.org/2001/XMLSchema-instance"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <!-- 1. Project Identification -->
     <groupId>com.logistics</groupId>
     <artifactId>logistics-app</artifactId>
     <version>1.0-SNAPSHOT</version>
-    <packaging>jar</packaging>
 
-    <!-- 2. Project Properties -->
     <properties>
-        <maven.compiler.source>1.8</maven.compiler.source>
-        <maven.compiler.target>1.8</maven.compiler.target>
+        <maven.compiler.source>11</maven.compiler.source>
+        <maven.compiler.target>11</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
-    <!-- 3. Project Dependencies -->
     <dependencies>
+        <!-- REMOVED H2 Dependency -->
+        <!-- ADDED SQLite JDBC Driver Dependency -->
         <dependency>
-            <groupId>com.h2database</groupId>
-            <artifactId>h2</artifactId>
-            <version>2.2.224</version>
+            <groupId>org.xerial</groupId>
+            <artifactId>sqlite-jdbc</artifactId>
+            <version>3.43.0.0</version> <!-- Use a recent version -->
         </dependency>
     </dependencies>
 
-    <!-- 4. Build Configuration -->
     <build>
         <plugins>
-            <!-- The assembly plugin is used to package our application into a single, executable JAR file -->
-            <!-- that includes all its dependencies (like the H2 library). This makes it easy to distribute and run. -->
+            <!-- This plugin creates the single executable JAR with all dependencies -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-assembly-plugin</artifactId>
@@ -37,7 +33,6 @@
                 <configuration>
                     <archive>
                         <manifest>
-                            <!-- This specifies the main class that should run when the JAR is executed. -->
                             <mainClass>com.logistics.App</mainClass>
                         </manifest>
                     </archive>
@@ -48,7 +43,6 @@
                 <executions>
                     <execution>
                         <id>make-assembly</id>
-                        <!-- This binds the plugin to the 'package' phase of the Maven build lifecycle. -->
                         <phase>package</phase>
                         <goals>
                             <goal>single</goal>
@@ -56,14 +50,17 @@
                     </execution>
                 </executions>
             </plugin>
+            <!-- This plugin allows you to run the app with 'mvn exec:java' -->
             <plugin>
-                  <groupId>org.codehaus.mojo</groupId>
-                  <artifactId>exec-maven-plugin</artifactId>
-                  <version>3.1.0</version> <!-- You can use a recent version -->
-                  <configuration>
-                          <mainClass>com.logistics.App</mainClass>
-                  </configuration>
-         </plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>3.1.0</version>
+                <configuration>
+                    <mainClass>com.logistics.App</mainClass>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
 </project>
+
+
